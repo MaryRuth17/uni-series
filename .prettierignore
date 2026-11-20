@@ -1,0 +1,9 @@
+dist/
+node_modules/
+test-results/
+playwright-report/
+blob-report/
+package-lock.json
+public/assets/
+# Owner documents: keep their formatting as written.
+*.md
