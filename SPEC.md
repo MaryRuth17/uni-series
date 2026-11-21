@@ -3,6 +3,14 @@
 > **Status: DRAFT — not final.** Transcribed from the owner's PDF *"Uni Series — AI Build Spec (Minigame #1: PUP Lagoon)"*
 > (Nov 20, 2026, @zeke). Engine: Phaser 4 + TypeScript + Vite, as written (Godot was evaluated and set aside; see
 > [DECISIONS.md](DECISIONS.md) D-001). Choices the spec does not cover are in DECISIONS.md; how agents work in this repo is in [AGENTS.md](AGENTS.md).
+>
+> **Two newer owner docs override parts of this one (2026-11-22):**
+> - [SPEC-homepage.md](SPEC-homepage.md) replaces the Title and Hub screens (section 3) with the Landing screen and the
+>   Campus Map, build steps H1–H5.
+> - [SPEC-pup-lagoon.md](SPEC-pup-lagoon.md) replaces section 4 ("Merienda sa Lagoon") with **Lagoon Merienda** (a new game, not the old one despite the similar name), an
+>   endless cozy budgeting game, build steps L1–L7. These replace milestones M2–M5 (section 10).
+>
+> Everything else here still applies: stack, architecture, save, settings, testing, deployment, legal, M0, M1, M6, M7.
 
 ---
 
@@ -78,6 +86,11 @@ PUP Lagoon in Sta. Mesa, Manila.
 
 ## 3. Game structure
 
+> **Superseded in part:** the Title and Hub screens are now the Landing screen and Campus Map in
+> [SPEC-homepage.md](SPEC-homepage.md). The Days, stars and unlock rules under "Progression and rewards" do not apply to
+> Lagoon Merienda, which is endless ([SPEC-pup-lagoon.md](SPEC-pup-lagoon.md) section 0). Sticker, Sticker Book, Pause
+> and the visibility rule still apply.
+
 The player repeats one loop: Title → Hub (U-Belt map) → pick a campus → play a Day → results and rewards → back to the Hub.
 
 **Screens**
@@ -144,6 +157,9 @@ the Pasig River across the bottom, and PUP on the right, east of the creeks. Cre
 ---
 
 ## 4. Minigame #1 — PUP Lagoon: "Merienda sa Lagoon"
+
+> **Replaced (2026-11-22)** by [SPEC-pup-lagoon.md](SPEC-pup-lagoon.md), "Lagoon Merienda". This section is kept for
+> reference only. Do not build it.
 
 The player runs a small merienda stall beside the PUP Lagoon and serves street food to students between classes. Fry,
 add sauce, and serve orders before customers lose patience, and earn enough ₱ to reach the Day's goal.
@@ -732,6 +748,10 @@ Saving rules:
 ---
 
 ## 10. Build milestones
+
+> **Updated order (2026-11-22):** M0 (done) → M1 core shell together with H1 ([SPEC-homepage.md](SPEC-homepage.md)) →
+> L1–L5 ([SPEC-pup-lagoon.md](SPEC-pup-lagoon.md)) alongside H2–H3 → H4 + L6 (art and audio) → H5 + L7 + M6 → M7.
+> M2–M5 below are replaced by L1–L7. In M1, "Title" and "Hub" mean the Landing and Campus Map greybox from H1.
 
 Build in 8 milestones, each ending in something you can open in a browser. The AI stops after each one, reports what
 changed, and waits for your "next".

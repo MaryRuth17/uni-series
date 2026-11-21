@@ -4,17 +4,24 @@ Brief for every AI agent (Claude Code, Codex, others) working in this repo, usua
 
 ## Read first
 
-1. `SPEC.md`: what to build (a **draft** spec; Phaser 4 + TypeScript + Vite). Section 14 is the master prompt.
-2. `DECISIONS.md`: choices already made, open questions (`Q-…`) and proposed gameplay rules (`G-…`). Add every new decision there.
-3. The milestone you were given (SPEC §10). Do only that milestone or task.
+1. `SPEC.md`: the whole game (a **draft** spec; Phaser 4 + TypeScript + Vite): stack, architecture, save, settings, tests, deploy, legal.
+2. `SPEC-homepage.md`: Landing screen + Campus Map (build steps H1–H5). Wins over SPEC.md for those screens (it replaces Title and Hub).
+3. `SPEC-pup-lagoon.md`: the PUP minigame **Lagoon Merienda** (L1–L7). Wins over SPEC.md §4. **Its section 0 (owner
+   changes: endless, no days, no clock, stamps instead of stars) wins over the rest of that file.**
+4. `DECISIONS.md`: choices already made and open questions (`Q-…`). Add every new decision there.
+5. The milestone or task you were given (build order: the note at the top of SPEC §10). Do only that.
 
 ## Status
 
 | Milestone | State |
 |---|---|
-| M0 — Setup and first deploy | Built and verified locally (lint, unit tests, build, Chromium smoke test). Waiting on first push + Pages source = GitHub Actions |
-| M1 — Core shell | Next |
-| M2–M7 | Not started |
+| M0 — Setup and first deploy | Done (PR #1, live on GitHub Pages) |
+| M1 — Core shell + H1 — Homepage greybox flow | Next |
+| L1 — Lagoon data and logic (+ `npm run sim`) | Next; can run in parallel with M1 + H1 (only shared file: `package.json` for the `sim` script) |
+| H2–H3, L2–L5 | Not started |
+| H4 + L6 — Art and audio (made by Claude, DECISIONS R-006) | Not started |
+| H5 + L7 + M6 — Polish; M7 — Release | Not started |
+| M2–M5 | Replaced by L1–L7 |
 
 ## Commands
 
@@ -27,7 +34,7 @@ Brief for every AI agent (Claude Code, Codex, others) working in this repo, usua
 | Unit tests (Vitest) | `npm test` (watch: `npm run test:watch`) |
 | Smoke tests (Playwright, builds first) | `npm run test:e2e` (first time: `npx playwright install`; one browser: `-- --project=chromium`) |
 | Lint / format | `npm run lint` / `npm run format` |
-| Balance bot | `npm run sim` (added in M3) |
+| Balance bot | `npm run sim` (added in L1) |
 
 ## Phaser 4, not Phaser 3
 
@@ -42,7 +49,7 @@ Known traps: `roundPixels` defaults to false (we set `pixelArt: true`, which tur
 - TypeScript strict. No `any` unless an `// eslint-disable-next-line @typescript-eslint/no-explicit-any -- reason` comment explains why.
 - Game rules live in `src/minigames/<id>/logic/` as plain classes: no Phaser imports, no `Math.random`, no timers (ESLint enforces this). Time advances only via `update(dtMs)`; randomness only via `Random` (`src/core/Random.ts`) with a seed.
 - Every tuning number goes in that minigame's `config.ts`. Every player-facing string is an i18n key in `src/i18n/en.json` (and `fil.json`), read with `t('key')`.
-- Asset keys and sizes come from SPEC §4.11. Placeholders (coloured shapes + labels) until M4. Asset paths are relative: `assets/...`, never a leading slash.
+- Asset keys and sizes come from SPEC-homepage §8 and SPEC-pup-lagoon §11. Placeholders (coloured shapes + labels) until H4/L6. Asset paths are relative: `assets/...`, never a leading slash.
 - No `setTimeout`/`setInterval` in game code; use logic time or `scene.time`. Remove event listeners in each scene's `shutdown` handler.
 - No official university logos, seals, mascots, team marks or real people (SPEC §13).
 - No new dependencies without the owner's OK (SPEC §7 list only).
@@ -62,13 +69,16 @@ commit message like `M2: wok cooking states`. Then stop and report: what you bui
   `playwright`, `.github/workflows`). If your task needs one of them, say so in your plan; otherwise list the change you need in your report.
 - `src/i18n/*.json`: add keys only inside your area's prefix (`ui.`, `hub.`, `pupLagoon.`…), never reorder or reformat other keys.
 - Good parallel splits:
-  - **M1:** `SaveManager` + tests ∥ `Settings` + `GameEvents` + `i18n` ∥ `AudioManager` ∥ UI kit (`src/ui/`) ∥ Hub scene ∥ Boot/Preloader/Title. One integrator wires scenes into `src/game/config.ts` at the end.
-  - **M2:** land `pup-lagoon/config.ts` first. Then `DayClock`, `Wok`, `Tray`, `OrderGenerator`, `CustomerQueue` and `Scoring` (each with tests) in parallel. Then `LagoonSim` integrates them, then the greybox scene.
+  - **M1 + H1:** `SaveManager` + tests ∥ `Settings` + `GameEvents` + `i18n` ∥ `AudioManager` ∥ UI kit (`src/ui/`) ∥ `TimeOfDay` + `RoutePath` + `roster.ts` (+ tests) ∥ Landing / IdCard / CampusMap / ComingSoon greybox scenes ∥ Boot/Preloader. One integrator wires scenes into `src/game/config.ts` at the end.
+  - **L1:** land `pup-lagoon/config.ts` and `data/*` (menu, stalls, walletMixes, events, fallbacks) first. Then `Listahan`, `Solver`, `Wallet`, `CashBox`, `Pila`, `Rhythm` and `Scoring` (each with tests) in parallel. Then `ListahanGen` (needs `Solver`), then `LagoonVacant` integrates them, then `npm run sim`.
+  - **Art and audio (DECISIONS R-006)** can start any time on its own branch (`art/<set>`, e.g. `art/food`): it only adds files under `public/assets/` and `scripts/`, using the spec keys.
 
 ## Gotchas for this project
 
 - `localStorage` can throw (private mode, itch.io iframe): wrap every read/write in `try/catch`, fall back to in-memory defaults, show the "Hindi ma-save ang progress" toast.
-- Audio is locked until the first tap; the Title "Tap to start" unlocks it.
-- Pause when `document.visibilitychange` reports hidden; pausing = not calling `LagoonSim.update`.
+- Audio is locked until the first tap; the Landing "Pindutin para magsimula" (tap to start) unlocks it.
+- Pause when `document.visibilitychange` reports hidden; pausing = not calling the minigame logic's `update`. Lagoon has
+  no clock (SPEC-pup-lagoon OC-2), but the pila and walking still advance through `update(dtMs)`.
+- Reference photos live only in the owner's main checkout `docs/reference/` (gitignored; see its README). Never ship or trace them.
 - Clamp the frame delta for logic: `sim.update(Math.min(delta, 100))`.
 - Load Pixelify Sans with `document.fonts.load()` in the Preloader before any scene draws text.
