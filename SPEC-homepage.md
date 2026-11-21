@@ -1,7 +1,8 @@
 # Uni Series Homepage & Campus Map — Build Prompt
 
 > **Status: DRAFT — not final.** Transcribed from the owner's PDF *"Uni Series Homepage & Campus Map — Build Prompt"*
-> (Nov 20, 2026, @zeke). For the landing and map screens this doc wins over [SPEC.md](SPEC.md). It replaces SPEC.md's
+> (Nov 20, 2026, @zeke; revised copy received 2026-11-22, which adds the landing wireframe, the embedded map and the
+> two passages in §3.1 and §4.7). For the landing and map screens this doc wins over [SPEC.md](SPEC.md). It replaces SPEC.md's
 > Title and Hub screens. "Changed" notes mark what later owner decisions altered (see
 > [SPEC-pup-lagoon.md](SPEC-pup-lagoon.md) section 0 and [DECISIONS.md](DECISIONS.md)). The original text stays below each note.
 
@@ -103,6 +104,13 @@ One living street corner in the U-Belt at golden hour, seen from the side. The t
 in the open sky; the city moves gently below. Scene key: `LandingScene`.
 
 ### 3.1 Layout (640×360 base)
+
+All interactive UI sits in the open sky, so the busy street never hides a button. Layers and motion are in the table below.
+
+![Landing screen layout, 640×360, drawn to scale: the sky holds the title and play button; the street stays alive below](docs/figures/landing-layout.png)
+
+*(Builder note: the wireframe matches the §3.2 positions to within a pixel. It draws the street from 318 to 348, with the
+footer strip covering 348–360.)*
 
 | Layer (back to front) | y range | Contents | Motion |
 |---|---|---|---|
@@ -251,6 +259,9 @@ This view is the accessible, no-map way to pick a game. *(OC-12: "stars" becomes
 | Map credit | bottom centre, 8 px | "Map data © OpenStreetMap contributors" |
 
 ### 4.7 Reference map (from the game owner)
+
+Use it for the relative positions of campuses, the LRT-2 line, the main roads and the river. Redraw it in the warm
+illustrated style of section 2; do not copy its dark colours.
 
 Saved locally as `docs/reference/ubelt-map.webp` (gitignored; see `docs/reference/README.md`). It shows España (top),
 UST as a large diamond top-left, FEU and Recto on the left, NU in the middle, UE / San Beda · CEU along the dashed

@@ -241,6 +241,11 @@ A round is a loop of look → choose → pay at different stalls until the lista
 never lets the player spend more than they have. If the money is short or the vendor has no change, the player adjusts
 the order or pays closer to exact; nothing is ever lost. The bell can end the round at any point.
 
+![One round: shopping loop and end. Day card → Tingnan menu → Pumila → Pili ng items → Kaya bayaran? (no: kulang o walang panukli, ayusin → back to Pili) → oo: Bayad + sukli → Kumpleto na? (hindi pa: next stall → Tingnan menu) → oo: Tara, kain na! → Kain scene → Results. Kriiing! Bell any time → Kain scene](docs/figures/lagoon-shopping-loop.png)
+
+*(OC-1 to OC-3: "Day card" is the Vacant card. The "Kriiing! Bell" box is replaced by "Tara, kain na!" being available
+any time after the first purchase. Results show stamps, not stars.)*
+
 ### 4.1 Start of the round
 
 - The Day card shows: day and week ("Lunes · Week 1"), time slot (Umaga, Tanghali or Hapon), baon amount and the actual
@@ -321,7 +326,7 @@ faces, seals or official marks.
 - The day's baon arrives as a specific mix. For example ₱70 = one ₱50 bill + one ₱10 + two ₱5. The mix is part of the
   puzzle and is set by the day data (section 9).
 - The wallet panel sits bottom-left in the HUD: coins in small stacks, bills fanned. It always shows the total.
-  *(Builder note: §10.1 places the wallet panel in the right-hand HUD column at 512, 292; that position wins.)*
+  *(Builder note: §10.1 and its figure place the wallet panel in the right-hand HUD column at 512, 292; that position wins.)*
 - Pasabay money from friends is added to the same wallet.
 
 **Paying**
@@ -640,6 +645,11 @@ right-hand column (x 512–640) is reserved for the HUD: listahan, busog meter a
 
 Kiosks line the left, the stall row runs along the top, the plaza and Lagoon fill the middle, and the benches sit at
 the bottom. Exact positions are in the table below.
+
+![Lagoon map layout, 640×360, drawn to scale: every stall fits on one screen; the HUD keeps the right column](docs/figures/lagoon-map-layout.png)
+
+*(Builder note: every box in the figure matches this table to within a pixel. OC-2: the top bar reads
+"Vacant 7 · Tanghali" with no clock. The figure confirms the wallet sits in the right-hand HUD column.)*
 
 | Element | Position (centre or top-left) | Size | Notes |
 |---|---|---|---|
