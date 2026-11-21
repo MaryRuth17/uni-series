@@ -18,7 +18,7 @@ two screens:
 2. **Campus map menu ("Mapa ng U-Belt")**: an illustrated map of the U-Belt where each university is a stop. The player
    picks a campus and rides a jeepney there to start its minigame.
 
-This comes before the PUP minigame (Lafang sa Lagoon). Tapping the PUP stop must open that minigame's intro, or a
+This comes before the PUP minigame (Listahan sa Lagoon). Tapping the PUP stop must open that minigame's intro, or a
 placeholder scene if it is not built yet.
 
 **Read first**
@@ -138,8 +138,8 @@ footer strip covering 348–360.)*
 
 ### 3.3 First launch
 
-> **Deferred by the owner (DECISIONS.md Q-003):** lace colours here are free, but the Lafang Ipon Shop sells them, and
-> the Lafang player has a backpack colour this list lacks. H1 builds the ID maker as written below.
+> **Deferred by the owner (DECISIONS.md Q-003):** lace colours here are free, but the Lagoon Ipon Shop sells them, and
+> the Lagoon player has a backpack colour this list lacks. H1 builds the ID maker as written below.
 
 1. **Tap to start:** the scene is dimmed with "Pindutin para magsimula" (`landing.tapToStart`). The first tap unlocks
    audio, then the scene brightens and the logo drops in with a bounce.
@@ -201,11 +201,11 @@ Positions are centres on the 640×360 map (adjust by eye against the reference).
 | 4 | UE | Recto | 245, 218 | Recto Book Hunt | Soon |
 | 5 | San Beda | Mendiola | 300, 236 | Shootaround sa Mendiola | Soon |
 | 6 | CEU | Mendiola | 380, 232 | Compounding Lab | Soon |
-| 7 | PUP | Sta. Mesa | 555, 248 | Lafang sa Lagoon | Playable |
+| 7 | PUP | Sta. Mesa | 555, 248 | Listahan sa Lagoon | Playable |
 
 **Stop marker** (one per campus)
 
-> **Changed (OC-12):** Lafang sa Lagoon is endless with no stars. The playable pin shows that minigame's own progress
+> **Changed (OC-12):** Listahan sa Lagoon is endless with no stars. The playable pin shows that minigame's own progress
 > summary (for PUP, the ipon total, for example "₱240") instead of "★ 12/60".
 
 - A round pin (24×24) with the campus short name on a small signboard below it.
@@ -222,7 +222,7 @@ Tapping a stop zooms the camera 10% toward it (300 ms) and slides a campus card 
 | Part | Content |
 |---|---|
 | Left | 96×96 illustration of the campus scene (for PUP: the Lagoon with stalls) |
-| Title area | Campus name ("PUP Sta. Mesa"), minigame title ("Lafang sa Lagoon"), tagline ("Busog na, may ipon pa!") |
+| Title area | Campus name ("PUP Sta. Mesa"), minigame title ("Listahan sa Lagoon"), tagline ("Busog na, may ipon pa!") |
 | Progress | Stars, days cleared, sticker status (playable only) |
 | Buttons | Sakay na! (ride there and play) and Isara (close). For Soon stops: "Malapit na!" with a one-line teaser and a disabled "Abangan!" button |
 
@@ -299,7 +299,7 @@ export const ROSTER: RosterEntry[] = [
     tagline: 'Sukat, halo, ayos!',
     teaser: 'Measure and mix orders in the pharmacy lab.' },
   { id: 'pup-lagoon', campus: 'PUP', area: 'Sta. Mesa', stop: 7, x: 555, y: 248,
-    title: 'Lafang sa Lagoon', status: 'playable',
+    title: 'Listahan sa Lagoon', status: 'playable',
     tagline: 'Busog na, may ipon pa!',
     teaser: 'Stretch your baon across the Lagoon stalls.',
     introScene: 'LagoonIntroScene' },
@@ -482,7 +482,7 @@ before continuing.
 
 **Acceptance criteria**
 
-- A first-time player sees tap-to-start, makes a School ID, reaches the map and starts Lafang sa Lagoon in under 30
+- A first-time player sees tap-to-start, makes a School ID, reaches the map and starts Listahan sa Lagoon in under 30
   seconds without help.
 - A returning player skips the ID step and sees "Welcome back, {name}!".
 - All 7 stops appear at their positions; only PUP is playable; Soon stops show their teaser card.

@@ -1,7 +1,7 @@
-# Lafang sa Lagoon — PUP Lagoon Minigame Spec
+# Listahan sa Lagoon — PUP Lagoon Minigame Spec
 
-> **Status: DRAFT — not final.** Transcribed from the owner's PDF *"Lafang sa Lagoon — PUP Lagoon Minigame Spec"*
-> (Nov 20, 2026, @zeke). It replaces section 4 ("Merienda sa Lagoon") of [SPEC.md](SPEC.md).
+> **Status: DRAFT — not final.** Transcribed from the owner's PDF *"Listahan sa Lagoon — PUP Lagoon Minigame Spec"*
+> (Nov 20, 2026, @zeke; first titled "Lafang sa Lagoon", renamed copy received 2026-11-22 with no other changes). It replaces section 4 ("Merienda sa Lagoon") of [SPEC.md](SPEC.md).
 > **Section 0 lists the owner's changes since the PDF. Section 0 wins over every other section of this file.**
 > Sections it changes carry a "Changed" note at the top. The original text stays below each note for reference.
 > Builder decisions are in [DECISIONS.md](DECISIONS.md).
@@ -10,7 +10,7 @@
 
 ## 0. Owner changes (2026-11-22) — these win
 
-The owner decided: **no days, no day unlocking. Lafang sa Lagoon is an endless cozy game.** The builder worked out the
+The owner decided: **no days, no day unlocking. Listahan sa Lagoon is an endless cozy game.** The builder worked out the
 rules below from that decision and the rest of this spec. The owner can change any of them; record changes in DECISIONS.md.
 
 **OC-1 — Endless vacants, no calendar.** No month, weeks, weekdays, day unlocking, campaign end or replaying days.
@@ -107,6 +107,9 @@ lagoon: {
 "★ 12/60". The campus card shows vacants played, ipon and the sticker. The return toast says "+₱25 sa alkansya!"
 instead of "+3 ★ sa PUP!". The map shows whatever progress summary each minigame provides.
 
+**OC-13 — Name: Listahan sa Lagoon (owner, 2026-11-22).** Formerly "Lafang sa Lagoon". The renamed PDF changed only its
+cover, so this file uses the new name throughout. The tagline and the minigame id `pup-lagoon` stay the same.
+
 **Deferred by the owner:** the ID lace conflict (free lace colours in the ID maker vs. ₱40 laces in the Ipon Shop,
 and the backpack colour). See DECISIONS.md Q-003.
 
@@ -114,7 +117,7 @@ and the backpack colour). See DECISIONS.md Q-003.
 
 ## 1. How to use this document
 
-This spec defines the PUP Lagoon minigame, **Lafang sa Lagoon**. It replaces section 4 ("Merienda sa Lagoon") of the
+This spec defines the PUP Lagoon minigame, **Listahan sa Lagoon**. It replaces section 4 ("Merienda sa Lagoon") of the
 main Uni Series spec. Everything else in the main spec still applies: the tech stack, architecture, save system,
 settings, deployment and legal notes.
 
@@ -170,7 +173,7 @@ over budget. Then sit under the trees and eat with your barkada.
 
 | Item | Decision |
 |---|---|
-| Title | Lafang sa Lagoon ("lafang" is Filipino slang for food or eating). Tagline: "Busog na, may ipon pa!" |
+| Title | Listahan sa Lagoon (the listahan is your list of cravings). Tagline: "Busog na, may ipon pa!" *(OC-13: renamed from "Lafang sa Lagoon"; "lafang" is Filipino slang for food or eating)* |
 | Minigame id | `pup-lagoon` |
 | Genre | Cozy budgeting and shopping puzzle |
 | Round | One vacant period: about 3 real minutes (10 game minutes) |
@@ -1052,7 +1055,7 @@ shell (M0 and M1 from SPEC.md) is not built yet, the AI builds that first.
 You are a senior game developer building a cozy browser game with me.
 
 Read SPEC.md (the whole Uni Series game) and SPEC-pup-lagoon.md (the PUP
-Lagoon minigame, "Lafang sa Lagoon") completely before writing code.
+Lagoon minigame, "Listahan sa Lagoon") completely before writing code.
 For the PUP Lagoon minigame, SPEC-pup-lagoon.md wins over SPEC.md.
 
 How we work:

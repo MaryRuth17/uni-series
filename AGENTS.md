@@ -6,7 +6,7 @@ Brief for every AI agent (Claude Code, Codex, others) working in this repo, usua
 
 1. `SPEC.md`: the whole game (a **draft** spec; Phaser 4 + TypeScript + Vite): stack, architecture, save, settings, tests, deploy, legal.
 2. `SPEC-homepage.md`: Landing screen + Campus Map (build steps H1–H5). Wins over SPEC.md for those screens (it replaces Title and Hub).
-3. `SPEC-pup-lagoon.md`: the PUP minigame **Lafang sa Lagoon** (L1–L7). Wins over SPEC.md §4. **Its section 0 (owner
+3. `SPEC-pup-lagoon.md`: the PUP minigame **Listahan sa Lagoon** (L1–L7). Wins over SPEC.md §4. **Its section 0 (owner
    changes: endless, no days, no clock, stamps instead of stars) wins over the rest of that file.**
 4. `DECISIONS.md`: choices already made and open questions (`Q-…`). Add every new decision there.
 5. The milestone or task you were given (build order: the note at the top of SPEC §10). Do only that.
@@ -17,7 +17,7 @@ Brief for every AI agent (Claude Code, Codex, others) working in this repo, usua
 |---|---|
 | M0 — Setup and first deploy | Done (PR #1, live on GitHub Pages) |
 | M1 — Core shell + H1 — Homepage greybox flow | Next |
-| L1 — Lafang data and logic (+ `npm run sim`) | Next; can run in parallel with M1 + H1 (only shared file: `package.json` for the `sim` script) |
+| L1 — Lagoon data and logic (+ `npm run sim`) | Next; can run in parallel with M1 + H1 (only shared file: `package.json` for the `sim` script) |
 | H2–H3, L2–L5 | Not started |
 | H4 + L6 — Art and audio (made by Claude, DECISIONS R-006) | Not started |
 | H5 + L7 + M6 — Polish; M7 — Release | Not started |
@@ -77,7 +77,7 @@ commit message like `M2: wok cooking states`. Then stop and report: what you bui
 
 - `localStorage` can throw (private mode, itch.io iframe): wrap every read/write in `try/catch`, fall back to in-memory defaults, show the "Hindi ma-save ang progress" toast.
 - Audio is locked until the first tap; the Landing "Pindutin para magsimula" (tap to start) unlocks it.
-- Pause when `document.visibilitychange` reports hidden; pausing = not calling the minigame logic's `update`. Lafang has
+- Pause when `document.visibilitychange` reports hidden; pausing = not calling the minigame logic's `update`. Lagoon has
   no clock (SPEC-pup-lagoon OC-2), but the pila and walking still advance through `update(dtMs)`.
 - Reference photos live only in the owner's main checkout `docs/reference/` (gitignored; see its README). Never ship or trace them.
 - Clamp the frame delta for logic: `sim.update(Math.min(delta, 100))`.

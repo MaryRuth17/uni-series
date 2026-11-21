@@ -9,9 +9,9 @@ Specs: [SPEC.md](SPEC.md) (§), [SPEC-homepage.md](SPEC-homepage.md) (H§), [SPE
   of the owner's PDFs. *Current default:* the repo copies are the master; changes made to the original documents should
   be copied here.
 - **Q-003 — ID lace colours (deferred by the owner, 2026-11-22).** The homepage ID maker offers 6 free lace colours
-  (H§3.3), the Lafang Ipon Shop sells 6 at ₱40 each (L§5), and the Lafang player also has a backpack colour (L§8).
+  (H§3.3), the Lagoon Ipon Shop sells 6 at ₱40 each (L§5), and the Lagoon player also has a backpack colour (L§8).
   *Current default until decided:* H1 builds the ID maker as written; the Ipon Shop lace item waits. Decide before L5.
-- **Q-004 — Are all minigames endless?** The owner made Lafang sa Lagoon endless. *Current default:* every future
+- **Q-004 — Are all minigames endless?** The owner made Listahan sa Lagoon endless. *Current default:* every future
   minigame is endless too, and SPEC.md §3's Days/stars/unlock rules apply to none of them. The map shows each
   minigame's own progress summary (H-006).
 - **Q-005 — Reference photos in the public repo.** *Current default:* the images in `docs/reference/` stay local only
@@ -26,9 +26,9 @@ Specs: [SPEC.md](SPEC.md) (§), [SPEC-homepage.md](SPEC-homepage.md) (H§), [SPE
 - **R-002 — Public repo + GitHub Pages (2026-11-20).** The owner made `uni-series` public; Pages source is GitHub
   Actions. Live at https://maryruth17.github.io/uni-series/ since the M0 merge.
 - **R-003 — New owner specs (2026-11-20, confirmed 2026-11-22).** SPEC-homepage.md replaces the Title and Hub screens;
-  SPEC-pup-lagoon.md ("Lafang sa Lagoon") replaces §4 "Merienda sa Lagoon" and milestones M2–M5. The cooking-game
+  SPEC-pup-lagoon.md ("Listahan sa Lagoon") replaces §4 "Merienda sa Lagoon" and milestones M2–M5. The cooking-game
   rules (Q-001, G-001 to G-013) are archived below.
-- **R-004 — Lafang sa Lagoon is endless (owner, 2026-11-22).** "No day unlocking, it must be an endless type of cozy
+- **R-004 — Listahan sa Lagoon is endless (owner, 2026-11-22).** "No day unlocking, it must be an endless type of cozy
   game. No days." The builder's rules for this are **L§0 OC-1 to OC-12**: endless vacants, no clock, stamps instead of
   stars, tiers by vacant count, per-vacant baon and events, and ipon as a balance plus a lifetime total. They also settle
   three review questions: event frequency is about 40% of vacants from tier 2 (OC-5); alkansya breaks count lifetime
@@ -49,6 +49,10 @@ Specs: [SPEC.md](SPEC.md) (§), [SPEC-homepage.md](SPEC-homepage.md) (H§), [SPE
     The owner reviews at H4/L6. Credits say the art and music were made with Claude.
   - The `art` and `audio` npm scripts need a `package.json` change (shared file), so they're proposed in the PR that
     adds the first assets.
+
+- **R-007 — The minigame is called "Listahan sa Lagoon" (owner, 2026-11-22).** Formerly "Lafang sa Lagoon". The owner
+  renamed the PDF; inside, it still used the old name, and the owner confirmed the rename applies to the game. The id
+  `pup-lagoon`, the tagline and the i18n prefix `pupLagoon.` stay the same. *(L§0 OC-13)*
 
 ## Setup and tooling (M0)
 
@@ -81,12 +85,12 @@ Specs: [SPEC.md](SPEC.md) (§), [SPEC-homepage.md](SPEC-homepage.md) (H§), [SPE
 - **D-013 — Playwright runs Chromium, Firefox and WebKit against `vite preview`.** Only Chromium is installed locally so
   far (`npx playwright install` adds the others). E2E joins CI in M7, as §10 says. *(§11)*
 
-## Shell, homepage and Lafang (M1, H1–H5, L1–L7)
+## Shell, homepage and Lagoon (M1, H1–H5, L1–L7)
 
 - **D-014 — Placeholder textures in Phaser 4.** `TextureManager.generate` was removed in v4. Placeholders are drawn with
   Graphics/Rectangle + Text objects, or rendered into a texture under the final asset key, so art swaps in by key. *(§6)*
 - **D-015 — Asset keys come from H§8 and L§11.** Extra keys the specs don't list: `icon_peso`, `sticker_<campus>`, and
-  for Lafang's stamps `ui_stamp_kumpleto`, `ui_stamp_busog` and `ui_stamp_sulit` (OC-3). Shared UI kit: `panel`,
+  for the Lagoon stamps `ui_stamp_kumpleto`, `ui_stamp_busog` and `ui_stamp_sulit` (OC-3). Shared UI kit: `panel`,
   `button`, `daycard_bg` (L§11). *(H§8, L§11)*
 - **D-016 — Save stays at version 1, with every section from the start.** No player has a save yet, so instead of the
   v1→v2 migration H§7 asks for, version 1 includes `settings`, `profile`, `home`, `stickers` and `minigames['pup-lagoon']`
