@@ -19,3 +19,9 @@ coverage/
 Thumbs.db
 .vscode/
 *.swp
+
+# Owner's reference images: local only (the repo is public; rights unclear). See docs/reference/README.md.
+docs/reference/*.png
+docs/reference/*.jpg
+docs/reference/*.jpeg
+docs/reference/*.webp
