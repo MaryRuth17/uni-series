@@ -6,7 +6,7 @@ Brief for every AI agent (Claude Code, Codex, others) working in this repo, usua
 
 1. `SPEC.md`: the whole game (a **draft** spec; Phaser 4 + TypeScript + Vite): stack, architecture, save, settings, tests, deploy, legal.
 2. `SPEC-homepage.md`: Landing screen + Campus Map (build steps H1–H5). Wins over SPEC.md for those screens (it replaces Title and Hub).
-3. `SPEC-pup-lagoon.md`: the PUP minigame **Listahan sa Lagoon** (L1–L7). Wins over SPEC.md §4. **Its section 0 (owner
+3. `SPEC-pup-lagoon.md`: the PUP minigame **Lagoon Merienda** (L1–L7). Wins over SPEC.md §4. **Its section 0 (owner
    changes: endless, no days, no clock, stamps instead of stars) wins over the rest of that file.**
 4. `DECISIONS.md`: choices already made and open questions (`Q-…`). Add every new decision there.
 5. The milestone or task you were given (build order: the note at the top of SPEC §10). Do only that.

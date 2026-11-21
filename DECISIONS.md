@@ -11,7 +11,7 @@ Specs: [SPEC.md](SPEC.md) (§), [SPEC-homepage.md](SPEC-homepage.md) (H§), [SPE
 - **Q-003 — ID lace colours (deferred by the owner, 2026-11-22).** The homepage ID maker offers 6 free lace colours
   (H§3.3), the Lagoon Ipon Shop sells 6 at ₱40 each (L§5), and the Lagoon player also has a backpack colour (L§8).
   *Current default until decided:* H1 builds the ID maker as written; the Ipon Shop lace item waits. Decide before L5.
-- **Q-004 — Are all minigames endless?** The owner made Listahan sa Lagoon endless. *Current default:* every future
+- **Q-004 — Are all minigames endless?** The owner made Lagoon Merienda endless. *Current default:* every future
   minigame is endless too, and SPEC.md §3's Days/stars/unlock rules apply to none of them. The map shows each
   minigame's own progress summary (H-006).
 - **Q-005 — Reference photos in the public repo.** *Current default:* the images in `docs/reference/` stay local only
@@ -26,9 +26,9 @@ Specs: [SPEC.md](SPEC.md) (§), [SPEC-homepage.md](SPEC-homepage.md) (H§), [SPE
 - **R-002 — Public repo + GitHub Pages (2026-11-20).** The owner made `uni-series` public; Pages source is GitHub
   Actions. Live at https://maryruth17.github.io/uni-series/ since the M0 merge.
 - **R-003 — New owner specs (2026-11-20, confirmed 2026-11-22).** SPEC-homepage.md replaces the Title and Hub screens;
-  SPEC-pup-lagoon.md ("Listahan sa Lagoon") replaces §4 "Merienda sa Lagoon" and milestones M2–M5. The cooking-game
+  SPEC-pup-lagoon.md ("Lagoon Merienda") replaces §4 "Merienda sa Lagoon" and milestones M2–M5. The cooking-game
   rules (Q-001, G-001 to G-013) are archived below.
-- **R-004 — Listahan sa Lagoon is endless (owner, 2026-11-22).** "No day unlocking, it must be an endless type of cozy
+- **R-004 — Lagoon Merienda is endless (owner, 2026-11-22).** "No day unlocking, it must be an endless type of cozy
   game. No days." The builder's rules for this are **L§0 OC-1 to OC-12**: endless vacants, no clock, stamps instead of
   stars, tiers by vacant count, per-vacant baon and events, and ipon as a balance plus a lifetime total. They also settle
   three review questions: event frequency is about 40% of vacants from tier 2 (OC-5); alkansya breaks count lifetime
@@ -50,9 +50,9 @@ Specs: [SPEC.md](SPEC.md) (§), [SPEC-homepage.md](SPEC-homepage.md) (H§), [SPE
   - The `art` and `audio` npm scripts need a `package.json` change (shared file), so they're proposed in the PR that
     adds the first assets.
 
-- **R-007 — The minigame is called "Listahan sa Lagoon" (owner, 2026-11-22).** Formerly "Lafang sa Lagoon". The owner
-  renamed the PDF; inside, it still used the old name, and the owner confirmed the rename applies to the game. The id
-  `pup-lagoon`, the tagline and the i18n prefix `pupLagoon.` stay the same. *(L§0 OC-13)*
+- **R-007 — The minigame is called "Lagoon Merienda" (owner, 2026-11-22).** Formerly "Lafang sa Lagoon". The owner
+  first renamed the PDF to "Listahan sa Lagoon", then chose "Lagoon Merienda". The id `pup-lagoon`, the tagline and the i18n
+  prefix `pupLagoon.` stay the same. It is a different game from the archived cooking game "Merienda sa Lagoon". *(L§0 OC-13)*
 
 ## Setup and tooling (M0)
 

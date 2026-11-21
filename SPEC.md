@@ -7,7 +7,7 @@
 > **Two newer owner docs override parts of this one (2026-11-22):**
 > - [SPEC-homepage.md](SPEC-homepage.md) replaces the Title and Hub screens (section 3) with the Landing screen and the
 >   Campus Map, build steps H1–H5.
-> - [SPEC-pup-lagoon.md](SPEC-pup-lagoon.md) replaces section 4 ("Merienda sa Lagoon") with **Listahan sa Lagoon**, an
+> - [SPEC-pup-lagoon.md](SPEC-pup-lagoon.md) replaces section 4 ("Merienda sa Lagoon") with **Lagoon Merienda** (a new game, not the old one despite the similar name), an
 >   endless cozy budgeting game, build steps L1–L7. These replace milestones M2–M5 (section 10).
 >
 > Everything else here still applies: stack, architecture, save, settings, testing, deployment, legal, M0, M1, M6, M7.
@@ -88,7 +88,7 @@ PUP Lagoon in Sta. Mesa, Manila.
 
 > **Superseded in part:** the Title and Hub screens are now the Landing screen and Campus Map in
 > [SPEC-homepage.md](SPEC-homepage.md). The Days, stars and unlock rules under "Progression and rewards" do not apply to
-> Listahan sa Lagoon, which is endless ([SPEC-pup-lagoon.md](SPEC-pup-lagoon.md) section 0). Sticker, Sticker Book, Pause
+> Lagoon Merienda, which is endless ([SPEC-pup-lagoon.md](SPEC-pup-lagoon.md) section 0). Sticker, Sticker Book, Pause
 > and the visibility rule still apply.
 
 The player repeats one loop: Title → Hub (U-Belt map) → pick a campus → play a Day → results and rewards → back to the Hub.
@@ -158,7 +158,7 @@ the Pasig River across the bottom, and PUP on the right, east of the creeks. Cre
 
 ## 4. Minigame #1 — PUP Lagoon: "Merienda sa Lagoon"
 
-> **Replaced (2026-11-22)** by [SPEC-pup-lagoon.md](SPEC-pup-lagoon.md), "Listahan sa Lagoon". This section is kept for
+> **Replaced (2026-11-22)** by [SPEC-pup-lagoon.md](SPEC-pup-lagoon.md), "Lagoon Merienda". This section is kept for
 > reference only. Do not build it.
 
 The player runs a small merienda stall beside the PUP Lagoon and serves street food to students between classes. Fry,
