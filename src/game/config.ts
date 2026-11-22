@@ -1,4 +1,6 @@
 import Phaser from 'phaser';
+import { LagoonIntroScene } from '../minigames/pup-lagoon/scenes/LagoonIntroScene';
+import { LagoonMapScene } from '../minigames/pup-lagoon/scenes/LagoonMapScene';
 import { AlbumScene } from '../scenes/AlbumScene';
 import { BootScene } from '../scenes/BootScene';
 import { CampusMapScene } from '../scenes/CampusMapScene';
@@ -6,6 +8,7 @@ import { ComingSoonScene } from '../scenes/ComingSoonScene';
 import { CreditsScene } from '../scenes/CreditsScene';
 import { IdCardScene } from '../scenes/IdCardScene';
 import { LandingScene } from '../scenes/LandingScene';
+import { PauseScene } from '../scenes/PauseScene';
 import { PreloaderScene } from '../scenes/PreloaderScene';
 import { SettingsScene } from '../scenes/SettingsScene';
 import { StickerBookScene } from '../scenes/StickerBookScene';
@@ -33,6 +36,9 @@ export const gameConfig: Phaser.Types.Core.GameConfig = {
     StickerBookScene,
     AlbumScene,
     CreditsScene,
+    LagoonIntroScene,
+    LagoonMapScene,
+    PauseScene,
     ToastScene,
   ],
 };

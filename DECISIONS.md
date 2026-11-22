@@ -195,3 +195,26 @@ Specs: [SPEC.md](SPEC.md) (§), [SPEC-homepage.md](SPEC-homepage.md) (H§), [SPE
   has no ♥. *(§3.5)*
 - **D-033 — Testing note.** Playwright's `page.clock.setFixedTime` also freezes Phaser's tweens (the logo stays
   off-screen). To preview a time of day, shift only `new Date()` with an init script, as the H2 screenshots did.
+
+### L2 — Lagoon greybox map and movement (builder, 2026-11-22)
+
+- **L-012 — Walking graph.** 18 nodes (`data/waypoints.ts`): one per stall window or kiosk, four around the plaza,
+  two by the Lagoon (north and east), three at the benches, one at the water station; 28 paths. A unit test checks that
+  no path crosses the water or the plaza planter. `Walker` (pure) follows the shortest path at 80 px/s, or 56 px/s in
+  the rain without the Payong. A new tap mid-walk finishes the current step, then reroutes. *(§10.1, §4.2)*
+- **L-013 — Pila on the map.** Students line up away from the counter (down from the windows, right of the kiosks and
+  the cart), 10 px apart, redrawn on every `pilaChanged`. Walking away (a tap elsewhere, Esc, or "Alis sa pila")
+  leaves the line; the grill still holds the player at the counter. *(§4.2)*
+- **L-014 — Vacant card in L2.** `LagoonIntroScene` (the roster's intro scene) already shows the real next vacant:
+  number, slot, special, event, rule, baon pieces, pasabay money, busog target, listahan, and stalls that just opened.
+  It is greybox; L4 finishes it. The save seed is created from the clock the first time the player enters the Lagoon
+  and stored at once. *(OC-1, OC-11)*
+- **L-015 — Unfinished vacants are not saved.** Leaving through Pause → "Balik sa mapa" drops the vacant; the next
+  visit offers the same vacant again (it is seeded by vacant number). Saving progress arrives with Results in L4. *(OC-1)*
+- **L-016 — Pause overlay** (shared, `src/scenes/PauseScene.ts`): Tuloy, Settings, Balik sa mapa. SPEC §3's
+  "Restart Day" is dropped because Lagoon Merienda has no days. *(§3, OC-1)*
+- **L-017 — Menu board** lists every orderable item with its price (promos applied), craving tags (the karinderya's
+  free iced tea tags included), busog and sold-out state, plus the live pila count. Locked stalls show
+  "Malapit nang magbukas!"; the water station explains it needs the Tumbler. *(§10.2)*
+- **L-018 — Counter placeholder.** At the front of the line the player sees "Ikaw na!" and can leave; buying, paying and
+  sukli arrive in L3. *(§14 L2/L3)*

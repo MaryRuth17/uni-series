@@ -194,3 +194,42 @@ export const IPON_SHOP: readonly IponShopItem[] = [
 
 /** Walking (used by the map view from L2). */
 export const WALK_SPEED = 80;
+
+/** Map layout at 640×360 (SPEC-pup-lagoon §10.1). The HUD keeps the right column (x 512–640). */
+export const VIEW = {
+  topBar: { h: 24 },
+  mapRight: 512,
+  stallRow: { x: 96, y: 28, w: 400, h: 68 },
+  windows: { palamig: 140, merienda: 220, lugawan: 300, ihaw: 400 } as Readonly<
+    Partial<Record<StallKey, number>>
+  >,
+  window: { w: 64, h: 48, cy: 62 },
+  kiosks: { karinderya: 110, silog: 176, halohalo: 242 } as Readonly<
+    Partial<Record<StallKey, number>>
+  >,
+  kiosk: { x: 8, w: 80, h: 50 },
+  plaza: { x: 250, y: 190, r: 56 },
+  lagoon: { x: 410, y: 225, w: 124, h: 80 },
+  tusokCart: { x: 455, y: 160, w: 36, h: 28 },
+  tambayan: { x: 110, y: 296, w: 360, h: 56 },
+  benches: [170, 290, 410],
+  water: { x: 485, y: 300, w: 20, h: 28 },
+  listahan: { x: 512, y: 30, w: 120, h: 172 },
+  busog: { x: 512, y: 208, w: 120, h: 16 },
+  wallet: { x: 512, y: 292, w: 120, h: 60 },
+  board: { x: 256, y: 186, w: 300, h: 236 },
+  /** NPC students stand this far apart in a pila. */
+  queueGap: 10,
+};
+
+/** Stall order for keys 1–8 (§10.3, §7 order). */
+export const STALL_KEYS_ORDER: readonly StallKey[] = [
+  'karinderya',
+  'tusok',
+  'palamig',
+  'ihaw',
+  'merienda',
+  'lugawan',
+  'halohalo',
+  'silog',
+];
