@@ -8,11 +8,9 @@ screen shows the same list (SPEC §13).
 | Asset | Author | Source | License |
 |---|---|---|---|
 | Phaser 4 (game engine) | Richard Davey, Phaser Studio Inc. | https://phaser.io | MIT (notice below) |
-
-To add when used:
-
-- Pixelify Sans (M1): author, Google Fonts / GitHub source URL, SIL Open Font License 1.1 (ship `OFL.txt` in `public/assets/fonts/`).
-- Hub map traced from OpenStreetMap (M4): "Map data © OpenStreetMap contributors".
+| Pixelify Sans (UI font) | The Pixelify Sans Project Authors | https://github.com/eifetx/Pixelify-Sans (file from https://github.com/google/fonts/tree/main/ofl/pixelifysans) | SIL Open Font License 1.1 (`public/assets/fonts/OFL.txt`) |
+| Campus map layout | Based on OpenStreetMap data | https://www.openstreetmap.org/copyright | "Map data © OpenStreetMap contributors" (ODbL), shown on the map and in Credits |
+| Art and music | Made with Claude (AI) for this project | this repo | Same as the game (DECISIONS R-006) |
 
 ## Phaser license
 

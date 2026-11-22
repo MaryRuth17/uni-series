@@ -141,6 +141,37 @@ Specs: [SPEC.md](SPEC.md) (§), [SPEC-homepage.md](SPEC-homepage.md) (H§), [SPE
 - **L-011 — Item names are i18n keys** (`pupLagoon.food.<key>`, `pupLagoon.stall.<key>`) but `en.json` entries are
   added with the screens in L2/L3, since M1 creates the i18n files. *(§12)*
 
+### M1 + H1 — Core shell and homepage greybox (builder, 2026-11-22)
+
+- **D-017 — Core services:** `GameEvents` (typed bus), `SaveManager`, `Settings`, `i18n` and `AudioManager`, created once
+  in `main.ts` and read through `services()`. Everything except `AudioManager` is plain TypeScript with unit tests. *(§8)*
+- **D-018 — Save version 1 shape:** `settings`, `profile` (null until the School ID is made), `home` (`lastStop`,
+  `mapView`, `theme`), `stickers`, and `minigames` (each minigame owns its own object; Lagoon stores
+  `LagoonProgress`). SPEC §9's old `wallet`, `unlockedDay`, `stars` and `upgrades` are gone with the cooking game.
+  Missing fields load from defaults. "Reset progress" keeps the settings. *(§9, D-016)*
+- **D-019 — i18n keys are flat strings** (`"map.ride": "Sakay na!"`), grouped by prefix. `fil.json` holds only
+  translated keys and falls back to English per key until M6. *(§9)*
+- **D-020 — Overlays pause the scene underneath** (so it ignores taps and keys) and resume it on close; they restart it
+  instead when its text changed (language, theme, reduced motion, reset, profile). A `ToastScene` stays on top for
+  messages, including the "Hindi ma-save" warning. *(SPEC-homepage §7)*
+- **D-021 — Pixelify Sans is self-hosted** (`public/assets/fonts/PixelifySans.ttf`, OFL) and loaded with the FontFace
+  API in the Preloader. It lacks ₱ and ★: ₱ falls back to the monospace font and reads like "P" at 8 px, so the art pass
+  must add a pixel ₱ (H-005 confirmed). No stars are used anywhere (OC-3). *(§6)*
+- **D-022 — Rotate overlay** is HTML/CSS in `index.html` (portrait + touch only), with text from i18n, and
+  `game.pause()` while it shows. *(§9)*
+- **D-023 — Route nodes** in `roster.ts` add road bends between stops so the jeepney follows streets, not straight
+  lines; `pointAt` snaps to a vertex within 1e-9 px, so rides end exactly on the stop. Positions get tuned by eye in H3.
+  *(SPEC-homepage §4.4)*
+- **D-024 — H1 scope.** Built: every scene from SPEC-homepage §7 as greybox, the full flow, list view, HUD, keyboard
+  (arrows, Enter, Esc, Tab), Skip, Reduced Motion (no ride, no bob, no bounce), Settings, Sticker Book, Album and Credits
+  overlays. Left for H3: the camera zoom toward a stop (it needs a separate HUD camera), map ambient life, and the
+  hover-grow of pins. Left for L2: the Pause overlay, since no gameplay scene exists yet. HUD positions follow the spec
+  except the ID chip, moved from x 160 to x 180 so it does not overlap the toggle (H-001). *(§10 M1, SPEC-homepage §9)*
+- **D-025 — Greybox icons are letters** (S = Sticker Book, * = Settings, i = Credits, A = Album) until the icon art
+  (`icon_*`) arrives in H4. *(SPEC-homepage §8)*
+- **D-026 — Test hook:** `window.__uniGame` exposes the Phaser game read-only, so the Playwright smoke test can check
+  which scene is running while it clicks through the flow. *(§11)*
+
 ## Archived: Merienda sa Lagoon (replaced 2026-11-22, R-003)
 
 Kept for history; none of these apply any more.
