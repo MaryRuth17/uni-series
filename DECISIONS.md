@@ -27,7 +27,7 @@ Specs: [SPEC.md](SPEC.md) (§), [SPEC-homepage.md](SPEC-homepage.md) (H§), [SPE
   Actions. Live at https://maryruth17.github.io/uni-series/ since the M0 merge.
 - **R-003 — New owner specs (2026-11-20, confirmed 2026-11-22).** SPEC-homepage.md replaces the Title and Hub screens;
   SPEC-pup-lagoon.md ("Lagoon Merienda") replaces §4 "Merienda sa Lagoon" and milestones M2–M5. The cooking-game
-  rules (Q-001, G-001 to G-013) are archived below.
+  rules (Q-001, G-001 to G-013) no longer apply and were removed in the cleanup (still in git history).
 - **R-004 — Lagoon Merienda is endless (owner, 2026-11-22).** "No day unlocking, it must be an endless type of cozy
   game. No days." The builder's rules for this are **L§0 OC-1 to OC-12**: endless vacants, no clock, stamps instead of
   stars, tiers by vacant count, per-vacant baon and events, and ipon as a balance plus a lifetime total. They also settle
@@ -52,7 +52,7 @@ Specs: [SPEC.md](SPEC.md) (§), [SPEC-homepage.md](SPEC-homepage.md) (H§), [SPE
 
 - **R-007 — The minigame is called "Lagoon Merienda" (owner, 2026-11-22).** Formerly "Lafang sa Lagoon". The owner
   first renamed the PDF to "Listahan sa Lagoon", then chose "Lagoon Merienda". The id `pup-lagoon`, the tagline and the i18n
-  prefix `pupLagoon.` stay the same. It is a different game from the archived cooking game "Merienda sa Lagoon". *(L§0 OC-13)*
+  prefix `pupLagoon.` stay the same. It is a different game from the replaced cooking game "Merienda sa Lagoon". *(L§0 OC-13)*
 
 ## Setup and tooling (M0)
 
@@ -171,14 +171,3 @@ Specs: [SPEC.md](SPEC.md) (§), [SPEC-homepage.md](SPEC-homepage.md) (H§), [SPE
   (`icon_*`) arrives in H4. *(SPEC-homepage §8)*
 - **D-026 — Test hook:** `window.__uniGame` exposes the Phaser game read-only, so the Playwright smoke test can check
   which scene is running while it clicks through the flow. *(§11)*
-
-## Archived: Merienda sa Lagoon (replaced 2026-11-22, R-003)
-
-Kept for history; none of these apply any more.
-
-- **Q-001 — Stall radio music tracks** (§4.9 vs §4.11).
-- **G-001 to G-012 —** cooking-game rule gaps: guard vs Ambon, Chill Mode perfect orders, perfect-order definition,
-  wrong-serve penalty, FEWA wok slots, Day 1 queue spots, dispenser with full tray, off-screen customers, customer type
-  mix, Ambon spawn rate, duplicate order lines, tip rounding.
-- **G-013 — Hub asset keys** (`hub_map`, `hub_jeepney`, …): replaced by the keys in H§8 (D-015).
-- **G-014 —** became D-014.

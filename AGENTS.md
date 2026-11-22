@@ -66,7 +66,7 @@ commit message like `M2: wok cooking states`. Then stop and report: what you bui
 - One task per worktree and branch, named `m<milestone>/<task>` (e.g. `m2/wok`). Run `npm ci` in a new worktree. Merge to `main` through a PR with green CI. Keep `main` playable.
 - **One owner at a time** for these shared files, because parallel edits conflict:
   `package.json` / `package-lock.json`, `src/main.ts`, `src/game/config.ts` (scene list), `src/core/*` services,
-  `src/minigames/index.ts` (registry), `index.html`, and the tool configs (`vite`, `vitest`, `tsconfig`, `eslint`,
+  `src/minigames/roster.ts` (registry), `index.html`, and the tool configs (`vite`, `vitest`, `tsconfig`, `eslint`,
   `playwright`, `.github/workflows`). If your task needs one of them, say so in your plan; otherwise list the change you need in your report.
 - `src/i18n/*.json`: add keys only inside your area's prefix (`ui.`, `hub.`, `pupLagoon.`…), never reorder or reformat other keys.
 - Good parallel splits:
