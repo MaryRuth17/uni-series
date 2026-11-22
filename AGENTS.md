@@ -17,7 +17,7 @@ Brief for every AI agent (Claude Code, Codex, others) working in this repo, usua
 |---|---|
 | M0 — Setup and first deploy | Done (PR #1, live on GitHub Pages) |
 | M1 — Core shell + H1 — Homepage greybox flow | Next |
-| L1 — Lagoon data and logic (+ `npm run sim`) | Next; can run in parallel with M1 + H1 (only shared file: `package.json` for the `sim` script) |
+| L1 — Lagoon data and logic (+ `npm run sim`) | Done: 84 unit tests; `npm run sim` plays 40,000 vacants with 0 failures |
 | H2–H3, L2–L5 | Not started |
 | H4 + L6 — Art and audio (made by Claude, DECISIONS R-006) | Not started |
 | H5 + L7 + M6 — Polish; M7 — Release | Not started |
