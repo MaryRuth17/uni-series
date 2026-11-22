@@ -109,6 +109,38 @@ Specs: [SPEC.md](SPEC.md) (§), [SPEC-homepage.md](SPEC-homepage.md) (H§), [SPE
 - **H-006 — Each minigame supplies its own progress summary** for the map pin, campus card, list view and return toast
   (for PUP: ipon total, vacants played, sticker, "+₱25 sa alkansya!"). The map never reads stars. *(H§4, L§0 OC-12)*
 
+### L1 — Lagoon logic (builder, 2026-11-22)
+
+- **L-001 — `npm run sim` runs through Vite's `runnerImport`.** `scripts/sim.mjs` loads `scripts/sim.ts` with the
+  game's own TypeScript and import style, so no new dependency (no tsx or ts-node). *(L§14)*
+- **L-002 — Rhythm numbers.** Slot = `['umaga','tanghali','hapon'][n % 3]`, so vacant 1 is tanghali. Normal baon ₱60 /
+  ₱70 / ₱80 weighted 1 : 2 : 1. A special or event that would repeat the previous vacant's is dropped, not re-rolled.
+  Paydays alternate Kinsenas, Katapusan. Measured over 40,000 vacants: events on 29% of tier-2 vacants (no hot days
+  yet) and 37–40% from tier 3. *(OC-4, OC-5)*
+- **L-003 — Friend lines are optional.** Kumpleto! needs only the player's lines. A finished pasabay gives +1 heart; a
+  skipped one returns the friend's money (it never becomes ipon). A finished Pang-barkada gives +2 hearts to each of
+  Migs, Bea and Jomar. Sulit Master! needs every line, friend lines included. *(OC-3, §8)*
+- **L-004 — Suki 2 "Libre na 'yan, suki!" adds a free extra piece** of the cheapest item ≤ ₱15 in the order instead of
+  a discount. A discount changes which coins the player holds, which could block a later payment the generator proved
+  possible (the sim found 3 such cases in 800 vacants). *(§9.4)*
+- **L-005 — "Ano ang pinakasulit?" shows `planComplete`** (the cheapest way to tick every line, the Sulit baseline).
+  `planBusog` (also reaching the busog target) is available for a second line on Results. *(OC-3)*
+- **L-006 — Solver details.** Up to 16 units supported (the generator caps lists at 8). The Tumbler refill is a
+  once-per-vacant bit in the state. Candidates that tick exactly the same lines are pruned to the cheapest per busog
+  value, which made it 6× faster with identical answers. *(§13)*
+- **L-007 — Payability check.** Plans are grouped into stall visits (≤ 5 items) and every visit order is tried, paying
+  each with Smart pay. Wallet mixes: one tier-weighted preset first, then the others, then a small-change mix.
+  Fallback lists skip the "not too easy" and busog checks. The sim needed 0 fallbacks in 40,000 vacants. *(§13, OC-8)*
+- **L-008 — Lagoon save fields beyond OC-11:** `recentFoods` (the last 5 vacants' foods, for the album's favourite
+  food) and `rewards` (alkansya and friend-gift rewards). *(OC-7, OC-11)*
+- **L-009 — Pila model.** Average length by usual pila (short 0.6, medium 1.4, long 2.4) × 1.7 at busy slots and on
+  hot days for halo-halo and palamig, × 0.5 at quiet slots, × 2 for the long-line event. Arrival rate keeps that
+  average with 3 s per person (M/M/1). Capped at 4 (8 with the event). *(§4.2, §9.1)*
+- **L-010 — Purchases tick at payment.** Grilled items then hold the player at the counter for 5 s. Pa-extra po needs a
+  purchase in that visit. Busog comes only from the player's own items and suki extras. *(§4.3)*
+- **L-011 — Item names are i18n keys** (`pupLagoon.food.<key>`, `pupLagoon.stall.<key>`) but `en.json` entries are
+  added with the screens in L2/L3, since M1 creates the i18n files. *(§12)*
+
 ## Archived: Merienda sa Lagoon (replaced 2026-11-22, R-003)
 
 Kept for history; none of these apply any more.

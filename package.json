@@ -16,7 +16,8 @@
     "test:e2e": "playwright test",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "sim": "node scripts/sim.mjs"
   },
   "dependencies": {
     "phaser": "^4.2.1"
