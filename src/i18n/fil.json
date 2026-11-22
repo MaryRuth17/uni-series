@@ -1,0 +1,13 @@
+{
+  "ui.close": "Isara",
+  "landing.disclaimer": "Hindi opisyal na fan project. Walang kaugnayan sa anumang unibersidad.",
+  "landing.welcomeBack": "Uy, {name}! Balik ka!",
+  "map.progress": "Vacant: {vacants} · Ipon: ₱{ipon}",
+  "settings.title": "Mga Setting",
+  "settings.music": "Musika",
+  "settings.language": "Wika",
+  "settings.reducedMotion": "Bawas galaw",
+  "settings.theme": "Tema",
+  "settings.reset": "Burahin ang progress",
+  "credits.prices": "Laro-presyo lang ang mga presyo, hindi galing sa totoong tindero o tindera."
+}

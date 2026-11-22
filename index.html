@@ -33,10 +33,42 @@
       #game canvas {
         image-rendering: pixelated;
       }
+      /* Portrait phones: ask to rotate (text set by main.ts through i18n). */
+      #rotate {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 10;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        background: #2b2233;
+        color: #fff4dc;
+        font:
+          16px 'Pixelify Sans',
+          monospace;
+      }
+      #rotate .phone {
+        width: 40px;
+        height: 64px;
+        border: 3px solid #fff4dc;
+        border-radius: 6px;
+        transform: rotate(90deg);
+      }
+      @media (orientation: portrait) and (pointer: coarse) {
+        #rotate {
+          display: flex;
+        }
+      }
     </style>
   </head>
   <body>
     <div id="game"></div>
+    <div id="rotate" aria-live="polite">
+      <div class="phone"></div>
+      <p></p>
+    </div>
     <script type="module" src="./src/main.ts"></script>
   </body>
 </html>

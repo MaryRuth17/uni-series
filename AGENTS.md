@@ -16,9 +16,10 @@ Brief for every AI agent (Claude Code, Codex, others) working in this repo, usua
 | Milestone | State |
 |---|---|
 | M0 — Setup and first deploy | Done (PR #1, live on GitHub Pages) |
-| M1 — Core shell + H1 — Homepage greybox flow | Next |
+| M1 — Core shell + H1 — Homepage greybox flow | Done: Landing → School ID → map → jeepney ride → placeholder; 27 new unit tests (111 total) + Chromium smoke test |
 | L1 — Lagoon data and logic (+ `npm run sim`) | Done: 84 unit tests; `npm run sim` plays 40,000 vacants with 0 failures |
-| H2–H3, L2–L5 | Not started |
+| H2 (living landing) ∥ L2 (Lagoon greybox map and movement) | Next |
+| H3, L3–L5 | Not started |
 | H4 + L6 — Art and audio (made by Claude, DECISIONS R-006) | Not started |
 | H5 + L7 + M6 — Polish; M7 — Release | Not started |
 | M2–M5 | Replaced by L1–L7 |
