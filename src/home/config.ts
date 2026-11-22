@@ -149,3 +149,49 @@ export const JEEP_COLORS = [
   PALETTE.jeepBlue,
   PALETTE.jeepGreen,
 ];
+
+/** Map objects at this depth and above are UI (HUD, list, card): drawn by the fixed UI camera. */
+export const MAP_UI_DEPTH = 30;
+
+/** Roads on the campus map: label key, line (x1, y1) → (x2, y2), label position clear of the pins (§4.1). */
+export const MAP_ROADS: readonly (readonly [
+  string,
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+])[] = [
+  ['espana', 80, 20, 360, 130, 312, 100],
+  ['recto', 20, 205, 300, 205, 196, 214],
+  ['legarda', 300, 205, 420, 190, 398, 180],
+  ['mendiola', 330, 250, 340, 200, 348, 268],
+  ['morayta', 110, 120, 120, 230, 120, 246],
+  ['magsaysay', 420, 190, 620, 230, 498, 222],
+];
+
+/** The LRT-2 line on the map: y at x (a gentle slope left to right), stations Recto, Legarda, Pureza. */
+export const MAP_LRT = { y0: 196, slope: 0.02, stations: { recto: 70, legarda: 330, pureza: 470 } };
+
+/** Map ambient life (§4.1): train every 20–30 s, small jeepneys on the roads, cloud shadows, birds. */
+export const MAP_AMBIENT = {
+  trainEveryMs: [20000, 30000] as const,
+  trainMs: 5000,
+  /** Roads the small jeepneys drive back and forth on (indexes into MAP_ROADS). */
+  jeepRoads: [0, 1, 5] as const,
+  jeepSpeed: 25,
+  cloudSpeed: 5,
+  birdEveryMs: [8000, 14000] as const,
+  birdMs: 8000,
+  /** The map unfolds from this scale when arriving from the landing (§6 transitions). */
+  unfoldFrom: 0.92,
+};
+
+/** Warm tint over the map matching the landing's time of day (§4.1): colour and alpha. */
+export const MAP_TINT: Readonly<Record<Phase, readonly [number, number]>> = {
+  umaga: [0xbfe0ff, 0.08],
+  tanghali: [0xffffff, 0],
+  hapon: [0xff9a5a, 0.12],
+  gabi: [0x1d2348, 0.35],
+};
