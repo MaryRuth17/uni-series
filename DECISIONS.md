@@ -171,3 +171,27 @@ Specs: [SPEC.md](SPEC.md) (§), [SPEC-homepage.md](SPEC-homepage.md) (H§), [SPE
   (`icon_*`) arrives in H4. *(SPEC-homepage §8)*
 - **D-026 — Test hook:** `window.__uniGame` exposes the Phaser game read-only, so the Playwright smoke test can check
   which scene is running while it clicks through the flow. *(§11)*
+
+### H2 — Living landing (builder, 2026-11-22)
+
+- **D-027 — Street split.** `StreetSpawner` (when walkers, jeepneys and the train appear; caps 6 / 2 / 1) and
+  `Surprises` (5 s cooldowns) are pure and unit-tested. `StreetView` is the Phaser layer: it draws the greybox street,
+  pools the movers and plays the reactions. Every number is in `home/config.ts` (`STREET`, `DEPTH`, `ROUTES`).
+  *(SPEC-homepage §7)*
+- **D-028 — Time of day.** Umaga: pale sky, taho cart, some students with coffee. Tanghali: about 60% of students carry
+  umbrellas. Hapon: signs and windows switch on one by one, every 1.5 s. Gabi: stars, moon, every light on, a lit train,
+  half as many students (cap 3, half as often), and the cat sleeps under the streetlight instead of on the jeepney roof.
+  December adds parols in the gaps between the shop signs. *(§3.4, §2)*
+- **D-029 — Reduced Motion on the landing** turns off cloud and city drift, banderitas sway, walker bob, barker wave,
+  steam puffs (a still wisp instead) and the jeepney shake. Walkers and traffic still move, since they are the street
+  itself, not idle drift. *(§6)*
+- **D-030 — Hidden tab.** Phaser pauses the game loop on `visibilitychange`, so nothing spawns and audio mutes; no
+  extra code needed. *(§6)*
+- **D-031 — Layout tweaks.** The streetlight stands at x 504 (between two shops) so its pole never crosses a sign; the
+  congratulations tarp is 96×30, not 96×32, so the fishball cart never hides its text; the route board is 92×12 to fit
+  "STA. MESA – QUIAPO" at 8 px; the jeepney stop sign reads "SAKAYAN". Text is never scaled below 8 px. *(§3.1, §6)*
+- **D-032 — Surprises** follow §3.5. The jeepney's horn also shows "Beep-beep!" while the barker shouts one of the two
+  spec lines. The train reacts only while it is on screen. The cat's heart is drawn as a shape, because Pixelify Sans
+  has no ♥. *(§3.5)*
+- **D-033 — Testing note.** Playwright's `page.clock.setFixedTime` also freezes Phaser's tweens (the logo stays
+  off-screen). To preview a time of day, shift only `new Date()` with an init script, as the H2 screenshots did.

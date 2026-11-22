@@ -1,17 +1,19 @@
 /**
- * LandingScene ("Tara, laro!", SPEC-homepage §3) — H1 greybox
- * Shows: the U-Belt street corner as labelled layers (sky by time of day, far city, LRT-2 track,
- * shop row, sidewalk, street with a parked jeepney), the UNI SERIES logo, subtitle, TARA, LARO!,
- * Sticker Book / Settings / Credits icons, the Student ID chip and the disclaimer footer.
- * First tap of the session dims-then-brightens ("Pindutin para magsimula") and unlocks audio.
- * Listens to: pointer and keyboard (Enter = TARA, LARO!).
+ * LandingScene ("Tara, laro!", SPEC-homepage §3) — H2 living landing (greybox shapes until H4 art)
+ * Shows: the living U-Belt street (StreetView: sky and lights by time of day, drifting clouds, the LRT-2
+ * train, walkers, passing jeepneys, carts, barker, tappable surprises), and on top of it the UNI SERIES
+ * logo, subtitle, TARA, LARO!, Sticker Book / Settings / Credits icons, the Student ID chip and the
+ * disclaimer footer. The first tap of the session dims-then-brightens ("Pindutin para magsimula"),
+ * unlocks audio and drops the logo in. TARA, LARO! drives the parked jeepney away, then fades to the map.
+ * Listens to: pointer, keyboard (Enter = TARA, LARO!), the frame update (moves the street).
  */
 import Phaser from 'phaser';
 import { gameEvents } from '../core/GameEvents';
 import { t } from '../core/i18n';
 import { services } from '../core/services';
-import { FADE_MS, LANDING, PALETTE, SKY } from '../home/config';
-import { phaseAt } from '../home/TimeOfDay';
+import { DEPTH, FADE_MS, LANDING, PALETTE } from '../home/config';
+import { StreetView } from '../home/StreetView';
+import { isDecember, phaseAt } from '../home/TimeOfDay';
 import { Button } from '../ui/Button';
 import { openOverlay } from '../ui/overlay';
 import { COLORS, SCENES, TEXT, textStyle } from '../ui/theme';
@@ -22,7 +24,7 @@ const REGISTRY_WELCOMED = 'landing.welcomed';
 
 export class LandingScene extends Phaser.Scene {
   private logo!: Phaser.GameObjects.Container;
-  private jeep!: Phaser.GameObjects.Container;
+  private street!: StreetView;
   private leaving = false;
 
   constructor() {
@@ -33,7 +35,9 @@ export class LandingScene extends Phaser.Scene {
     this.leaving = false;
     const save = services().save.data;
     const reduced = save.settings.reducedMotion;
-    this.drawStreet(phaseAt(new Date(), save.home.theme));
+    const now = new Date();
+    this.street = new StreetView(this, phaseAt(now, save.home.theme), reduced, isDecember(now));
+    this.street.build();
     this.drawUi(reduced);
 
     this.input.keyboard?.on('keydown-ENTER', () => this.play());
@@ -44,46 +48,8 @@ export class LandingScene extends Phaser.Scene {
     else this.welcome();
   }
 
-  private drawStreet(phase: keyof typeof SKY): void {
-    const L = LANDING;
-    const [top, bottom] = SKY[phase];
-    const sky = this.add.graphics();
-    sky.fillGradientStyle(top, top, bottom, bottom, 1);
-    sky.fillRect(0, L.sky.y, 640, L.sky.h);
-    this.add.rectangle(320, L.city.y + L.city.h / 2, 640, L.city.h, PALETTE.city, 0.8);
-    this.layerLabel(8, L.city.y + 4, t('landing.layer.city'));
-    this.add.rectangle(320, L.track.y + L.track.h / 2, 640, L.track.h, 0x9a9aa6);
-    this.layerLabel(8, L.track.y + 4, t('landing.layer.lrt'));
-    for (const x of [60, 220, 420, 580]) this.add.rectangle(x, 252, 8, 132, 0x8a8a96);
-
-    const shops = ['dorm', 'print', 'carinderia', 'sarisari', 'milktea'];
-    shops.forEach((key, i) => {
-      const x = 12 + i * 124;
-      this.add
-        .rectangle(x + 58, L.shops.y + L.shops.h / 2 + 4, 116, L.shops.h - 8, PALETTE.walls[i])
-        .setStrokeStyle(1, COLORS.ink);
-      this.add
-        .text(
-          x + 58,
-          L.shops.y + 50,
-          t(`landing.shop.${key}`),
-          textStyle(8, TEXT.ink, { align: 'center', wordWrap: { width: 100 } }),
-        )
-        .setOrigin(0.5);
-    });
-
-    this.add.rectangle(320, L.sidewalk.y + L.sidewalk.h / 2, 640, L.sidewalk.h, 0xb9b0a3);
-    this.layerLabel(8, L.sidewalk.y + 4, t('landing.layer.sidewalk'));
-    this.add.rectangle(320, L.street.y + L.street.h / 2, 640, L.street.h + 12, 0x4a4453);
-    this.layerLabel(8, L.street.y + 4, t('landing.layer.street'), TEXT.cream);
-
-    const body = this.add.rectangle(0, 0, 72, 28, PALETTE.jeepRed).setStrokeStyle(1, COLORS.ink);
-    const label = this.add.text(0, 0, t('landing.jeep'), textStyle(8, TEXT.cream)).setOrigin(0.5);
-    this.jeep = this.add.container(190, L.street.y + 14, [body, label]);
-  }
-
-  private layerLabel(x: number, y: number, text: string, color: string = TEXT.ink): void {
-    this.add.text(x, y, text, textStyle(8, color)).setAlpha(0.7);
+  override update(_time: number, delta: number): void {
+    this.street.update(Math.min(delta, 100));
   }
 
   private drawUi(reduced: boolean): void {
@@ -99,7 +65,7 @@ export class LandingScene extends Phaser.Scene {
         textStyle(32, TEXT.red, { stroke: '#2B2233', strokeThickness: 4 }),
       )
       .setOrigin(0.5);
-    this.logo = this.add.container(L.logo.x, L.logo.y, [logoBox, logoText]);
+    this.logo = this.add.container(L.logo.x, L.logo.y, [logoBox, logoText]).setDepth(DEPTH.ui);
     if (!reduced) {
       this.tweens.add({
         targets: this.logo,
@@ -117,7 +83,8 @@ export class LandingScene extends Phaser.Scene {
         t('landing.subtitle'),
         textStyle(8, TEXT.cream, { stroke: '#2B2233', strokeThickness: 2 }),
       )
-      .setOrigin(0.5);
+      .setOrigin(0.5)
+      .setDepth(DEPTH.ui);
 
     new Button(this, L.play.x, L.play.y, t('landing.play'), () => this.play(), {
       width: L.play.w,
@@ -125,7 +92,7 @@ export class LandingScene extends Phaser.Scene {
       fill: PALETTE.jeepYellow,
       textColor: TEXT.red,
       fontSize: 16,
-    });
+    }).setDepth(DEPTH.ui);
 
     const icons: [string, string, () => void][] = [
       ['landing.icon.stickers', 'S', () => openOverlay(this, SCENES.stickerBook)],
@@ -137,7 +104,7 @@ export class LandingScene extends Phaser.Scene {
         width: L.icons.size,
         height: L.icons.size,
         fontSize: 16,
-      });
+      }).setDepth(DEPTH.ui);
     });
 
     const profile = services().save.data.profile;
@@ -155,25 +122,35 @@ export class LandingScene extends Phaser.Scene {
       );
       chip.add(avatarPreview(this, -46, 0, profile, 0.4));
       chip.label.setText(profile.name).setX(10);
+      chip.setDepth(DEPTH.ui);
     }
 
-    this.add.rectangle(320, L.footer.y + L.footer.h / 2, 640, L.footer.h, COLORS.ink, 0.75);
-    this.add.text(
-      4,
-      L.footer.y + 2,
-      t('ui.version', { version: __APP_VERSION__ }),
-      textStyle(8, TEXT.cream),
-    );
+    this.add
+      .rectangle(320, L.footer.y + L.footer.h / 2, 640, L.footer.h, COLORS.ink, 0.75)
+      .setDepth(DEPTH.ui);
+    this.add
+      .text(
+        4,
+        L.footer.y + 2,
+        t('ui.version', { version: __APP_VERSION__ }),
+        textStyle(8, TEXT.cream),
+      )
+      .setDepth(DEPTH.ui);
     this.add
       .text(320, L.footer.y + 2, t('landing.disclaimer'), textStyle(8, TEXT.cream))
-      .setOrigin(0.5, 0);
+      .setOrigin(0.5, 0)
+      .setDepth(DEPTH.ui);
   }
 
   private showTapToStart(reduced: boolean): void {
-    const dim = this.add.rectangle(320, 180, 640, 360, COLORS.dim, 0.7).setInteractive();
+    const dim = this.add
+      .rectangle(320, 180, 640, 360, COLORS.dim, 0.7)
+      .setInteractive()
+      .setDepth(DEPTH.ui + 10);
     const label = this.add
       .text(320, 230, t('landing.tapToStart'), textStyle(16, TEXT.cream))
-      .setOrigin(0.5);
+      .setOrigin(0.5)
+      .setDepth(DEPTH.ui + 10);
     this.logo.setVisible(false);
     dim.once('pointerup', () => {
       this.registry.set(REGISTRY_STARTED, true);
@@ -214,7 +191,7 @@ export class LandingScene extends Phaser.Scene {
     if (reduced) go();
     else
       this.tweens.add({
-        targets: this.jeep,
+        targets: this.street.parkedJeep,
         x: 720,
         duration: 800,
         ease: 'Sine.easeIn',

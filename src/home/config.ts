@@ -75,3 +75,77 @@ export const RIDE = {
 };
 
 export const FADE_MS = 400;
+
+/** Draw order per landing layer (SPEC-homepage §7). */
+export const DEPTH = {
+  sky: 0,
+  city: 10,
+  track: 20,
+  shops: 30,
+  sidewalk: 40,
+  street: 50,
+  ui: 100,
+};
+
+/** The living street (SPEC-homepage §3.1, §3.5). Speeds in px/s, times in ms. */
+export const STREET = {
+  walker: {
+    everyMs: [2000, 4000] as const,
+    firstMs: 600,
+    cap: 6,
+    nightFactor: 2,
+    speed: [18, 28] as const,
+    variants: 6,
+    y: 304,
+  },
+  jeep: {
+    everyMs: [6000, 10000] as const,
+    firstMs: [1500, 4000] as const,
+    cap: 2,
+    speed: [80, 110] as const,
+    variants: 4,
+    y: 336,
+  },
+  train: {
+    everyMs: [20000, 30000] as const,
+    firstMs: [3000, 6000] as const,
+    cap: 1,
+    /** The 220 px train's centre travels 640 + 220 px in 2.5 s (§3.1). */
+    speed: Math.round((640 + 220) / 2.5),
+    y: 158,
+    width: 220,
+  },
+  cloudSpeed: 4,
+  cityDriftPx: 2,
+  cityDriftMs: 4000,
+  signOnEveryMs: 1500,
+  routeCycleMs: 2500,
+  surpriseCooldownMs: 5000,
+  bubbleMs: 1600,
+  /** Parked jeepney at the stop, the carts and the corner, by x. */
+  parkedJeepX: 200,
+  fishballX: 56,
+  stopSignX: 128,
+  barkerX: 146,
+  cartX: 566,
+  tricycleX: 612,
+  /** In the gap between the sari-sari store and the milk tea stall, so the pole never crosses a sign. */
+  streetlightX: 504,
+};
+
+/** Route signboards on the parked jeepney (real place names only, §10). */
+export const ROUTES = [
+  'RECTO – STA. MESA',
+  'ESPAÑA – QUIAPO',
+  'STA. MESA – QUIAPO',
+  'LEGARDA – RECTO',
+];
+
+/** Greybox colours for the six student walkers (walker_1..6) and the four jeepneys (jeep_1..4). */
+export const WALKER_COLORS = [0xfff4dc, 0xffffff, 0x3b6fb6, 0x8b5a3c, 0x6b2f3a, 0x3a9a6a];
+export const JEEP_COLORS = [
+  PALETTE.jeepRed,
+  PALETTE.jeepYellow,
+  PALETTE.jeepBlue,
+  PALETTE.jeepGreen,
+];
