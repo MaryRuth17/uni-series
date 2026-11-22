@@ -50,6 +50,17 @@ test('first launch: tap to start, School ID, map, ride to PUP, placeholder, back
 
   await tap(page, 320, 250); // "Pindutin para magsimula"
   await page.waitForTimeout(700);
+  // H2 surprises: parked jeepney, barker, cart, print shop, cat. They must never block or error.
+  for (const [x, y] of [
+    [200, 330],
+    [146, 306],
+    [566, 300],
+    [194, 250],
+    [232, 297],
+  ]) {
+    await tap(page, x, y);
+  }
+  await page.waitForTimeout(300);
   await tap(page, 320, 146); // TARA, LARO!
   await waitForScene(page, 'IdCard');
   await page.waitForTimeout(400);
