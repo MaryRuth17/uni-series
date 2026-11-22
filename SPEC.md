@@ -17,7 +17,7 @@
 ## 1. How to use this document
 
 This spec is the single source of truth for building **Uni Series** (working title) and its first minigame,
-**PUP Lagoon: Merienda sa Lagoon**. Give it to an AI coding assistant as `SPEC.md` in the project root, then paste the
+**PUP — Lagoon Merienda** (specified in SPEC-pup-lagoon.md). Give it to an AI coding assistant as `SPEC.md` in the project root, then paste the
 master prompt from section 14.
 
 **Steps for you (the human)**
@@ -150,230 +150,17 @@ pauses automatically when the browser tab is hidden (`document.visibilitychange`
 
 **Reference map** (provided by the game owner; it uses OpenStreetMap data, so keep the credit line if you trace it — see section 13)
 
-The image is in the original PDF; save a copy as `docs/reference/ubelt-map.png`. It shows España (top), UST as a large
+The image is in the original PDF; a copy is saved locally as `docs/reference/ubelt-map.webp`. It shows España (top), UST as a large
 diamond top-left, FEU and Recto on the left, NU in the middle, UE / San Beda · CEU along the dashed purple LRT-2 line,
 the Pasig River across the bottom, and PUP on the right, east of the creeks. Credit: "Map data © OpenStreetMap contributors".
 
 ---
 
-## 4. Minigame #1 — PUP Lagoon: "Merienda sa Lagoon"
+## 4. Minigame #1 — PUP Lagoon
 
-> **Replaced (2026-11-22)** by [SPEC-pup-lagoon.md](SPEC-pup-lagoon.md), "Lagoon Merienda". This section is kept for
-> reference only. Do not build it.
-
-The player runs a small merienda stall beside the PUP Lagoon and serves street food to students between classes. Fry,
-add sauce, and serve orders before customers lose patience, and earn enough ₱ to reach the Day's goal.
-Minigame id: `pup-lagoon`.
-
-### 4.1 Setting and mood
-
-- **Real place.** The Lagoon sits at the heart of PUP's Mabini Campus in Sta. Mesa, Manila (PUP campuses). It is a landscaped rainwater-catchment pond with walkways, greenery and renovated stalls (campus facilities).
-- **Real food.** Stalls around it sell cheap favourites such as fish balls, burgers and the famous FEWA (Footlong Egg Wrapped Around) (PUP facilities guide). The game uses these and similar Filipino street food.
-- **Mood.** Late-afternoon tambay. Warm sunlight, trees reflected in green water, string lights that switch on near the end of the Day, students strolling past with bags and folders.
-- **Gentle humour.** The lagoon's green water is a known campus joke. Keep it affectionate (for example a sign: "Bawal mag-swimming"). No gross-out jokes.
-- **Background details** (decoration only): walkway, benches, trees, neighbouring stall roofs, a distant obelisk-like silhouette (generic shape, not a copy of any official mark), birds, water ripples, a cat napping on a bench.
-
-### 4.2 Core loop (one order)
-
-1. A customer walks up to one of 3 queue spots. A speech bubble shows the order as icons: item(s) + sauce.
-2. The player taps an ingredient bin. One serving drops into a free wok slot and starts frying.
-3. A ring around the slot fills: Raw (grey) → Cooked (green) → Burnt (black).
-4. The player taps a cooked serving. It moves to the plating tray as a cup.
-5. With a tray cup selected, the player taps a sauce jar. The sauce is applied.
-6. The player serves: drag the cup onto the customer, or tap the cup and then the customer.
-7. **Correct:** the customer pays, "+₱" floats up, and they leave happy once every line of their order is served. **Wrong item or sauce:** the customer says "Hala, mali!", the cup is wasted, and their patience drops 20%. Nothing else is lost.
-
-Rules that keep it simple:
-
-- One tap on a bin = one serving. The wok has 6 slots (3×2 grid). If all are full, the bin wiggles and nothing happens.
-- The tray holds up to 3 cups. If it is full, cooked food waits in the wok (and can still burn).
-- Burnt food must be tapped (or dragged) to the trash to free the slot. It costs nothing but time.
-- An order has 1–3 lines; each line is one item + one sauce (or "no sauce", shown as a crossed-out drop). Delivering a correct cup ticks its line.
-- Gulaman (a drink) skips the wok: tap the dispenser and a cup appears on the tray. It never takes sauce.
-
-### 4.3 Menu
-
-| Item | Key | Unlocks | Cook time (s) | Burns after cooked (s) | Price (₱) | Notes |
-|---|---|---|---|---|---|---|
-| Fishball | `fishball` | Day 1 | 3 | 4 | 15 | The basic order |
-| Kikiam | `kikiam` | Day 1 | 4 | 4 | 15 | |
-| Kwek-kwek | `kwekkwek` | Day 2 | 5 | 3.5 | 20 | Orange-battered quail eggs |
-| Sago't gulaman | `gulaman` | Day 2 | — | — | 20 | Drink; instant; no sauce |
-| Squidball | `squidball` | Day 3 | 4 | 3.5 | 20 | |
-| FEWA | `fewa` | Day 4 | 7 | 3 | 35 | Takes 2 side-by-side wok slots |
-
-Sauces: Sweet (`sweet`, brown), Spicy (`spicy`, red with chilli), Suka (`suka`, vinegar with onions). "No sauce" orders start on Day 3.
-
-### 4.4 Customers
-
-All characters are original, with generic clothes. No real people, no real school uniforms or insignia.
-
-| Type | Key | From | Patience (s) | Order lines | Tip rate | Look |
-|---|---|---|---|---|---|---|
-| Freshie | `freshie` | Day 1 | 30 | 1 | 0.10 | Big backpack, new ID lace, campus map in hand |
-| Engineering student | `engg` | Day 1 | 25 | 1–2 | 0.20 | Drafting tube, hard-hat keychain |
-| Accountancy student | `acctg` | Day 2 | 22 | 1–2 | 0.30 only if perfect, else 0 | Calculator, thick reviewer |
-| Org officer | `org` | Day 3 | 25 | 2–3 | 0.35 | Org shirt, clipboard, lanyard |
-| Professor | `prof` | Day 4, 10% chance | 35 | 1 | 0.50 | Polo, folder, umbrella |
-| Guard | `guard` | Day 5, once | 40 | 3 (all gulaman) | 0.50 | Generic security uniform |
-
-Payment rules:
-
-- Base pay = sum of the order's item prices.
-- Tip = round(base pay × tip rate × patience left as a fraction 0–1).
-- Combo: each consecutive perfect order (no mistakes, served with more than 50% patience) adds +₱1 per step, capped at +₱5. A mistake or a customer leaving resets it.
-- If patience reaches 0, the customer sighs ("Sige, next time na lang.") and leaves. No money; combo resets.
-- **Chill Mode:** patience never runs out and tips use a fixed 0.5 patience fraction.
-
-### 4.5 Day structure and difficulty
-
-A Day lasts 180 real seconds, shown as a clock from 3:00 PM to 6:00 PM (1 second = 1 game minute).
-
-| Phase | Clock | Base spawn interval (s) | What changes |
-|---|---|---|---|
-| Vacant | 3:00–4:00 PM | 9 | Calm start |
-| Merienda rush | 4:00–5:00 PM | 5 | Busiest hour; music layer adds percussion |
-| Uwian | 5:00–6:00 PM | 6 | String lights switch on at 5:30 |
-
-No new customers spawn after 5:55 PM. The Day ends at 6:00 PM once the queue is empty, or after a 15-second grace
-period. The spawn interval is the phase value × the Day's multiplier, with ±20% random jitter. A new customer never
-spawns if all queue spots are full; they wait off-screen instead.
-
-| Day | New this Day | Max queue | Spawn multiplier | Goals ★ / ★★ / ★★★ (₱) |
-|---|---|---|---|---|
-| 1 | Tutorial; fishball, kikiam, 3 sauces; freshie, engg | 2 | 1.30 | 180 / 300 / 390 |
-| 2 | Kwek-kwek, gulaman, acctg | 3 | 1.15 | 300 / 490 / 650 |
-| 3 | Squidball, "no sauce" orders, org officer | 3 | 1.00 | 410 / 660 / 870 |
-| 4 | FEWA, professor | 3 | 0.95 | 500 / 800 / 1050 |
-| 5 | Ambon (sudden rain) event, guard | 3 | 0.90 | 560 / 910 / 1190 |
-
-**These goals are first-pass estimates.** The AI must build `npm run sim`: a headless bot that plays each Day perfectly
-using the pure logic classes. Then set goals to 40% / 65% / 85% of the bot's average over 50 runs, rounded to the nearest ₱10.
-
-**Ambon event (Day 5):** at 4:30 PM, rain falls for 40 seconds. Customers spawn 30% faster, arrive with umbrellas, and
-order only hot food (no gulaman). Add rain particles, a cozy rain loop, and darker lighting. It ends with a small rainbow.
-
-### 4.6 Controls
-
-| Action | Mouse or touch | Keyboard |
-|---|---|---|
-| Fry an item | Tap its bin | 1–5 |
-| Make gulaman | Tap the dispenser | G |
-| Pick up a cooked serving | Tap it in the wok | Space (oldest cooked first) |
-| Select a tray cup | Tap it | Tab (cycles) |
-| Add sauce to the selected cup | Tap a sauce jar | Q sweet, W spicy, E suka |
-| Serve the selected cup | Drag to customer, or tap cup then customer | A / S / D (queue spot 1 / 2 / 3) |
-| Throw away | Drag to trash, or select then tap trash | X |
-| Pause | Pause button | Esc or P |
-
-### 4.7 Screen layout (640×360 base)
-
-The top 200 px is the lagoon scene and customer queue; the bottom 160 px is the stall counter with every station on it.
-The wok is the centre of play; ingredients feed it from the left and sauces finish cups on the right. Exact positions
-are in the table below.
-
-```
-+------------------------------------------------------------------------------+
-| 3:00 PM                    ₱120 / goal ₱390                            Pause |  HUD 0..24
-| Lagoon scene: sky, trees, water, walkway     toasts: Combo x3!               |
-|                     [order]        [order]        [order]                    |
-|                     [Spot 1]       [Spot 2]       [Spot 3]                   |  feet at y=196
-+------------------------------------------------------------------------------+  y=200
-| [fish][kikiam][kwek][squid][FEWA]   [ wok 3x2 slots ]   [sweet][spicy][suka] |
-| [gulaman] [ tray: 3 cups      ]     [               ]              [trash]   |
-+------------------------------------------------------------------------------+  y=360
-```
-
-| Element | Top-left x, y | Size (w×h) | Notes |
-|---|---|---|---|
-| HUD bar | 0, 0 | 640×24 | Clock (left), ₱ total and goal bar (centre), pause (right) |
-| Lagoon background | 0, 0 | 640×200 | Layers: sky, far trees, water (ripple loop), walkway, string lights |
-| Queue spots (3) | centres x = 200, 320, 440; feet at y = 196 | 48×72 sprites | Bubble above the head; patience bar under the bubble |
-| Counter | 0, 200 | 640×160 | Wooden stall front |
-| Ingredient bins (5) | 16, 216 | 52×44 each, 8 px gaps | fishball, kikiam, kwekkwek, squidball, fewa; locked bins show a padlock |
-| Gulaman dispenser | 16, 276 | 52×64 | |
-| Plating tray (3 cups) | 84, 284 | 216×56 | 3 slots of 64×48 |
-| Wok (6 slots) | 324, 216 | 168×104 | 3×2 slots of 48×40 |
-| Sauce jars (3) | 508, 216 | 36×52 each, 8 px gaps | sweet, spicy, suka |
-| Trash | 572, 292 | 48×48 | |
-| Combo and toasts | centred at 320, 44 | — | "Combo x3!", phase banners |
-
-All touch targets must be at least 44×44 px after scaling on a phone. If a station is smaller at 640×360, enlarge its invisible hit area.
-
-### 4.8 Feedback and "juice"
-
-- Item drops into the wok with a small bounce, a soft "tsss" sizzle and oil-bubble particles.
-- Cooking ring around each slot. At Cooked: soft ding and a green glow. 1 second before burning: the ring blinks orange. Each state also has its own icon, so colour is never the only signal.
-- Correct serve: soft coin sound, "+₱20" floats up from the customer, heart emote, "Salamat po!", customer walks away.
-- Wrong serve: soft "bonk", "?" emote, cup poofs.
-- Customer gives up: sigh emote, slow walk away. Never a loud buzzer.
-- Phase change: banner slides in ("Merienda rush!"), music adds or drops a layer.
-- End of Day: lights glow on, the results card slides up.
-
-Flavour lines (store in i18n files, pick at random): "Pabili po!", "Isa nga pong kwek-kwek.", "Ate, spicy ha!",
-"Salamat po!", "Sarap!", "Hala, mali!", "Sige, next time na lang.", "May quiz pa ako, bilis!"
-
-### 4.9 Upgrades
-
-Bought on the Results screen with ₱ earned in this minigame. They are saved permanently.
-
-| Upgrade | Key | Cost Lv1 / Lv2 / Lv3 (₱) | Effect Lv1 / Lv2 / Lv3 |
-|---|---|---|---|
-| Mainit na Kawali (hotter wok) | `wok` | 200 / 450 / 800 | Cook time −10% / −20% / −30% |
-| Slow-burn oil | `oil` | 150 / 350 / 700 | Burn window +1 / +2 / +3 s |
-| Stall radio | `radio` | 250 / 500 / 900 | Patience +10% / +20% / +30%; each level unlocks a music track |
-| Painted stall sign | `sign` | 200 / 450 / 800 | Tips +5% / +10% / +15% |
-
-### 4.10 Tutorial (Day 1, first play only)
-
-A hand pointer guides one scripted order. The clock and patience are frozen until the tutorial ends.
-
-1. A freshie arrives: "Pabili po!" The bubble shows fishball + sweet. Point at the fishball bin.
-2. Point at the frying slot: "Wait until it turns green."
-3. Point at the cooked fishball: "Tap to put it in a cup."
-4. Point at the sweet sauce jar.
-5. Point at the customer: "Serve!"
-6. "Ayan! Ready ka na." The clock starts.
-
-The tutorial has a Skip button and can be replayed from Settings.
-
-### 4.11 Asset list
-
-Placeholders first (coloured rectangles with text labels), using exactly these keys.
-
-| Key | Type | Size (px) | Frames or notes |
-|---|---|---|---|
-| `lagoon_sky`, `lagoon_trees`, `lagoon_walkway` | image | 640×200 | Parallax layers |
-| `lagoon_water` | spritesheet | 640×80 | 4-frame ripple loop |
-| `lagoon_lights` | spritesheet | 640×40 | 2 frames: off, on |
-| `stall_counter` | image | 640×160 | |
-| `bin_<item>` | image | 52×44 | One per fried item |
-| `food_<item>` | spritesheet | 32×24 (FEWA 64×24) | 3 frames: raw, cooked, burnt |
-| `cup_<item>` | image | 32×32 | Plated serving; sauce shown as an overlay `sauce_drip_<sauce>` |
-| `jar_<sauce>` | image | 36×52 | |
-| `dispenser_gulaman`, `trash`, `wok` | image | per layout | |
-| `customer_<type>` | spritesheet | 48×72 | walk 4, idle 2, happy 2, sad 2 frames |
-| `bubble` | nine-slice image | 24×24 source | |
-| `icons` | spritesheet | 16×16 | Item, sauce and no-sauce icons, emotes |
-| `fx_oil`, `fx_coin`, `fx_rain` | particle textures | 4–8 px | |
-| `sfx_sizzle`, `sfx_ding`, `sfx_coin`, `sfx_bonk`, `sfx_drop`, `sfx_click`, `sfx_rain_loop` | audio | short | `.ogg` + `.m4a` |
-| `music_lagoon_base`, `music_lagoon_rush` | audio loop | 60–120 s each | Two layers that play in sync |
-
-In Milestone 4, pack the images into one texture atlas: `pup-lagoon.png` + `pup-lagoon.json`.
-
-### 4.12 Acceptance criteria
-
-PUP Lagoon is done when all of these are true:
-
-- [ ] All 5 Days can be played start to finish on desktop Chrome, Firefox and Safari, and on a mid-range Android phone in landscape.
-- [ ] An order can be completed with mouse only, with touch only, and with keyboard only.
-- [ ] Cooking states change at the configured times (within 0.1 s) and are readable without relying on colour.
-- [ ] Wrong orders and customers leaving never end a Day early.
-- [ ] Chill Mode removes patience timers; the Day still ends at 6:00 PM.
-- [ ] Results show stars, ₱ earned and best score; progress survives a page reload.
-- [ ] Upgrades apply their effects and persist.
-- [ ] Runs at 60 fps on desktop and at least 50 fps on a mid-range phone with 3 customers and 6 items frying.
-- [ ] `npm run sim` reports each Day's 3-star goal at 80–90% of the bot's average.
+> **Replaced (2026-11-22).** The first draft's cooking game ("Merienda sa Lagoon") was replaced by **Lagoon Merienda**,
+> specified in [SPEC-pup-lagoon.md](SPEC-pup-lagoon.md). The old section was removed to avoid confusion; its full text is
+> in git history (commit `e8dddf0`, SPEC.md §4).
 
 ---
 
@@ -382,7 +169,7 @@ PUP Lagoon is done when all of these are true:
 Every minigame plugs into the hub the same way, so adding a campus later means writing one folder and one design page,
 not touching the core. Build only PUP Lagoon now; the code must already support the other six as "Soon" stops.
 
-**Minigame manifest** (each minigame exports one; the hub reads the list from `src/minigames/index.ts`)
+**Minigame manifest** (each minigame exports one; the campus map reads the list from `src/minigames/roster.ts`, DECISIONS D-017)
 
 ```ts
 export interface MinigameManifest {
@@ -432,7 +219,7 @@ Rules for every minigame:
 | 4 | UE, Recto | The campus faces Recto Avenue, an area known for bookstores, budget eateries and transport hubs | **Recto Book Hunt**: find every book on a classmate's list | Hidden-object search in stacked bookstall shelves |
 | 5 | San Beda, Mendiola | A Benedictine school founded in 1901, famous for its Red Lions basketball team | **Shootaround sa Mendiola**: chill free-throw practice after class | Timing meter: release at the sweet spot; streaks unlock trick shots |
 | 6 | CEU, Mendiola | Its first degree programme was Pharmacy, opened in 1921 | **Compounding Lab**: prepare orders in the pharmacy lab | Sort-and-measure: drag ingredients into the right jar in the right amounts |
-| 7 | PUP, Sta. Mesa | The Lagoon and its food stalls | **Merienda sa Lagoon** (this spec) | Cook-and-serve |
+| 7 | PUP, Sta. Mesa | The Lagoon and its food stalls | **Lagoon Merienda** ([SPEC-pup-lagoon.md](SPEC-pup-lagoon.md)) | Endless budgeting and shopping |
 
 Keep every concept affectionate and generic: original characters, no real school logos, seals, mascots or team marks (section 13).
 
@@ -593,8 +380,7 @@ uni-series/
 │  ├─ ui/                    Button, Panel, ResultsCard, Toast, HandPointer
 │  ├─ i18n/                  en.json, fil.json
 │  └─ minigames/
-│     ├─ index.ts            registry of all 7 manifests
-│     ├─ soon/               manifests for the 6 "Soon" campuses
+│     ├─ roster.ts           all 7 campuses, playable and "Soon" (SPEC-homepage §5)
 │     └─ pup-lagoon/
 │        ├─ manifest.ts
 │        ├─ config.ts        every tuning number from section 4
@@ -981,8 +767,8 @@ after it as you go. (In this repo, agents also read `AGENTS.md` automatically.)
 You are a senior game developer building a browser game with me.
 
 Read SPEC.md in this folder completely before writing any code. It is the single
-source of truth for the game "Uni Series" and its first minigame, "PUP Lagoon:
-Merienda sa Lagoon".
+source of truth for the game "Uni Series". Its first minigame, "Lagoon Merienda",
+is specified in SPEC-pup-lagoon.md.
 
 How we work:
 1. Follow the milestones in section 10 in order. Do ONLY the current milestone.
