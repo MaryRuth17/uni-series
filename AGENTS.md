@@ -20,8 +20,8 @@ Brief for every AI agent (Claude Code, Codex, others) working in this repo, usua
 | L1 — Lagoon data and logic (+ `npm run sim`) | Done: 84 unit tests; `npm run sim` plays 40,000 vacants with 0 failures |
 | H2 — Living landing | Done: street spawner, LRT-2 train, surprises, time of day, December parols (greybox shapes) |
 | L2 — Lagoon greybox map and movement | Done: Vacant card, walkable map, menu boards, live pila, Pause |
-| H3 — Living map | Next |
-| L3 — Buying and paying | Next after H3 |
+| H3 — Living map | Done: zoom toward stops, ambient life, time-of-day tint, unfold transition, list drag |
+| L3 — Buying and paying | Next |
 | L4–L5 | Not started |
 | H4 + L6 — Art and audio (made by Claude, DECISIONS R-006) | Not started |
 | H5 + L7 + M6 — Polish; M7 — Release | Not started |

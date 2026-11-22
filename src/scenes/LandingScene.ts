@@ -186,7 +186,9 @@ export class LandingScene extends Phaser.Scene {
     const reduced = services().save.data.settings.reducedMotion;
     const go = (): void => {
       this.cameras.main.fadeOut(FADE_MS, 0x2b, 0x22, 0x33);
-      this.cameras.main.once('camerafadeoutcomplete', () => this.scene.start(SCENES.campusMap));
+      this.cameras.main.once('camerafadeoutcomplete', () =>
+        this.scene.start(SCENES.campusMap, { from: 'landing' }),
+      );
     };
     if (reduced) go();
     else

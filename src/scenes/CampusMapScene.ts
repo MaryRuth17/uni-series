@@ -1,18 +1,32 @@
 /**
- * CampusMapScene ("Mapa ng U-Belt", SPEC-homepage §4) — H1 greybox
- * Shows: the U-Belt map as shapes and labels (roads, LRT-2 with Recto / Legarda / Pureza, Pasig River),
- * the 7 campus stops (PUP playable, the rest "SOON"), the jeepney, the HUD (Home, Mapa/Listahan,
- * ID chip, ipon total, sticker count, Settings, Sticker Book, Album, map credit), the campus card,
- * the list view, and the jeepney ride along the route into the minigame (or ComingSoonScene).
- * Listens to: pointer, mouse wheel (list), keyboard (arrows move between stops, Enter opens / rides,
- * Esc closes the card, Tab switches Mapa/Listahan).
+ * CampusMapScene ("Mapa ng U-Belt", SPEC-homepage §4) — H3 living map (greybox shapes until H4 art)
+ * Shows: the U-Belt map (roads, LRT-2 with Recto / Legarda / Pureza, Pasig River) tinted by the time of
+ * day, ambient life (an LRT-2 train every 20–30 s, small jeepneys on the roads, cloud shadows, birds), the
+ * 7 campus stops (PUP playable with its progress and sticker mark, the rest "SOON"), the jeepney, the HUD,
+ * the campus card, the list view, and the jeepney ride into the minigame. Tapping a stop zooms the world
+ * camera 10% toward it; a second, fixed camera draws the UI so the HUD never zooms. Arriving from the
+ * landing, the map unfolds (scale 0.92 → 1).
+ * Listens to: pointer (taps, hover grow, list drag), mouse wheel (list), keyboard (arrows move between
+ * stops, Enter opens / rides, Esc closes the card, Tab switches Mapa/Listahan), the frame update (clouds).
  */
 import Phaser from 'phaser';
 import { gameEvents } from '../core/GameEvents';
 import { t } from '../core/i18n';
 import type { MapView } from '../core/SaveManager';
 import { services } from '../core/services';
-import { FADE_MS, MAP, PALETTE, RIDE } from '../home/config';
+import {
+  FADE_MS,
+  JEEP_COLORS,
+  MAP,
+  MAP_AMBIENT,
+  MAP_LRT,
+  MAP_ROADS,
+  MAP_TINT,
+  MAP_UI_DEPTH,
+  PALETTE,
+  RIDE,
+} from '../home/config';
+import { phaseAt } from '../home/TimeOfDay';
 import { pointAt, polylineLength, RoutePath, rideDurationMs } from '../map/RoutePath';
 import { summaryFor, totalIpon } from '../minigames/progressSummary';
 import { entryAtStop, ROSTER, type RosterEntry, ROUTE_NODES } from '../minigames/roster';
@@ -25,6 +39,8 @@ import { avatarPreview } from './IdCardScene';
 export interface CampusMapData {
   /** A message to show on arrival, e.g. "+₱25 sa alkansya!" after a vacant. */
   toast?: string;
+  /** 'landing' plays the paper-unfold transition (§6). */
+  from?: 'landing';
 }
 
 const ROUTE = new RoutePath(ROUTE_NODES);
@@ -32,6 +48,7 @@ const CARD_OPEN_Y = 360 - MAP.card.h / 2 - 6;
 const CARD_HIDDEN_Y = 360 + MAP.card.h;
 /** The jeepney parks beside the pin, not on it. */
 const JEEP_OFFSET = { x: -44, y: 6 };
+const lrtY = (x: number): number => MAP_LRT.y0 + x * MAP_LRT.slope;
 
 export class CampusMapScene extends Phaser.Scene {
   private view: MapView = 'map';
@@ -43,9 +60,13 @@ export class CampusMapScene extends Phaser.Scene {
   private list!: Phaser.GameObjects.Container;
   private listCards: Phaser.GameObjects.Container[] = [];
   private listScroll = 0;
+  private drag: { y: number; scroll: number; moved: boolean } | null = null;
   private toggle!: Button;
   private highlight!: Phaser.GameObjects.Arc;
   private riding = false;
+  private reduced = false;
+  private uiCam!: Phaser.Cameras.Scene2D.Camera;
+  private clouds: Phaser.GameObjects.Ellipse[] = [];
 
   constructor() {
     super(SCENES.campusMap);
@@ -58,21 +79,79 @@ export class CampusMapScene extends Phaser.Scene {
     this.riding = false;
     this.cardEntry = null;
     this.listScroll = 0;
+    this.drag = null;
+    this.clouds = [];
+    this.reduced = save.settings.reducedMotion;
 
     this.drawBase();
+    this.drawAmbient();
     this.drawStops();
     this.drawJeep(save.home.lastStop);
+    this.drawTint();
     this.buildList();
     this.drawHud();
     this.card = this.add.container(320, CARD_HIDDEN_Y).setDepth(50);
     this.setView(this.view, false);
     this.bindKeys();
 
-    this.cameras.main.fadeIn(FADE_MS, 0x2b, 0x22, 0x33);
+    const main = this.cameras.main;
+    main.setBounds(0, 0, 640, 360);
+    this.uiCam = this.cameras.add(0, 0, 640, 360);
+    this.syncCameras();
+
+    this.fadeIn();
+    if (data.from === 'landing' && !this.reduced) {
+      main.setZoom(MAP_AMBIENT.unfoldFrom);
+      main.zoomTo(1, FADE_MS, 'Sine.easeOut');
+    }
     if (data.toast) gameEvents.emit('toast', { text: data.toast });
   }
 
-  // ---- Drawing ---------------------------------------------------------------------------------
+  override update(_time: number, delta: number): void {
+    if (this.reduced) return;
+    const dt = Math.min(delta, 100) / 1000;
+    for (const c of this.clouds) {
+      c.x -= MAP_AMBIENT.cloudSpeed * dt;
+      if (c.x < -80) c.x = 720;
+    }
+  }
+
+  // ---- Cameras -----------------------------------------------------------------------------------
+
+  /** World objects go to the zooming main camera, UI (depth ≥ MAP_UI_DEPTH) to the fixed UI camera. */
+  private syncCameras(): void {
+    const main = this.cameras.main;
+    for (const obj of this.children.list) {
+      const depth = (obj as unknown as { depth: number }).depth;
+      if (depth >= MAP_UI_DEPTH) main.ignore(obj);
+      else this.uiCam.ignore(obj);
+    }
+  }
+
+  private fadeIn(): void {
+    for (const cam of [this.cameras.main, this.uiCam]) cam.fadeIn(FADE_MS, 0x2b, 0x22, 0x33);
+  }
+
+  private fadeOut(then: () => void): void {
+    for (const cam of [this.cameras.main, this.uiCam]) cam.fadeOut(FADE_MS, 0x2b, 0x22, 0x33);
+    this.cameras.main.once('camerafadeoutcomplete', then);
+  }
+
+  private zoomToward(x: number, y: number): void {
+    if (this.reduced || this.view !== 'map') return;
+    const main = this.cameras.main;
+    main.pan(x, y, MAP.zoomMs, 'Sine.easeInOut', true);
+    main.zoomTo(MAP.zoom, MAP.zoomMs, 'Sine.easeInOut', true);
+  }
+
+  private zoomReset(): void {
+    if (this.reduced) return;
+    const main = this.cameras.main;
+    main.pan(320, 180, MAP.zoomMs, 'Sine.easeInOut', true);
+    main.zoomTo(1, MAP.zoomMs, 'Sine.easeInOut', true);
+  }
+
+  // ---- Drawing -----------------------------------------------------------------------------------
 
   private drawBase(): void {
     this.add.rectangle(320, 180, 640, 360, 0xf3e6c8);
@@ -97,19 +176,15 @@ export class CampusMapScene extends Phaser.Scene {
     river.lineBetween(430, 300, 470, 140);
     river.lineBetween(330, 305, 300, 120);
     this.add.text(320, 326, t('map.river'), textStyle(8, '#3E5E78')).setOrigin(0.5);
+    if (!this.reduced) {
+      // A gentle shimmer on the river.
+      const shimmer = this.add.rectangle(320, 318, 640, 2, 0xffffff, 0.25);
+      this.tweens.add({ targets: shimmer, alpha: 0.05, duration: 1500, yoyo: true, repeat: -1 });
+    }
 
-    // Road: label key, line from (x1, y1) to (x2, y2), label position clear of the campus pins.
-    const roads: [string, number, number, number, number, number, number][] = [
-      ['espana', 80, 20, 360, 130, 312, 100],
-      ['recto', 20, 205, 300, 205, 196, 214],
-      ['legarda', 300, 205, 420, 190, 398, 180],
-      ['mendiola', 330, 250, 340, 200, 348, 268],
-      ['morayta', 110, 120, 120, 230, 120, 246],
-      ['magsaysay', 420, 190, 620, 230, 498, 222],
-    ];
     const g = this.add.graphics();
     g.lineStyle(4, 0xffffff, 1);
-    for (const [key, x1, y1, x2, y2, lx, ly] of roads) {
+    for (const [key, x1, y1, x2, y2, lx, ly] of MAP_ROADS) {
       g.lineBetween(x1, y1, x2, y2);
       this.add
         .text(lx, ly, t(`map.road.${key}`), textStyle(8, '#7A6A55'))
@@ -119,17 +194,13 @@ export class CampusMapScene extends Phaser.Scene {
 
     const lrt = this.add.graphics();
     lrt.lineStyle(2, PALETTE.lrt, 1);
-    for (let x = 10; x < 630; x += 12)
-      lrt.lineBetween(x, 196 + x * 0.02, x + 7, 196 + (x + 7) * 0.02);
-    for (const [key, x] of [
-      ['recto', 70],
-      ['legarda', 330],
-      ['pureza', 470],
-    ] as const) {
-      this.add.circle(x, 196 + x * 0.02, 3, PALETTE.lrt).setStrokeStyle(1, COLORS.cream);
+    for (let x = 10; x < 630; x += 12) lrt.lineBetween(x, lrtY(x), x + 7, lrtY(x + 7));
+    for (const [key, x] of Object.entries(MAP_LRT.stations)) {
+      this.add.circle(x, lrtY(x), 3, PALETTE.lrt).setStrokeStyle(1, COLORS.cream).setDepth(2);
       this.add
-        .text(x, 186 + x * 0.02, t(`map.station.${key}`), textStyle(8, '#5B3C8A'))
-        .setOrigin(0.5);
+        .text(x, lrtY(x) - 10, t(`map.station.${key}`), textStyle(8, '#5B3C8A'))
+        .setOrigin(0.5)
+        .setDepth(2);
     }
     this.add.text(600, 196, t('map.lrt'), textStyle(8, '#5B3C8A')).setOrigin(0.5, 1);
 
@@ -138,12 +209,87 @@ export class CampusMapScene extends Phaser.Scene {
     route.strokePoints(ROUTE_NODES.map((n) => new Phaser.Math.Vector2(n.x, n.y)));
   }
 
+  /** LRT-2 train, small jeepneys on the roads, cloud shadows and birds (§4.1 ambient). */
+  private drawAmbient(): void {
+    // The LRT-2 train glides along its line every 20–30 s.
+    const train = this.add
+      .container(-30, lrtY(0), [
+        this.add.rectangle(0, 0, 40, 8, 0xe6e6ee).setStrokeStyle(1, COLORS.ink),
+        this.add.rectangle(0, 2, 40, 2, PALETTE.lrt),
+      ])
+      .setDepth(3)
+      .setVisible(false);
+    const runTrain = (): void => {
+      train.setVisible(true).setPosition(-30, lrtY(0));
+      this.tweens.add({
+        targets: train,
+        x: 670,
+        y: lrtY(670),
+        duration: MAP_AMBIENT.trainMs,
+        onComplete: () => train.setVisible(false),
+      });
+      this.time.delayedCall(Phaser.Math.Between(...MAP_AMBIENT.trainEveryMs), runTrain);
+    };
+    this.time.delayedCall(Phaser.Math.Between(2000, 5000), runTrain);
+
+    // Small jeepneys drive back and forth along their roads.
+    MAP_AMBIENT.jeepRoads.forEach((roadIndex, i) => {
+      const [, x1, y1, x2, y2] = MAP_ROADS[roadIndex];
+      const jeep = this.add
+        .rectangle(x1, y1, 10, 6, JEEP_COLORS[i % JEEP_COLORS.length])
+        .setStrokeStyle(1, COLORS.ink)
+        .setDepth(3);
+      this.tweens.add({
+        targets: jeep,
+        x: x2,
+        y: y2,
+        duration: (Math.hypot(x2 - x1, y2 - y1) / MAP_AMBIENT.jeepSpeed) * 1000,
+        yoyo: true,
+        repeat: -1,
+        delay: i * 1500,
+        ease: 'Linear',
+      });
+    });
+
+    if (this.reduced) return;
+    // Cloud shadows drift; birds cross now and then.
+    this.clouds = [
+      this.add.ellipse(160, 120, 140, 60, COLORS.ink, 0.06).setDepth(4),
+      this.add.ellipse(520, 260, 120, 50, COLORS.ink, 0.06).setDepth(4),
+    ];
+    const bird = (): void => {
+      const y = Phaser.Math.Between(30, 150);
+      const b = this.add
+        .container(-10, y, [
+          this.add.line(0, 0, -4, -2, 0, 0, COLORS.ink),
+          this.add.line(0, 0, 0, 0, 4, -2, COLORS.ink),
+        ])
+        .setDepth(4);
+      this.uiCam.ignore(b);
+      this.tweens.add({
+        targets: b,
+        x: 650,
+        y: y - 20,
+        duration: MAP_AMBIENT.birdMs,
+        onComplete: () => b.destroy(),
+      });
+      this.time.delayedCall(Phaser.Math.Between(...MAP_AMBIENT.birdEveryMs), bird);
+    };
+    this.time.delayedCall(Phaser.Math.Between(...MAP_AMBIENT.birdEveryMs), bird);
+  }
+
+  private drawTint(): void {
+    const save = services().save.data;
+    const [color, alpha] = MAP_TINT[phaseAt(new Date(), save.home.theme)];
+    if (alpha > 0) this.add.rectangle(320, 180, 640, 360, color, alpha).setDepth(20);
+  }
+
   private drawStops(): void {
     const save = services().save.data;
     this.highlight = this.add.circle(0, 0, 15).setStrokeStyle(2, COLORS.red).setDepth(5);
     for (const entry of ROSTER) {
       const playable = entry.status === 'playable';
-      this.add
+      const block = this.add
         .rectangle(
           entry.x,
           entry.y,
@@ -152,7 +298,8 @@ export class CampusMapScene extends Phaser.Scene {
           playable ? PALETTE.gold : 0xb8b0a0,
           playable ? 0.35 : 0.25,
         )
-        .setStrokeStyle(1, COLORS.ink, 0.3);
+        .setStrokeStyle(1, COLORS.ink, 0.3)
+        .setDepth(4);
       const pin = this.add
         .circle(entry.x, entry.y - 4, MAP.pin / 2, playable ? PALETTE.jeepRed : COLORS.grey)
         .setStrokeStyle(1, COLORS.ink)
@@ -162,7 +309,18 @@ export class CampusMapScene extends Phaser.Scene {
         Phaser.Geom.Circle.Contains,
       );
       pin.on('pointerup', () => this.select(entry.stop, true));
-      if (playable && !save.settings.reducedMotion) {
+      // Hover (desktop): the pin grows 10% and the campus block glows (§4.2).
+      pin.on('pointerover', () => {
+        pin.setScale(1.1);
+        block.setStrokeStyle(2, PALETTE.glow, 1).setFillStyle(block.fillColor, 0.6);
+      });
+      pin.on('pointerout', () => {
+        pin.setScale(1);
+        block
+          .setStrokeStyle(1, COLORS.ink, 0.3)
+          .setFillStyle(block.fillColor, playable ? 0.35 : 0.25);
+      });
+      if (playable && !this.reduced) {
         this.tweens.add({
           targets: pin,
           y: entry.y - 7,
@@ -188,6 +346,12 @@ export class CampusMapScene extends Phaser.Scene {
             .text(entry.x, entry.y + 28, t(s.pin.key, s.pin.params), textStyle(8, TEXT.ink))
             .setOrigin(0.5)
             .setDepth(6);
+        }
+        if (save.stickers.includes(entry.stickerId)) {
+          this.add
+            .star(entry.x + 12, entry.y - 14, 5, 3, 6, PALETTE.gold)
+            .setStrokeStyle(1, COLORS.ink)
+            .setDepth(7);
         }
       } else {
         this.add.rectangle(entry.x + 16, entry.y - 14, 28, 10, COLORS.yellow).setDepth(7);
@@ -302,25 +466,31 @@ export class CampusMapScene extends Phaser.Scene {
     hud(this.add.text(320, 352, t('map.credit'), textStyle(8, '#7A6A55')).setOrigin(0.5));
   }
 
-  // ---- List view (§4.5) ------------------------------------------------------------------------
+  // ---- List view (§4.5) --------------------------------------------------------------------------
 
   private buildList(): void {
     const L = MAP.list;
-    this.list = this.add.container(0, 0).setDepth(30);
-    this.list.add(this.add.rectangle(320, 180, 640, 360, 0xf3e6c8).setInteractive());
+    this.list = this.add.container(0, 0).setDepth(MAP_UI_DEPTH);
+    const bg = this.add.rectangle(320, 180, 640, 360, 0xf3e6c8).setInteractive();
+    this.list.add(bg);
     this.list.add(
       this.add.text(320, 30, t('map.listTitle'), textStyle(8, TEXT.ink)).setOrigin(0.5),
     );
     const save = services().save.data;
     this.listCards = ROSTER.map((entry) => {
       const playable = entry.status === 'playable';
-      const bg = this.add
+      const cardBg = this.add
         .rectangle(0, 0, L.w, L.h, playable ? COLORS.yellow : 0xe6dcc6)
         .setStrokeStyle(1, COLORS.ink);
-      bg.setInteractive({ useHandCursor: true }).on('pointerup', () => this.openCard(entry));
+      cardBg.setInteractive({ useHandCursor: true });
+      cardBg.on('pointerdown', (p: Phaser.Input.Pointer) => this.dragStart(p));
+      cardBg.on('pointerup', () => {
+        if (!this.drag?.moved) this.openCard(entry);
+        this.drag = null;
+      });
       const s = summaryFor(entry.id, save);
       const items: Phaser.GameObjects.GameObject[] = [
-        bg,
+        cardBg,
         this.add.text(-L.w / 2 + 10, -14, `${entry.campus} · ${entry.area}`, textStyle(8)),
         this.add.text(
           -L.w / 2 + 10,
@@ -342,9 +512,33 @@ export class CampusMapScene extends Phaser.Scene {
       return card;
     });
     this.layoutList();
+    // Touch: drag to scroll. Mouse: wheel. Keyboard: arrows (bindKeys).
+    bg.on('pointerdown', (p: Phaser.Input.Pointer) => this.dragStart(p));
+    this.input.on('pointermove', (p: Phaser.Input.Pointer) => {
+      if (!this.drag || !p.isDown || this.view !== 'list') return;
+      const dy = p.y - this.drag.y;
+      if (Math.abs(dy) > 6) this.drag.moved = true;
+      this.listScroll = this.drag.scroll - dy;
+      this.layoutList();
+    });
+    this.input.on('pointerup', () => {
+      if (this.drag && !this.drag.moved) return; // let the card's pointerup handle a tap
+      if (this.drag?.moved) {
+        // Snap to the nearest card so no row is left half-hidden.
+        const step = MAP.list.h + MAP.list.gap;
+        this.listScroll = Math.round(this.listScroll / step) * step;
+        this.layoutList();
+      }
+      this.drag = null;
+    });
     this.input.on('wheel', (_p: unknown, _o: unknown, _dx: number, dy: number) => {
       if (this.view === 'list' && !this.cardEntry) this.scrollList(dy > 0 ? 1 : -1);
     });
+  }
+
+  private dragStart(p: Phaser.Input.Pointer): void {
+    if (this.view !== 'list' || this.cardEntry) return;
+    this.drag = { y: p.y, scroll: this.listScroll, moved: false };
   }
 
   private layoutList(): void {
@@ -367,17 +561,17 @@ export class CampusMapScene extends Phaser.Scene {
   private setView(view: MapView, remember: boolean): void {
     this.view = view;
     this.list.setVisible(view === 'list');
-    this.toggle.setText(`${t('map.viewMap')} | ${t('map.viewList')}`);
     this.toggle.label.setColor(TEXT.ink);
     this.toggle.label.setText(
       view === 'map'
         ? `[${t('map.viewMap')}] ${t('map.viewList')}`
         : `${t('map.viewMap')} [${t('map.viewList')}]`,
     );
+    if (view === 'list') this.zoomReset();
     if (remember) services().save.update((d) => (d.home.mapView = view));
   }
 
-  // ---- Selection and campus card (§4.3) --------------------------------------------------------
+  // ---- Selection and campus card (§4.3) ----------------------------------------------------------
 
   private select(stop: number, open: boolean): void {
     if (this.riding) return;
@@ -396,6 +590,7 @@ export class CampusMapScene extends Phaser.Scene {
     this.cardEntry = entry;
     this.selected = entry.stop;
     this.moveHighlight();
+    this.zoomToward(entry.x, entry.y);
     const C = MAP.card;
     this.card.removeAll(true);
     const playable = entry.status === 'playable';
@@ -464,6 +659,7 @@ export class CampusMapScene extends Phaser.Scene {
   private closeCard(): void {
     if (!this.cardEntry) return;
     this.cardEntry = null;
+    this.zoomReset();
     this.tweens.killTweensOf(this.card);
     this.tweens.add({
       targets: this.card,
@@ -473,7 +669,7 @@ export class CampusMapScene extends Phaser.Scene {
     });
   }
 
-  // ---- Jeepney ride (§4.4) ---------------------------------------------------------------------
+  // ---- Jeepney ride (§4.4) -----------------------------------------------------------------------
 
   private ride(entry: RosterEntry): void {
     if (this.riding) return;
@@ -484,7 +680,7 @@ export class CampusMapScene extends Phaser.Scene {
     services().save.update((d) => (d.home.lastStop = entry.stop));
     this.jeepSign.setText(entry.area.toUpperCase());
 
-    if (services().save.data.settings.reducedMotion) {
+    if (this.reduced) {
       this.arrive(entry, false);
       return;
     }
@@ -516,22 +712,21 @@ export class CampusMapScene extends Phaser.Scene {
         height: 20,
       });
       skip.setDepth(60);
+      this.cameras.main.ignore(skip);
     });
   }
 
   private arrive(entry: RosterEntry, animate: boolean): void {
     const end = ROUTE.stopPoint(entry.stop);
     this.jeep.setPosition(end.x + JEEP_OFFSET.x, end.y + JEEP_OFFSET.y);
-    const go = (): void => {
-      this.cameras.main.fadeOut(FADE_MS, 0x2b, 0x22, 0x33);
-      this.cameras.main.once('camerafadeoutcomplete', () => {
+    const go = (): void =>
+      this.fadeOut(() => {
         const target =
           entry.introScene && this.sceneExists(entry.introScene)
             ? entry.introScene
             : SCENES.comingSoon;
         this.scene.start(target, { id: entry.id });
       });
-    };
     if (!animate) {
       go();
       return;
@@ -545,6 +740,7 @@ export class CampusMapScene extends Phaser.Scene {
       )
       .setOrigin(0.5)
       .setDepth(9);
+    this.uiCam.ignore(bubble);
     this.tweens.add({ targets: this.jeep, y: this.jeep.y - 2, duration: 90, yoyo: true });
     this.time.delayedCall(RIDE.arriveMs, () => {
       bubble.destroy();
@@ -556,12 +752,11 @@ export class CampusMapScene extends Phaser.Scene {
     return key in (this.game.scene as unknown as { keys: Record<string, unknown> }).keys;
   }
 
-  // ---- Navigation ------------------------------------------------------------------------------
+  // ---- Navigation --------------------------------------------------------------------------------
 
   private goHome(): void {
     if (this.riding) return;
-    this.cameras.main.fadeOut(FADE_MS, 0x2b, 0x22, 0x33);
-    this.cameras.main.once('camerafadeoutcomplete', () => this.scene.start(SCENES.landing));
+    this.fadeOut(() => this.scene.start(SCENES.landing));
   }
 
   private bindKeys(): void {
@@ -596,6 +791,8 @@ export class CampusMapScene extends Phaser.Scene {
       kb.removeAllListeners();
       kb.removeCapture('TAB');
       this.input.off('wheel');
+      this.input.off('pointermove');
+      this.input.off('pointerup');
     });
   }
 }

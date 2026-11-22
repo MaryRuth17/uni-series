@@ -169,7 +169,9 @@ export class IdCardScene extends Phaser.Scene {
     if (this.data_.next === 'map') {
       this.scene.stop(this.data_.from);
       this.cameras.main.fadeOut(FADE_MS, 0x2b, 0x22, 0x33);
-      this.cameras.main.once('camerafadeoutcomplete', () => this.scene.start(SCENES.campusMap));
+      this.cameras.main.once('camerafadeoutcomplete', () =>
+        this.scene.start(SCENES.campusMap, { from: 'landing' }),
+      );
       return;
     }
     closeOverlay(this, this.data_.from, true);

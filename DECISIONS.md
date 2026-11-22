@@ -218,3 +218,21 @@ Specs: [SPEC.md](SPEC.md) (§), [SPEC-homepage.md](SPEC-homepage.md) (H§), [SPE
   "Malapit nang magbukas!"; the water station explains it needs the Tumbler. *(§10.2)*
 - **L-018 — Counter placeholder.** At the front of the line the player sees "Ikaw na!" and can leave; buying, paying and
   sukli arrive in L3. *(§14 L2/L3)*
+
+### H3 — Living map (builder, 2026-11-22)
+
+- **D-034 — Two cameras on the campus map.** The main camera draws the world and zooms 10% toward a tapped stop in
+  300 ms (clamped to the map's bounds); a second fixed camera draws everything at depth ≥ 30 (HUD, list view, campus
+  card, Skip), so the UI never zooms. This resolves the H1 deferral (D-024). Reduced Motion: no zoom. *(§4.3)*
+- **D-035 — Map ambient life.** An LRT-2 train runs its line every 20–30 s; three small jeepneys drive back and forth on
+  España, Recto and Magsaysay; two cloud shadows drift; a bird crosses every 8–14 s; the river shimmers. Reduced Motion
+  keeps the train and jeepneys (traffic, as on the landing, D-029) and drops clouds, birds and shimmer. *(§4.1)*
+- **D-036 — Time-of-day tint** over the map, matching the landing: umaga light blue 8%, tanghali none, hapon warm 12%,
+  gabi navy 35% (`MAP_TINT`). *(§4.1)*
+- **D-037 — Transitions.** Landing → map: the parked jeepney pulls away (H2), then the map unfolds from scale 0.92 while
+  fading in (skipped with Reduced Motion). Map → minigame and map → landing fade both cameras. Minigame → map shows the
+  minigame's toast (`CampusMapData.toast`, used from L4). *(§6)*
+- **D-038 — Stops.** Hover grows the pin 10% and makes the campus block glow; a playable stop shows a gold star once its
+  sticker is earned (drawn as a shape: Pixelify Sans has no ★). *(§4.2)*
+- **D-039 — List view** scrolls by drag (touch), wheel and arrow keys; a drag snaps to the nearest card when released, and
+  a drag never counts as a tap on a card. *(§4.5)*
