@@ -41,7 +41,7 @@ test('boots to the Landing screen with no console errors', async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
-test('first launch: tap to start, School ID, map, ride to PUP, placeholder, back', async ({
+test('first launch: tap to start, School ID, map, ride to PUP, Lagoon, pause, back', async ({
   page,
 }) => {
   const errors = collectErrors(page);
@@ -77,9 +77,31 @@ test('first launch: tap to start, School ID, map, ride to PUP, placeholder, back
   await tap(page, 555, 244); // PUP pin
   await page.waitForTimeout(400);
   await tap(page, 360, 331); // Sakay na!
-  await waitForScene(page, 'ComingSoon');
+  await waitForScene(page, 'LagoonIntroScene'); // the Vacant card
   await page.waitForTimeout(500);
-  await tap(page, 320, 212); // Balik
+  await page.keyboard.press('Enter'); // Tara!
+  await waitForScene(page, 'LagoonMap');
+  await page.waitForTimeout(500);
+
+  // L2: open the karinderya menu board (key 1), Pumila (Enter), walk there and join the line.
+  await page.keyboard.press('1');
+  await page.keyboard.press('Enter');
+  const location = (): Promise<string | null> =>
+    page.evaluate(() => {
+      const game = (window as unknown as { __uniGame: { scene: { getScene(k: string): unknown } } })
+        .__uniGame;
+      const scene = game.scene.getScene('LagoonMap') as {
+        vacant: { location: { stall: string } | null };
+      };
+      return scene.vacant.location?.stall ?? null;
+    });
+  await expect.poll(location, { timeout: 15_000 }).toBe('karinderya');
+  await page.keyboard.press('Escape'); // leave the line
+  await expect.poll(location).toBeNull();
+
+  await page.keyboard.press('p'); // pause
+  await waitForScene(page, 'Pause');
+  await tap(page, 320, 216); // Balik sa mapa
   await waitForScene(page, 'CampusMap');
 
   // A returning player skips the School ID.
