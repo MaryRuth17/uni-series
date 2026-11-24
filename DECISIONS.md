@@ -360,3 +360,13 @@ Specs: [SPEC.md](SPEC.md) (§), [SPEC-homepage.md](SPEC-homepage.md) (H§), [SPE
   (the game writes "WELCOME, ISKOLAR NG BAYAN!" / "MABUHAY, ISKOLAR NG BAYAN!"), the white fence on a red base, the
   tall white pylon of three slabs (plain: no initials, SPEC §13), a pedicab, barricades and vendor umbrellas. Replaces
   L-025's gate-and-obelisk panorama.
+- **L-029 — Detail and UI polish (owner).** The PUP front gets real foliage (`acacia`: forked trunks, layered leaf
+  clusters), birds on the wires, a detailed stone marker and bronze relief, a guard and students at the gate, a
+  fishball cart, a pedicab with its driver, a painted curb, dappled shade, a manhole and leaves. Storefronts add wall
+  clocks, calendars, stand fans, snack strips hanging from the overhang (generic colours, no brands), a warm light
+  inside, grime, plastic chairs, bins, plants, more crates and a steel kick plate on the kiosks. UI: original coins
+  (₱1, ₱5, ₱10, ₱20 bimetallic) and bills (₱50 red, ₱100 violet) with no faces or seals; spiral notebook pages
+  (`note_card`, `note_hud`, `note_how`); pencil check boxes; rice bowls for busog; time-of-day icons; paper price
+  tags. The Vacant card is a notebook page over a dimmed PUP front, with the baon as coins and bills and the busog
+  target as bowls; How to play is a notebook page with four taped-in pictures and numbered steps; the stalls HUD is a
+  cork board with the listahan page (ticked lines struck through), the busog bowls and the wallet's coins and bills.

@@ -7,12 +7,89 @@
         "url": "assets/lagoon/lagoon_intro.png"
       },
       {
+        "type": "image",
+        "key": "coin_1",
+        "url": "assets/lagoon/coin_1.png"
+      },
+      {
+        "type": "image",
+        "key": "coin_5",
+        "url": "assets/lagoon/coin_5.png"
+      },
+      {
+        "type": "image",
+        "key": "coin_10",
+        "url": "assets/lagoon/coin_10.png"
+      },
+      {
+        "type": "image",
+        "key": "coin_20",
+        "url": "assets/lagoon/coin_20.png"
+      },
+      {
+        "type": "image",
+        "key": "bill_50",
+        "url": "assets/lagoon/bill_50.png"
+      },
+      {
+        "type": "image",
+        "key": "bill_100",
+        "url": "assets/lagoon/bill_100.png"
+      },
+      {
+        "type": "image",
+        "key": "note_card",
+        "url": "assets/lagoon/note_card.png"
+      },
+      {
+        "type": "image",
+        "key": "note_hud",
+        "url": "assets/lagoon/note_hud.png"
+      },
+      {
+        "type": "image",
+        "key": "note_how",
+        "url": "assets/lagoon/note_how.png"
+      },
+      {
+        "type": "spritesheet",
+        "key": "ui_check",
+        "url": "assets/lagoon/ui_check.png",
+        "frameConfig": {
+          "frameWidth": 12,
+          "frameHeight": 12
+        }
+      },
+      {
+        "type": "spritesheet",
+        "key": "ui_bowl",
+        "url": "assets/lagoon/ui_bowl.png",
+        "frameConfig": {
+          "frameWidth": 12,
+          "frameHeight": 12
+        }
+      },
+      {
+        "type": "spritesheet",
+        "key": "ui_slot",
+        "url": "assets/lagoon/ui_slot.png",
+        "frameConfig": {
+          "frameWidth": 16,
+          "frameHeight": 16
+        }
+      },
+      {
+        "type": "image",
+        "key": "ui_tag",
+        "url": "assets/lagoon/ui_tag.png"
+      },
+      {
         "type": "spritesheet",
         "key": "lagoon_how",
         "url": "assets/lagoon/lagoon_how.png",
         "frameConfig": {
-          "frameWidth": 48,
-          "frameHeight": 48
+          "frameWidth": 104,
+          "frameHeight": 72
         }
       },
       {

@@ -165,4 +165,15 @@ describe('Lagoon art (L6)', () => {
     expect(byKey.get('lagoon_intro')?.width).toBe(960);
     expect(frames('lagoon_how')).toBe(4);
   });
+
+  it('has the money, notebook pages and HUD pieces (L6 polish)', () => {
+    for (const k of ['coin_1', 'coin_5', 'coin_10', 'coin_20', 'bill_50', 'bill_100'])
+      expect(byKey.has(k), k).toBe(true);
+    for (const k of ['note_card', 'note_hud', 'note_how', 'ui_tag'])
+      expect(byKey.has(k), k).toBe(true);
+    expect(frames('ui_check')).toBe(2);
+    expect(frames('ui_bowl')).toBe(2);
+    expect(frames('ui_slot')).toBe(3);
+    expect(byKey.get('lagoon_how')?.frame).toEqual([104, 72]);
+  });
 });

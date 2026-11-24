@@ -273,6 +273,99 @@ function poster(p, x, y, w, h, c1, c2) {
   for (let k = 0; k < 3; k++) p.hline(x + 4, y + h / 2 + 6 + k * 4, w - 10, '#ffffffb0');
 }
 
+function wallClock(p, x, y) {
+  p.disc(x, y, 8, '#2b2233');
+  p.disc(x, y, 7, '#fbfaf6');
+  for (let k = 0; k < 12; k++) {
+    const a = (k / 12) * Math.PI * 2;
+    p.px(Math.round(x + Math.cos(a) * 6), Math.round(y + Math.sin(a) * 6), '#55505f');
+  }
+  p.line(x, y, x, y - 5, INK);
+  p.line(x, y, x + 3, y + 1, INK);
+  p.px(x, y, '#d94b3d');
+}
+
+function standFan(p, x, y) {
+  p.disc(x, y, 12, '#8a929c');
+  p.disc(x, y, 11, '#c9d1d9');
+  for (let k = 0; k < 3; k++) {
+    const a = (k / 3) * Math.PI * 2 + 0.4;
+    p.ellipse(Math.round(x + Math.cos(a) * 6), Math.round(y + Math.sin(a) * 6), 4, 3, '#a6d2ea');
+  }
+  p.disc(x, y, 2, '#3b6fb6');
+  for (let k = -10; k <= 10; k += 4) p.vline(x + k, y - 10, 20, '#8a929c80');
+  p.rect(x - 1, y + 12, 3, 26, '#8a929c');
+  p.ellipse(x, y + 39, 9, 3, '#55505f');
+}
+
+function calendar(p, x, y) {
+  p.rect(x, y, 22, 28, '#fbfaf6');
+  p.rect(x, y, 22, 10, '#3a9a6a');
+  p.rect(x + 3, y + 2, 16, 6, '#8fc46a');
+  for (let r = 0; r < 4; r++)
+    for (let c = 0; c < 5; c++) p.px(x + 3 + c * 4, y + 13 + r * 4, '#8a8494');
+  p.px(x + 11, y + 21, '#d94b3d');
+  p.rect(x + 10, y - 2, 2, 3, '#55505f');
+}
+
+function smallSign(p, x, y, w, h, bg, fg) {
+  // A small printed sign; its words are drawn as text lines (no real wording).
+  p.rect(x + 1, y + 1, w, h, '#00000030');
+  p.rect(x, y, w, h, bg);
+  p.stroke(x, y, w, h, fg);
+  for (let k = 0; k < Math.floor((h - 4) / 4); k++)
+    p.hline(x + 3, y + 3 + k * 4, w - 6 - (k % 2) * 4, fg);
+}
+
+/** Strips of snack packs hanging from the overhang (generic colours, no brands): a sari-sari staple. */
+function snackStrips(p, x0, x1, y) {
+  const colors = ['#d94b3d', '#f2c14e', '#3b6fb6', '#3a9a6a', '#f08a3c', '#e98ab0', '#8a5ab8'];
+  for (let x = x0; x < x1; x += 12) {
+    const c = colors[Math.floor(hash(x, 41) * colors.length)];
+    p.vline(x + 4, y - 2, 2, '#8a8494');
+    for (let k = 0; k < 4; k++) {
+      p.rect(x, y + k * 9, 9, 8, c);
+      p.hline(x, y + k * 9, 9, shade(c, 0.35));
+      p.rect(x + 2, y + k * 9 + 3, 5, 3, '#fff4dc');
+      p.hline(x, y + k * 9 + 7, 9, shade(c, -0.3));
+    }
+  }
+}
+
+function plasticChair(p, x, y) {
+  const c = '#d94b3d';
+  p.rect(x, y, 22, 4, c);
+  p.rect(x + 2, y - 18, 18, 16, c);
+  for (let k = 0; k < 3; k++) p.hline(x + 4, y - 15 + k * 4, 14, shade(c, 0.2));
+  p.rect(x + 1, y + 4, 3, 14, shade(c, -0.15));
+  p.rect(x + 18, y + 4, 3, 14, shade(c, -0.15));
+}
+
+function trashBin(p, x, y) {
+  p.rect(x, y, 18, 24, '#3a7a4a');
+  p.rect(x - 1, y - 3, 20, 4, '#2b5a3a');
+  for (let k = 3; k < 18; k += 4) p.vline(x + k, y + 2, 20, '#2f6a3e');
+  p.rect(x + 3, y - 6, 12, 3, '#f4f1ea');
+}
+
+function pottedPlant(p, x, y) {
+  p.rect(x, y, 16, 14, '#c8693f');
+  p.hline(x, y, 16, '#e08a5a');
+  for (let k = 0; k < 9; k++)
+    p.line(x + 8, y, x + 2 + k * 1.5, y - 10 - (k % 3) * 4, k % 2 ? '#5e9c48' : '#3f7d3a');
+  p.px(x + 4, y - 12, '#e98ab0');
+  p.px(x + 11, y - 14, '#e98ab0');
+}
+
+function grime(p, x, y, w, h, c, n, seed) {
+  for (let k = 0; k < n; k++) {
+    const gx = x + Math.floor(hash(seed, k, 1) * w);
+    const gy = y + Math.floor(hash(seed, k, 2) * h);
+    p.px(gx, gy, c);
+    if (hash(seed, k, 3) < 0.3) p.px(gx, gy + 1, c);
+  }
+}
+
 // ---- Two looks -------------------------------------------------------------------------------------------
 
 function kioskBase(p, key, layout) {
@@ -287,6 +380,10 @@ function kioskBase(p, key, layout) {
     photoBanner(p, 8 + b * 126, 4, 120, 34, bannerKeys.slice(b * 2, b * 2 + 2), b);
   const s = layout.sign;
   printedSign(p, s.x, s.y, s.w, s.h);
+  grime(p, 0, 40, FRONT_W, 110, '#d2ccc0', 260, key.length);
+  wallClock(p, 86, 52);
+  calendar(p, 104 + s.w + 2, 44);
+  smallSign(p, 196, 40, 34, 9, '#fff4dc', '#d94b3d');
   plasticBags(p, 6, 46);
   vendor(p, layout.vendor[0], layout.vendor[1], LOOKS[1]);
   // Glass case: red frame, fluorescent tube, an upper shelf of extra trays, the main shelf.
@@ -312,6 +409,12 @@ function kioskBase(p, key, layout) {
     p.hline(0, 150, FRONT_W, '#8a8494');
     p.rect(0, 160, FRONT_W, 60, '#d22f2a');
     p.hline(0, 160, FRONT_W, '#e8604a');
+    p.rect(cx0 + 4, 140, cw - 8, 6, '#fff6c940');
+    // A shine across the red front and a steel kick plate at the bottom.
+    for (let k = 0; k < 40; k++) p.px(40 + k * 11, 164 + (k % 3), '#e8604a');
+    p.rect(0, 206, FRONT_W, 8, '#b8bec6');
+    p.hline(0, 206, FRONT_W, '#e2e6ea');
+    for (let x = 8; x < FRONT_W; x += 32) p.px(x, 210, '#8a929c');
     p.rect(0, 214, FRONT_W, 6, '#a8221e');
     for (let x = 0; x < FRONT_W; x += 64) p.vline(x, 162, 52, '#c02a26');
   };
@@ -332,8 +435,23 @@ function rowBase(p, key, layout, { tree = false } = {}) {
         ['#d94b3d', '#f2c14e', '#efe6cc', '#3a9a6a', '#3b6fb6'][(k + y) % 5],
       );
   }
+  // Warm light from a tube inside.
+  p.rect(60, 30, 440, 3, '#fff6c9');
+  for (let y = 33; y < 70; y++)
+    p.hline(
+      60,
+      y,
+      440,
+      `#fff1c0${Math.max(0, 40 - (y - 33))
+        .toString(16)
+        .padStart(2, '0')}`,
+    );
+  grime(p, 60, 30, 440, 116, '#3e3830', 180, key.length + 7);
   fridge(p, 270, 40);
   poster(p, 326, 70, 30, 38, '#f2c14e', '#d94b3d');
+  wallClock(p, 372, 84);
+  calendar(p, 384, 98);
+  standFan(p, 488, 92);
   // Concrete overhang and its underside.
   p.rect(0, 0, FRONT_W, 18, '#d4cfc4');
   p.hline(0, 0, FRONT_W, '#e8e4da');
@@ -356,6 +474,8 @@ function rowBase(p, key, layout, { tree = false } = {}) {
   p.stroke(290, 26, 192, 36, '#f2c14e');
   p.rect(292, 22, 4, 4, '#8a929c');
   p.rect(476, 22, 4, 4, '#8a929c');
+  snackStrips(p, 268, 286, 28);
+  snackStrips(p, 486, 508, 28);
   if (tree) treeTrunk(p, 0);
   else {
     p.rect(0, 28, 52, 178, '#e8e4da');
@@ -378,9 +498,14 @@ function rowBase(p, key, layout, { tree = false } = {}) {
     for (let x = 0; x < FRONT_W; x += 40) p.vline(x + (x % 3), 200, 20, '#a9a49a');
     for (let k = 0; k < 10; k++)
       p.px(Math.floor(hash(k, 77) * 512), 204 + Math.floor(hash(k, 78) * 14), '#7a9a4a');
+    p.rect(52, 196, 460, 4, '#00000030');
     crate(p, 60, 176, 56, 30);
     crate(p, 120, 182, 46, 24, 'foam');
     crate(p, 440, 178, 64, 28);
+    crate(p, 446, 160, 50, 18, 'foam');
+    trashBin(p, 176, 186);
+    plasticChair(p, 400, 190);
+    if (!tree) pottedPlant(p, 18, 188);
   };
 }
 
