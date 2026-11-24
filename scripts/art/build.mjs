@@ -1,15 +1,17 @@
 // Bakes every art asset to PNG plus a Phaser asset pack (DECISIONS R-006). Run: npm run art
 // Optional: node scripts/art/build.mjs --preview <dir>  writes composed previews for review.
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { landingAssets } from './landing.mjs';
 import { uiAssets } from './ui.mjs';
 import { avatarAssets } from './avatar.mjs';
+import { mapAssets } from './map.mjs';
 import { Pix } from './pix.mjs';
 
 const SETS = [
   { name: 'home', dir: 'public/assets/home', assets: landingAssets() },
   { name: 'common', dir: 'public/assets/common', assets: [...uiAssets(), ...avatarAssets()] },
+  { name: 'map', dir: 'public/assets/map', assets: mapAssets() },
 ];
 
 for (const set of SETS) {
@@ -99,6 +101,66 @@ if (previewAt > 0) {
         big.rect(x * 2, y * 2, 2, 2, h);
       }
     writeFileSync(join(dir, `landing-${phase}.png`), big.png());
+  }
+  // Campus map previews: day and night (navy tint plus the lights overlay).
+  const geo = JSON.parse(readFileSync('src/map/mapGeometry.json', 'utf8'));
+  const shorts = {
+    'ust-paskuhan': 'ust',
+    'feu-deco': 'feu',
+    'nu-peprally': 'nu',
+    'ue-bookhunt': 'ue',
+    'sanbeda-shoot': 'sanbeda',
+    'ceu-lab': 'ceu',
+    'pup-lagoon': 'pup',
+  };
+  for (const night of [false, true]) {
+    const s = new Pix(640, 360);
+    s.blit(get('map_ubelt').pix, 0, 0);
+    if (night) {
+      s.rect(0, 0, 640, 360, '#1d234859');
+      const l = get('map_lights').pix;
+      for (let y = 0; y < 360; y++)
+        for (let x = 0; x < 640; x++) {
+          const c = l.get(x, y);
+          if (!c || !c[3]) continue;
+          const b = s.get(x, y);
+          const a = c[3] / 255;
+          s.px(
+            x,
+            y,
+            `#${[0, 1, 2]
+              .map((k) =>
+                Math.min(255, Math.round(b[k] + c[k] * a))
+                  .toString(16)
+                  .padStart(2, '0'),
+              )
+              .join('')}`,
+          );
+        }
+    }
+    for (const [id, c] of Object.entries(geo.campuses)) {
+      const img = frame(`map_campus_${shorts[id]}`, night ? 1 : 0);
+      s.blit(img, Math.round(c.x - img.w / 2), c.y + 12 - img.h);
+      s.blit(frame('map_pin', id === 'pup-lagoon' ? 0 : 1), c.x - 8, c.y + 12 - img.h - 22);
+    }
+    s.blit(frame('map_jeep', 0), 555 - 44 - 15, 248 + 6 - 9);
+    const big = new Pix(1280, 720);
+    for (let y = 0; y < 360; y++)
+      for (let x = 0; x < 640; x++) {
+        const c = s.get(x, y);
+        if (!c || !c[3]) continue;
+        big.rect(
+          x * 2,
+          y * 2,
+          2,
+          2,
+          `#${c
+            .slice(0, 3)
+            .map((v) => v.toString(16).padStart(2, '0'))
+            .join('')}`,
+        );
+      }
+    writeFileSync(join(dir, `map-${night ? 'gabi' : 'day'}.png`), big.png());
   }
   console.log(`previews → ${dir}`);
 }

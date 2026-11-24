@@ -1,13 +1,14 @@
 /**
- * CampusMapScene ("Mapa ng U-Belt", SPEC-homepage §4) — H3 living map (greybox shapes until H4 art)
- * Shows: the U-Belt map (roads, LRT-2 with Recto / Legarda / Pureza, Pasig River) tinted by the time of
- * day, ambient life (an LRT-2 train every 20–30 s, small jeepneys on the roads, cloud shadows, birds), the
- * 7 campus stops (PUP playable with its progress and sticker mark, the rest "SOON"), the jeepney, the HUD,
- * the campus card, the list view, and the jeepney ride into the minigame. Tapping a stop zooms the world
- * camera 10% toward it; a second, fixed camera draws the UI so the HUD never zooms. Arriving from the
- * landing, the map unfolds (scale 0.92 → 1).
- * Listens to: pointer (taps, hover grow, list drag), mouse wheel (list), keyboard (arrows move between
- * stops, Enter opens / rides, Esc closes the card, Tab switches Mapa/Listahan), the frame update (clouds).
+ * CampusMapScene ("Mapa ng U-Belt", SPEC-homepage §4) — H4 illustrated map
+ * Shows: the baked U-Belt map (map_ubelt: rooftops, avenues, the LRT-2 viaduct, the Pasig River, Quiapo,
+ * street signs), the time-of-day tint with night lights (map_lights), ambient life (an LRT-2 train every
+ * 20–30 s, jeepneys, tricycles and cars on the avenues, a river ferry, drifting water hyacinth, sparkles on
+ * the water, cloud shadows, birds), the 7 campus buildings with pins (PUP playable with its progress and
+ * sticker mark, the rest a "SOON" tarpaulin), the player's jeepney, the HUD, the campus card, the list view
+ * and the jeepney ride into the minigame. Tapping a stop zooms the world camera 10% toward it; a second,
+ * fixed camera draws the UI so the HUD never zooms. Arriving from the landing, the map unfolds (0.92 → 1).
+ * Listens to: pointer (taps, hover glow, list drag), mouse wheel (list), keyboard (arrows move between
+ * stops, Enter opens / rides, Esc closes the card, Tab switches Map/List), the frame update (movers, clouds).
  */
 import Phaser from 'phaser';
 import { addViewCamera, RENDER_SCALE, sceneConfig } from '../ui/view';
@@ -17,18 +18,17 @@ import type { MapView } from '../core/SaveManager';
 import { services } from '../core/services';
 import {
   FADE_MS,
-  JEEP_COLORS,
   MAP,
   MAP_AMBIENT,
-  MAP_LRT,
-  MAP_ROADS,
+  MAP_LIGHTS,
   MAP_TINT,
   MAP_UI_DEPTH,
   PALETTE,
   RIDE,
 } from '../home/config';
-import { phaseAt } from '../home/TimeOfDay';
-import { pointAt, polylineLength, RoutePath, rideDurationMs } from '../map/RoutePath';
+import { phaseAt, type Phase } from '../home/TimeOfDay';
+import { MAP_CAMPUSES, MAP_LRT, MAP_RIVER, road, type CampusPlot } from '../map/geometry';
+import { type Point, pointAt, polylineLength, RoutePath, rideDurationMs } from '../map/RoutePath';
 import { summaryFor, totalIpon } from '../minigames/progressSummary';
 import { entryAtStop, ROSTER, type RosterEntry, ROUTE_NODES } from '../minigames/roster';
 import { Button } from '../ui/Button';
@@ -44,17 +44,56 @@ export interface CampusMapData {
   from?: 'landing';
 }
 
+/** World depths: under the tint (map, traffic, clouds) and above it (stops, jeep, bubbles). */
+const DEPTH = {
+  traffic: 3,
+  clouds: 4,
+  tint: 20,
+  lights: 21,
+  glow: 22,
+  building: 23,
+  stopUi: 24,
+  jeep: 25,
+  bubble: 26,
+  birds: 27,
+};
+
 const ROUTE = new RoutePath(ROUTE_NODES);
 const CARD_OPEN_Y = 360 - MAP.card.h / 2 - 6;
 const CARD_HIDDEN_Y = 360 + MAP.card.h;
-/** The jeepney parks beside the pin, not on it. */
-const JEEP_OFFSET = { x: -44, y: 6 };
-const lrtY = (x: number): number => MAP_LRT.y0 + x * MAP_LRT.slope;
+/** The jeepney parks beside the campus building, not on it. */
+const JEEP_OFFSET = { x: -46, y: 14 };
+/** A building's footprint sits this far below the stop point. */
+const BASE_DY = 12;
+/** Lane offsets from the road's centre line (traffic keeps right). */
+const LANE = { boulevard: 2.5, avenue: 1.8, street: 0.8 } as const;
+
+interface Mover {
+  obj: Phaser.GameObjects.Image | Phaser.GameObjects.Sprite;
+  path: Point[];
+  len: number;
+  d: number;
+  dir: 1 | -1;
+  speed: number;
+  lane: number;
+  /** bounce: turn around at the ends; wrap: start over at the far end. */
+  mode: 'bounce' | 'wrap';
+  rotate: boolean;
+}
+
+interface StopView {
+  entry: RosterEntry;
+  plot: CampusPlot;
+  building: Phaser.GameObjects.Image;
+  glow: Phaser.GameObjects.Ellipse;
+}
 
 export class CampusMapScene extends Phaser.Scene {
   private view: MapView = 'map';
   private selected = 7;
+  private phase: Phase = 'tanghali';
   private jeep!: Phaser.GameObjects.Container;
+  private jeepSprite!: Phaser.GameObjects.Sprite;
   private jeepSign!: Phaser.GameObjects.Text;
   private card!: Phaser.GameObjects.Container;
   private cardEntry: RosterEntry | null = null;
@@ -63,11 +102,13 @@ export class CampusMapScene extends Phaser.Scene {
   private listScroll = 0;
   private drag: { y: number; scroll: number; moved: boolean } | null = null;
   private toggle!: Button;
-  private highlight!: Phaser.GameObjects.Arc;
+  private highlight!: Phaser.GameObjects.Ellipse;
+  private stops = new Map<number, StopView>();
   private riding = false;
   private reduced = false;
   private uiCam!: Phaser.Cameras.Scene2D.Camera;
   private clouds: Phaser.GameObjects.Ellipse[] = [];
+  private movers: Mover[] = [];
 
   constructor() {
     super(sceneConfig(SCENES.campusMap));
@@ -82,13 +123,17 @@ export class CampusMapScene extends Phaser.Scene {
     this.listScroll = 0;
     this.drag = null;
     this.clouds = [];
+    this.movers = [];
+    this.stops = new Map();
     this.reduced = save.settings.reducedMotion;
+    this.phase = phaseAt(new Date(), save.home.theme);
 
-    this.drawBase();
+    this.createAnims();
+    this.add.image(0, 0, 'map_ubelt').setOrigin(0);
     this.drawAmbient();
+    this.drawTint();
     this.drawStops();
     this.drawJeep(save.home.lastStop);
-    this.drawTint();
     this.buildList();
     this.drawHud();
     this.card = this.add.container(320, CARD_HIDDEN_Y).setDepth(50);
@@ -109,8 +154,9 @@ export class CampusMapScene extends Phaser.Scene {
   }
 
   override update(_time: number, delta: number): void {
-    if (this.reduced) return;
     const dt = Math.min(delta, 100) / 1000;
+    for (const m of this.movers) this.stepMover(m, dt);
+    if (this.reduced) return;
     for (const c of this.clouds) {
       c.x -= MAP_AMBIENT.cloudSpeed * dt;
       if (c.x < -80) c.x = 720;
@@ -152,120 +198,161 @@ export class CampusMapScene extends Phaser.Scene {
     main.zoomTo(RENDER_SCALE, MAP.zoomMs, 'Sine.easeInOut', true);
   }
 
-  // ---- Drawing -----------------------------------------------------------------------------------
+  // ---- Ambient life (§4.1) -----------------------------------------------------------------------
 
-  private drawBase(): void {
-    this.add.rectangle(320, 180, 640, 360, 0xf3e6c8);
-    this.add.rectangle(320, 180, 624, 344).setStrokeStyle(2, 0xd8c39a);
-
-    const river = this.add.graphics();
-    river.fillStyle(0x7fb0d0, 1);
-    river.fillPoints(
-      [
-        { x: 0, y: 300 },
-        { x: 120, y: 312 },
-        { x: 260, y: 296 },
-        { x: 400, y: 318 },
-        { x: 520, y: 290 },
-        { x: 640, y: 300 },
-        { x: 640, y: 340 },
-        { x: 0, y: 340 },
-      ].map((p) => new Phaser.Math.Vector2(p.x, p.y)),
-      true,
-    );
-    river.lineStyle(6, 0x7fb0d0, 1);
-    river.lineBetween(430, 300, 470, 140);
-    river.lineBetween(330, 305, 300, 120);
-    this.add.text(320, 326, t('map.river'), textStyle(8, '#3E5E78')).setOrigin(0.5);
-    if (!this.reduced) {
-      // A gentle shimmer on the river.
-      const shimmer = this.add.rectangle(320, 318, 640, 2, 0xffffff, 0.25);
-      this.tweens.add({ targets: shimmer, alpha: 0.05, duration: 1500, yoyo: true, repeat: -1 });
+  private createAnims(): void {
+    const anims: [string, string, number][] = [
+      ['map_jeep_drive', 'map_jeep', 8],
+      ['map_bird_flap', 'map_bird', 6],
+      ['map_hyacinth_bob', 'map_hyacinth', 1],
+    ];
+    for (const [key, texture, frameRate] of anims) {
+      if (this.anims.exists(key)) continue;
+      this.anims.create({
+        key,
+        frames: this.anims.generateFrameNumbers(texture, { start: 0, end: 1 }),
+        frameRate,
+        repeat: -1,
+      });
     }
-
-    const g = this.add.graphics();
-    g.lineStyle(4, 0xffffff, 1);
-    for (const [key, x1, y1, x2, y2, lx, ly] of MAP_ROADS) {
-      g.lineBetween(x1, y1, x2, y2);
-      this.add
-        .text(lx, ly, t(`map.road.${key}`), textStyle(8, '#7A6A55'))
-        .setOrigin(0.5)
-        .setAlpha(0.8);
-    }
-
-    const lrt = this.add.graphics();
-    lrt.lineStyle(2, PALETTE.lrt, 1);
-    for (let x = 10; x < 630; x += 12) lrt.lineBetween(x, lrtY(x), x + 7, lrtY(x + 7));
-    for (const [key, x] of Object.entries(MAP_LRT.stations)) {
-      this.add.circle(x, lrtY(x), 3, PALETTE.lrt).setStrokeStyle(1, COLORS.cream).setDepth(2);
-      this.add
-        .text(x, lrtY(x) - 10, t(`map.station.${key}`), textStyle(8, '#5B3C8A'))
-        .setOrigin(0.5)
-        .setDepth(2);
-    }
-    this.add.text(600, 196, t('map.lrt'), textStyle(8, '#5B3C8A')).setOrigin(0.5, 1);
-
-    const route = this.add.graphics();
-    route.lineStyle(1, COLORS.ink, 0.25);
-    route.strokePoints(ROUTE_NODES.map((n) => new Phaser.Math.Vector2(n.x, n.y)));
   }
 
-  /** LRT-2 train, small jeepneys on the roads, cloud shadows and birds (§4.1 ambient). */
+  private addMover(m: Omit<Mover, 'len'>): Mover {
+    const mover = { ...m, len: polylineLength(m.path) };
+    this.movers.push(mover);
+    this.placeMover(mover);
+    return mover;
+  }
+
+  private stepMover(m: Mover, dt: number): void {
+    m.d += m.dir * m.speed * dt;
+    if (m.mode === 'wrap') {
+      if (m.d < 0) m.d += m.len;
+      if (m.d > m.len) m.d -= m.len;
+    } else if (m.d > m.len) {
+      m.d = m.len;
+      m.dir = -1;
+    } else if (m.d < 0) {
+      m.d = 0;
+      m.dir = 1;
+    }
+    this.placeMover(m);
+  }
+
+  private placeMover(m: Mover): void {
+    const p = pointAt(m.path, m.d);
+    const a = pointAt(m.path, Math.max(0, m.d - 1));
+    const b = pointAt(m.path, Math.min(m.len, m.d + 1));
+    let angle = Math.atan2(b.y - a.y, b.x - a.x);
+    if (m.dir < 0) angle += Math.PI;
+    // Keep right: offset to the right-hand side of the direction of travel.
+    m.obj.setPosition(p.x - Math.sin(angle) * m.lane, p.y + Math.cos(angle) * m.lane);
+    if (m.rotate) m.obj.setRotation(angle);
+  }
+
+  /** LRT-2 train, traffic, the river, cloud shadows and birds. */
   private drawAmbient(): void {
-    // The LRT-2 train glides along its line every 20–30 s.
+    // The LRT-2 train runs its viaduct every 20–30 s, alternating direction.
     const train = this.add
-      .container(-30, lrtY(0), [
-        this.add.rectangle(0, 0, 40, 8, 0xe6e6ee).setStrokeStyle(1, COLORS.ink),
-        this.add.rectangle(0, 2, 40, 2, PALETTE.lrt),
-      ])
-      .setDepth(3)
+      .image(-40, 0, 'map_train')
+      .setDepth(DEPTH.traffic + 0.5)
       .setVisible(false);
+    const lrtLen = polylineLength(MAP_LRT.points);
+    let east = true;
     const runTrain = (): void => {
-      train.setVisible(true).setPosition(-30, lrtY(0));
+      const progress = { d: east ? 0 : lrtLen };
+      const place = (): void => {
+        const p = pointAt(MAP_LRT.points, progress.d);
+        const q = pointAt(MAP_LRT.points, progress.d + (east ? 1 : -1));
+        train.setPosition(p.x, p.y).setRotation(Math.atan2(q.y - p.y, q.x - p.x));
+      };
+      train.setVisible(true);
+      place();
       this.tweens.add({
-        targets: train,
-        x: 670,
-        y: lrtY(670),
+        targets: progress,
+        d: east ? lrtLen : 0,
         duration: MAP_AMBIENT.trainMs,
+        onUpdate: place,
         onComplete: () => train.setVisible(false),
       });
+      east = !east;
       this.time.delayedCall(Phaser.Math.Between(...MAP_AMBIENT.trainEveryMs), runTrain);
     };
     this.time.delayedCall(Phaser.Math.Between(2000, 5000), runTrain);
 
-    // Small jeepneys drive back and forth along their roads.
-    MAP_AMBIENT.jeepRoads.forEach((roadIndex, i) => {
-      const [, x1, y1, x2, y2] = MAP_ROADS[roadIndex];
-      const jeep = this.add
-        .rectangle(x1, y1, 10, 6, JEEP_COLORS[i % JEEP_COLORS.length])
-        .setStrokeStyle(1, COLORS.ink)
-        .setDepth(3);
-      this.tweens.add({
-        targets: jeep,
-        x: x2,
-        y: y2,
-        duration: (Math.hypot(x2 - x1, y2 - y1) / MAP_AMBIENT.jeepSpeed) * 1000,
-        yoyo: true,
-        repeat: -1,
-        delay: i * 1500,
-        ease: 'Linear',
+    // Jeepneys, tricycles and cars on the avenues (traffic stays with Reduced Motion, D-035).
+    for (const [roadId, frame] of MAP_AMBIENT.traffic) {
+      const r = road(roadId);
+      const len = polylineLength(r.points);
+      this.addMover({
+        obj: this.add.image(0, 0, 'map_mini', frame).setDepth(DEPTH.traffic),
+        path: r.points,
+        d: Phaser.Math.FloatBetween(0, len),
+        dir: Phaser.Math.Between(0, 1) ? 1 : -1,
+        speed: Phaser.Math.Between(...MAP_AMBIENT.trafficSpeed),
+        lane: LANE[r.kind],
+        mode: 'bounce',
+        rotate: true,
       });
+    }
+    // A Pasig River ferry.
+    this.addMover({
+      obj: this.add.image(0, 0, 'map_boat').setDepth(DEPTH.traffic),
+      path: MAP_RIVER.points,
+      d: 120,
+      dir: 1,
+      speed: MAP_AMBIENT.boatSpeed,
+      lane: 3,
+      mode: 'bounce',
+      rotate: true,
     });
 
     if (this.reduced) return;
+    // Water hyacinth drifts downstream (west, toward Manila Bay); sparkles on the water.
+    const riverLen = polylineLength(MAP_RIVER.points);
+    for (let i = 0; i < MAP_AMBIENT.hyacinths; i++) {
+      this.addMover({
+        obj: this.add
+          .sprite(0, 0, 'map_hyacinth')
+          .setDepth(DEPTH.traffic - 0.5)
+          .play({ key: 'map_hyacinth_bob', startFrame: i % 2 }),
+        path: MAP_RIVER.points,
+        d: (riverLen * i) / MAP_AMBIENT.hyacinths,
+        dir: -1,
+        speed: MAP_AMBIENT.hyacinthSpeed * Phaser.Math.FloatBetween(0.7, 1.3),
+        lane: Phaser.Math.FloatBetween(-MAP_RIVER.width / 2 + 3, MAP_RIVER.width / 2 - 3),
+        mode: 'wrap',
+        rotate: false,
+      });
+    }
+    for (let i = 0; i < MAP_AMBIENT.sparkles; i++) {
+      const s = this.add.rectangle(0, 0, 3, 1, 0xffffff, 1).setDepth(DEPTH.traffic - 0.5);
+      const move = (): void => {
+        const p = pointAt(MAP_RIVER.points, Phaser.Math.FloatBetween(0, riverLen));
+        s.setPosition(Math.round(p.x), Math.round(p.y + Phaser.Math.Between(-5, 5)));
+      };
+      move();
+      s.setAlpha(0);
+      this.tweens.add({
+        targets: s,
+        alpha: 0.8,
+        duration: 700,
+        yoyo: true,
+        repeat: -1,
+        delay: i * 450,
+        repeatDelay: 1200,
+        onRepeat: move,
+      });
+    }
+
     // Cloud shadows drift; birds cross now and then.
     this.clouds = [
-      this.add.ellipse(160, 120, 140, 60, COLORS.ink, 0.06).setDepth(4),
-      this.add.ellipse(520, 260, 120, 50, COLORS.ink, 0.06).setDepth(4),
+      this.add.ellipse(160, 120, 140, 60, COLORS.ink, 0.07).setDepth(DEPTH.clouds),
+      this.add.ellipse(520, 260, 120, 50, COLORS.ink, 0.07).setDepth(DEPTH.clouds),
     ];
     const bird = (): void => {
-      const y = Phaser.Math.Between(30, 150);
-      const b = this.add
-        .container(-10, y, [
-          this.add.line(0, 0, -4, -2, 0, 0, COLORS.ink),
-          this.add.line(0, 0, 0, 0, 4, -2, COLORS.ink),
-        ])
-        .setDepth(4);
+      const y = Phaser.Math.Between(40, 160);
+      const b = this.add.sprite(-10, y, 'map_bird').setDepth(DEPTH.birds).play('map_bird_flap');
       this.uiCam.ignore(b);
       this.tweens.add({
         targets: b,
@@ -280,51 +367,61 @@ export class CampusMapScene extends Phaser.Scene {
   }
 
   private drawTint(): void {
-    const save = services().save.data;
-    const [color, alpha] = MAP_TINT[phaseAt(new Date(), save.home.theme)];
-    if (alpha > 0) this.add.rectangle(320, 180, 640, 360, color, alpha).setDepth(20);
+    const [color, alpha] = MAP_TINT[this.phase];
+    if (alpha > 0) this.add.rectangle(320, 180, 640, 360, color, alpha).setDepth(DEPTH.tint);
+    const lights = MAP_LIGHTS[this.phase];
+    if (lights > 0) {
+      this.add
+        .image(0, 0, 'map_lights')
+        .setOrigin(0)
+        .setDepth(DEPTH.lights)
+        .setBlendMode(Phaser.BlendModes.ADD)
+        .setAlpha(lights);
+    }
   }
+
+  // ---- Campus stops (§4.2) -----------------------------------------------------------------------
 
   private drawStops(): void {
     const save = services().save.data;
-    this.highlight = this.add.circle(0, 0, 15).setStrokeStyle(2, COLORS.red).setDepth(5);
+    const night = this.phase === 'gabi';
+    this.highlight = this.add
+      .ellipse(0, 0, 40, 12)
+      .setStrokeStyle(2, COLORS.red)
+      .setDepth(DEPTH.glow + 0.5);
+    if (!this.reduced) {
+      this.tweens.add({
+        targets: this.highlight,
+        alpha: 0.4,
+        duration: 600,
+        yoyo: true,
+        repeat: -1,
+      });
+    }
     for (const entry of ROSTER) {
+      const plot = MAP_CAMPUSES[entry.id];
       const playable = entry.status === 'playable';
-      const block = this.add
-        .rectangle(
-          entry.x,
-          entry.y,
-          44,
-          30,
-          playable ? PALETTE.gold : 0xb8b0a0,
-          playable ? 0.35 : 0.25,
-        )
-        .setStrokeStyle(1, COLORS.ink, 0.3)
-        .setDepth(4);
+      const baseY = entry.y + BASE_DY;
+      const glow = this.add
+        .ellipse(entry.x, baseY - 2, 10, 10, PALETTE.glow, 0)
+        .setDepth(DEPTH.glow);
+      const building = this.add
+        .image(entry.x, baseY, `map_campus_${plot.art}`, night ? 1 : 0)
+        .setOrigin(0.5, 1)
+        .setDepth(DEPTH.building);
+      if (this.phase === 'hapon') building.setTint(0xffe6cf);
+      glow.setSize(building.width + 12, 16);
+      const top = baseY - building.height;
+      this.stops.set(entry.stop, { entry, plot, building, glow });
+
       const pin = this.add
-        .circle(entry.x, entry.y - 4, MAP.pin / 2, playable ? PALETTE.jeepRed : COLORS.grey)
-        .setStrokeStyle(1, COLORS.ink)
-        .setDepth(6);
-      pin.setInteractive(
-        new Phaser.Geom.Circle(MAP.pin / 2, MAP.pin / 2, 16),
-        Phaser.Geom.Circle.Contains,
-      );
-      pin.on('pointerup', () => this.select(entry.stop, true));
-      // Hover (desktop): the pin grows 10% and the campus block glows (§4.2).
-      pin.on('pointerover', () => {
-        pin.setScale(1.1);
-        block.setStrokeStyle(2, PALETTE.glow, 1).setFillStyle(block.fillColor, 0.6);
-      });
-      pin.on('pointerout', () => {
-        pin.setScale(1);
-        block
-          .setStrokeStyle(1, COLORS.ink, 0.3)
-          .setFillStyle(block.fillColor, playable ? 0.35 : 0.25);
-      });
+        .image(entry.x, top + 2, 'map_pin', playable ? 0 : 1)
+        .setOrigin(0.5, 1)
+        .setDepth(DEPTH.stopUi);
       if (playable && !this.reduced) {
         this.tweens.add({
           targets: pin,
-          y: entry.y - 7,
+          y: top - 2,
           duration: 200,
           yoyo: true,
           repeat: -1,
@@ -332,34 +429,59 @@ export class CampusMapScene extends Phaser.Scene {
           ease: 'Sine.easeOut',
         });
       }
-      this.add
-        .rectangle(entry.x, entry.y + 16, 46, 11, COLORS.cream)
-        .setStrokeStyle(1, COLORS.ink)
-        .setDepth(6);
-      this.add
-        .text(entry.x, entry.y + 16, entry.campus, textStyle(8))
+
+      // Tap target: the building and its pin. Hover grows the pin and lights the ground (§4.2).
+      const zoneH = building.height + 24;
+      const zone = this.add
+        .zone(entry.x, baseY - zoneH / 2 + 2, Math.max(36, building.width), zoneH)
+        .setDepth(DEPTH.stopUi)
+        .setInteractive({ useHandCursor: true });
+      zone.on('pointerup', () => this.select(entry.stop, true));
+      zone.on('pointerover', () => {
+        pin.setScale(1.1);
+        glow.setFillStyle(PALETTE.glow, 0.6);
+      });
+      zone.on('pointerout', () => {
+        pin.setScale(1);
+        glow.setFillStyle(PALETTE.glow, 0);
+      });
+
+      // Campus name on a yellow signboard below.
+      const label = this.add
+        .text(entry.x, baseY + 9, entry.campus, textStyle(8))
         .setOrigin(0.5)
-        .setDepth(6);
+        .setDepth(DEPTH.stopUi + 0.1);
+      this.add
+        .nineslice(entry.x, baseY + 9, 'ui_board', undefined, label.width + 10, 13, 6, 6, 6, 6)
+        .setDepth(DEPTH.stopUi);
+
       if (playable) {
         const s = summaryFor(entry.id, save);
         if (s.pin) {
           this.add
-            .text(entry.x, entry.y + 28, t(s.pin.key, s.pin.params), textStyle(8, TEXT.ink))
+            .text(
+              entry.x,
+              baseY + 21,
+              t(s.pin.key, s.pin.params),
+              textStyle(8, TEXT.ink, { backgroundColor: '#FFF4DC', padding: { x: 2, y: 0 } }),
+            )
             .setOrigin(0.5)
-            .setDepth(6);
+            .setDepth(DEPTH.stopUi);
         }
         if (save.stickers.includes(entry.stickerId)) {
           this.add
-            .star(entry.x + 12, entry.y - 14, 5, 3, 6, PALETTE.gold)
+            .star(entry.x + 9, top - 16, 5, 3, 6, PALETTE.gold)
             .setStrokeStyle(1, COLORS.ink)
-            .setDepth(7);
+            .setDepth(DEPTH.stopUi + 0.2);
         }
       } else {
-        this.add.rectangle(entry.x + 16, entry.y - 14, 28, 10, COLORS.yellow).setDepth(7);
+        // A "SOON" tarpaulin hung on the building, Pinoy style.
+        const ty = baseY - 9;
+        this.add.image(entry.x, ty, 'tarp_soon').setDepth(DEPTH.stopUi);
         this.add
-          .text(entry.x + 16, entry.y - 14, t('map.soon'), textStyle(8, TEXT.red))
+          .text(entry.x, ty, t('map.soon'), textStyle(8, TEXT.red))
           .setOrigin(0.5)
-          .setDepth(7);
+          .setDepth(DEPTH.stopUi + 0.1);
       }
     }
     this.moveHighlight();
@@ -367,16 +489,26 @@ export class CampusMapScene extends Phaser.Scene {
 
   private drawJeep(stop: number): void {
     const p = ROUTE.stopPoint(stop);
-    const body = this.add.rectangle(0, 0, 24, 16, PALETTE.jeepBlue).setStrokeStyle(1, COLORS.ink);
-    const board = this.add
-      .rectangle(0, -12, 44, 9, PALETTE.jeepYellow)
-      .setStrokeStyle(1, COLORS.ink);
+    this.jeepSprite = this.add.sprite(0, 0, 'map_jeep', 0).setOrigin(0.5, 1);
     this.jeepSign = this.add
-      .text(0, -12, entryAtStop(stop).area.toUpperCase(), textStyle(8, TEXT.red))
+      .text(0, -24, entryAtStop(stop).area.toUpperCase(), textStyle(8, TEXT.red))
       .setOrigin(0.5);
+    const board = this.add.nineslice(
+      0,
+      -24,
+      'ui_board',
+      undefined,
+      this.jeepSign.width + 10,
+      13,
+      6,
+      6,
+      6,
+      6,
+    );
     this.jeep = this.add
-      .container(p.x + JEEP_OFFSET.x, p.y + JEEP_OFFSET.y, [body, board, this.jeepSign])
-      .setDepth(8);
+      .container(p.x + JEEP_OFFSET.x, p.y + JEEP_OFFSET.y, [this.jeepSprite, board, this.jeepSign])
+      .setDepth(DEPTH.jeep);
+    if (this.phase === 'hapon') this.jeepSprite.setTint(0xffe6cf);
   }
 
   private drawHud(): void {
@@ -404,12 +536,12 @@ export class CampusMapScene extends Phaser.Scene {
     );
     hud(this.toggle);
     if (save.profile) {
-      const chip = new Button(this, 180, MAP.idChip.y, '', () => openOverlay(this, SCENES.idCard), {
-        width: MAP.idChip.w,
-        height: 22,
-      });
-      chip.add(avatarSprite(this, -48, -3, save.profile, 0.42));
-      chip.label.setText(save.profile.name).setX(8);
+      // The School ID chip only shows who is playing; the character is made on the landing (H4).
+      const chip = this.add.container(180, MAP.idChip.y, [
+        panel(this, 0, 0, MAP.idChip.w, 22),
+        avatarSprite(this, -48, -3, save.profile, 0.42),
+        this.add.text(8, -1, save.profile.name, textStyle(8)).setOrigin(0.5),
+      ]);
       hud(chip);
     }
     const ipon = totalIpon(
@@ -465,7 +597,16 @@ export class CampusMapScene extends Phaser.Scene {
         icon: 'icon_album',
       }),
     );
-    hud(this.add.text(320, 352, t('map.credit'), textStyle(8, '#7A6A55')).setOrigin(0.5));
+    hud(
+      this.add
+        .text(
+          320,
+          352,
+          t('map.credit'),
+          textStyle(8, '#5A4632', { backgroundColor: '#F3E6C8', padding: { x: 3, y: 0 } }),
+        )
+        .setOrigin(0.5),
+    );
   }
 
   // ---- List view (§4.5) --------------------------------------------------------------------------
@@ -490,25 +631,32 @@ export class CampusMapScene extends Phaser.Scene {
         if (!this.drag?.moved) this.openCard(entry);
         this.drag = null;
       });
-      const s = summaryFor(entry.id, save);
       const items: Phaser.GameObjects.GameObject[] = [
         cardBg,
-        this.add.text(-L.w / 2 + 10, -14, `${entry.campus} · ${entry.area}`, textStyle(8)),
-        this.add.text(
-          -L.w / 2 + 10,
-          2,
-          t(`roster.${entry.id}.title`),
-          textStyle(16, playable ? TEXT.red : TEXT.ink),
-        ),
-        this.add.rectangle(L.w / 2 - 50, 0, 64, 16, playable ? PALETTE.jeepGreen : COLORS.grey),
         this.add
-          .text(L.w / 2 - 50, 0, t(playable ? 'map.playNow' : 'map.soon'), textStyle(8, TEXT.cream))
-          .setOrigin(0.5),
+          .image(-L.w / 2 + 34, L.h / 2 - 6, `map_campus_${MAP_CAMPUSES[entry.id].art}`)
+          .setOrigin(0.5, 1)
+          .setScale(playable ? 1 : 0.9)
+          .setAlpha(playable ? 1 : 0.75),
+        this.add.text(-L.w / 2 + 72, -14, `${entry.campus} · ${entry.area}`, textStyle(8)),
       ];
-      if (s.pin)
+      if (playable) {
+        // Only the playable game shows its title; the rest just say "Coming soon" (owner, H4).
+        const s = summaryFor(entry.id, save);
         items.push(
-          this.add.text(L.w / 2 - 120, 0, t(s.pin.key, s.pin.params), textStyle(8)).setOrigin(0.5),
+          this.add.text(-L.w / 2 + 72, 2, t(`roster.${entry.id}.title`), textStyle(16, TEXT.red)),
+          this.add.rectangle(L.w / 2 - 50, 0, 64, 16, PALETTE.jeepGreen),
+          this.add.text(L.w / 2 - 50, 0, t('map.playNow'), textStyle(8, TEXT.cream)).setOrigin(0.5),
         );
+        if (s.pin)
+          items.push(
+            this.add
+              .text(L.w / 2 - 120, 0, t(s.pin.key, s.pin.params), textStyle(8))
+              .setOrigin(0.5),
+          );
+      } else {
+        items.push(this.add.text(-L.w / 2 + 72, 2, t('map.soonTitle'), textStyle(16, '#7A6A55')));
+      }
       const card = this.add.container(320, 0, items);
       this.list.add(card);
       return card;
@@ -583,8 +731,11 @@ export class CampusMapScene extends Phaser.Scene {
   }
 
   private moveHighlight(): void {
-    const e = entryAtStop(this.selected);
-    this.highlight.setPosition(e.x, e.y - 4);
+    const s = this.stops.get(this.selected);
+    if (!s) return;
+    this.highlight
+      .setPosition(s.entry.x, s.entry.y + BASE_DY - 1)
+      .setSize(s.building.width + 8, 12);
   }
 
   private openCard(entry: RosterEntry): void {
@@ -597,24 +748,32 @@ export class CampusMapScene extends Phaser.Scene {
     this.card.removeAll(true);
     const playable = entry.status === 'playable';
     const left = -C.w / 2;
+    const thumbX = left + 8 + C.thumb / 2;
+    const building = this.add
+      .image(thumbX, C.thumb / 2 - 10, `map_campus_${MAP_CAMPUSES[entry.id].art}`)
+      .setOrigin(0.5, 1);
+    building.setScale(Math.min((C.thumb - 12) / building.width, (C.thumb - 26) / building.height));
     const items: Phaser.GameObjects.GameObject[] = [
       panel(this, 0, 0, C.w, C.h).setInteractive(),
       this.add
-        .rectangle(left + 8 + C.thumb / 2, 0, C.thumb, C.thumb, playable ? 0x5e8c61 : 0xb8b0a0)
+        .rectangle(thumbX, -12, C.thumb, C.thumb - 24, 0xbfe0ff)
         .setStrokeStyle(1, COLORS.ink),
       this.add
-        .text(left + 8 + C.thumb / 2, 0, entry.campus, textStyle(8, TEXT.cream))
-        .setOrigin(0.5),
+        .rectangle(thumbX, C.thumb / 2 - 12, C.thumb, 24, 0x8bc163)
+        .setStrokeStyle(1, COLORS.ink),
+      building,
       this.add.text(left + 116, -66, `${entry.campus} ${entry.area}`, textStyle(8)),
-      this.add.text(left + 116, -54, t(`roster.${entry.id}.title`), textStyle(16, TEXT.red)),
-      this.add.text(
-        left + 116,
-        -34,
-        t(`roster.${entry.id}.tagline`),
-        textStyle(8, TEXT.ink, { wordWrap: { width: 230 } }),
-      ),
     ];
     if (playable) {
+      items.push(
+        this.add.text(left + 116, -54, t(`roster.${entry.id}.title`), textStyle(16, TEXT.red)),
+        this.add.text(
+          left + 116,
+          -34,
+          t(`roster.${entry.id}.tagline`),
+          textStyle(8, TEXT.ink, { wordWrap: { width: 230 } }),
+        ),
+      );
       const s = summaryFor(entry.id, services().save.data);
       s.lines.forEach((line, i) =>
         items.push(this.add.text(left + 116, -10 + i * 12, t(line.key, line.params), textStyle(8))),
@@ -629,21 +788,8 @@ export class CampusMapScene extends Phaser.Scene {
         }),
       );
     } else {
-      items.push(this.add.text(left + 116, -10, t('map.soonTitle'), textStyle(8, TEXT.red)));
-      items.push(
-        this.add.text(
-          left + 116,
-          2,
-          t(`roster.${entry.id}.teaser`),
-          textStyle(8, TEXT.ink, { wordWrap: { width: 230 } }),
-        ),
-      );
-      items.push(
-        new Button(this, 40, 52, t('map.soonButton'), () => undefined, {
-          width: 96,
-          height: 24,
-        }).setEnabled(false),
-      );
+      // Other campuses: just "Coming soon", no game title yet (owner, H4).
+      items.push(this.add.text(left + 116, -40, t('map.soonTitle'), textStyle(16, '#7A6A55')));
     }
     items.push(
       new Button(this, 130, 52, t('ui.close'), () => this.closeCard(), { width: 64, height: 24 }),
@@ -693,6 +839,7 @@ export class CampusMapScene extends Phaser.Scene {
     const length = polylineLength(path);
     const progress = { d: 0 };
     let skip: Button | null = null;
+    this.jeepSprite.play('map_jeep_drive');
     const tween = this.tweens.add({
       targets: progress,
       d: length,
@@ -700,10 +847,13 @@ export class CampusMapScene extends Phaser.Scene {
       ease: 'Sine.easeInOut',
       onUpdate: () => {
         const p = pointAt(path, progress.d);
+        // The sprite faces left; mirror it when driving right.
+        if (Math.abs(p.x - this.jeep.x) > 0.05) this.jeepSprite.setFlipX(p.x > this.jeep.x);
         this.jeep.setPosition(p.x, p.y);
       },
       onComplete: () => {
         skip?.destroy();
+        this.jeepSprite.stop();
         this.arrive(entry, true);
       },
     });
@@ -736,12 +886,12 @@ export class CampusMapScene extends Phaser.Scene {
     const bubble = this.add
       .text(
         this.jeep.x,
-        this.jeep.y - 24,
+        this.jeep.y - 40,
         t('map.para'),
         textStyle(8, TEXT.ink, { backgroundColor: '#FFF4DC', padding: { x: 3, y: 2 } }),
       )
       .setOrigin(0.5)
-      .setDepth(9);
+      .setDepth(DEPTH.bubble);
     this.uiCam.ignore(bubble);
     this.tweens.add({ targets: this.jeep, y: this.jeep.y - 2, duration: 90, yoyo: true });
     this.time.delayedCall(RIDE.arriveMs, () => {

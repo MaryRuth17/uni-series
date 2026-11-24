@@ -39,6 +39,7 @@ export class PreloaderScene extends Phaser.Scene {
     // Baked art (scripts/art, DECISIONS R-006): the landing street and the shared UI kit and avatar parts.
     this.load.pack('home', 'assets/home/pack.json', 'home');
     this.load.pack('common', 'assets/common/pack.json', 'common');
+    this.load.pack('map', 'assets/map/pack.json', 'map');
   }
 
   create(): void {
