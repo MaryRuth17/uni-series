@@ -44,6 +44,8 @@ test('boots to the Landing screen with no console errors', async ({ page }) => {
 test('first launch: tap to start, School ID, map, ride to PUP, Lagoon, pause, back', async ({
   page,
 }) => {
+  // The full flow (ride, walk to the karinderya, reload) takes ~30 s; give it room on slow machines.
+  test.setTimeout(60_000);
   const errors = collectErrors(page);
   await page.goto('./');
   await waitForScene(page, 'Landing');
