@@ -1,0 +1,157 @@
+[
+  {
+    "key": "map_ubelt",
+    "url": "assets/map/map_ubelt.png",
+    "width": 640,
+    "height": 360,
+    "frame": null
+  },
+  {
+    "key": "map_lights",
+    "url": "assets/map/map_lights.png",
+    "width": 640,
+    "height": 360,
+    "frame": null
+  },
+  {
+    "key": "map_pin",
+    "url": "assets/map/map_pin.png",
+    "width": 32,
+    "height": 22,
+    "frame": [
+      16,
+      22
+    ]
+  },
+  {
+    "key": "tarp_soon",
+    "url": "assets/map/tarp_soon.png",
+    "width": 32,
+    "height": 12,
+    "frame": null
+  },
+  {
+    "key": "map_jeep",
+    "url": "assets/map/map_jeep.png",
+    "width": 60,
+    "height": 18,
+    "frame": [
+      30,
+      18
+    ]
+  },
+  {
+    "key": "map_train",
+    "url": "assets/map/map_train.png",
+    "width": 36,
+    "height": 7,
+    "frame": null
+  },
+  {
+    "key": "map_mini",
+    "url": "assets/map/map_mini.png",
+    "width": 60,
+    "height": 6,
+    "frame": [
+      10,
+      6
+    ]
+  },
+  {
+    "key": "map_boat",
+    "url": "assets/map/map_boat.png",
+    "width": 16,
+    "height": 6,
+    "frame": null
+  },
+  {
+    "key": "map_hyacinth",
+    "url": "assets/map/map_hyacinth.png",
+    "width": 12,
+    "height": 4,
+    "frame": [
+      6,
+      4
+    ]
+  },
+  {
+    "key": "map_bird",
+    "url": "assets/map/map_bird.png",
+    "width": 10,
+    "height": 3,
+    "frame": [
+      5,
+      3
+    ]
+  },
+  {
+    "key": "map_campus_ust",
+    "url": "assets/map/map_campus_ust.png",
+    "width": 128,
+    "height": 48,
+    "frame": [
+      64,
+      48
+    ]
+  },
+  {
+    "key": "map_campus_feu",
+    "url": "assets/map/map_campus_feu.png",
+    "width": 88,
+    "height": 34,
+    "frame": [
+      44,
+      34
+    ]
+  },
+  {
+    "key": "map_campus_nu",
+    "url": "assets/map/map_campus_nu.png",
+    "width": 80,
+    "height": 32,
+    "frame": [
+      40,
+      32
+    ]
+  },
+  {
+    "key": "map_campus_ue",
+    "url": "assets/map/map_campus_ue.png",
+    "width": 88,
+    "height": 32,
+    "frame": [
+      44,
+      32
+    ]
+  },
+  {
+    "key": "map_campus_sanbeda",
+    "url": "assets/map/map_campus_sanbeda.png",
+    "width": 80,
+    "height": 34,
+    "frame": [
+      40,
+      34
+    ]
+  },
+  {
+    "key": "map_campus_ceu",
+    "url": "assets/map/map_campus_ceu.png",
+    "width": 80,
+    "height": 32,
+    "frame": [
+      40,
+      32
+    ]
+  },
+  {
+    "key": "map_campus_pup",
+    "url": "assets/map/map_campus_pup.png",
+    "width": 112,
+    "height": 40,
+    "frame": [
+      56,
+      40
+    ]
+  }
+]

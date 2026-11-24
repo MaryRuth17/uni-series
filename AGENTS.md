@@ -23,7 +23,7 @@ Brief for every AI agent (Claude Code, Codex, others) working in this repo, usua
 | H3 — Living map | Done: zoom toward stops, ambient life, time-of-day tint, unfold transition, list drag |
 | L3 — Buying and paying | Next |
 | L4–L5 | Not started |
-| H4 + L6 — Art and audio (made by Claude, DECISIONS R-006) | H4 part 1 done: crisp 3× text, landing street art, UI kit and icons, girl/boy avatar, EN/FIL toggle (D-040–D-043). Map art, Lagoon art and audio not started |
+| H4 + L6 — Art and audio (made by Claude, DECISIONS R-006) | H4 done: crisp 3× text, landing street art, UI kit and icons, girl/boy avatar, EN/FIL toggle, illustrated campus map (D-040–D-047). Lagoon art (L6) and audio not started |
 | H5 + L7 + M6 — Polish; M7 — Release | Not started |
 | M2–M5 | Replaced by L1–L7 |
 

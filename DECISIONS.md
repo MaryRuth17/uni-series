@@ -260,3 +260,28 @@ Specs: [SPEC.md](SPEC.md) (§), [SPEC-homepage.md](SPEC-homepage.md) (H§), [SPE
   The UI kit is nine-slice (`ui_panel`, `ui_button`, `ui_board`) with 16×16 icons; the logo is sign-painter lettering.
   Remaining H4 work: campus map art and the Lagoon set (L6).
 - **D-021 update:** at 3× text resolution the fallback ₱ is legible, so no pixel ₱ glyph is needed in the font.
+
+### H4 (part 2) — Illustrated campus map (builder, 2026-11-24)
+
+- **D-044 — The map is baked pixel art** (`scripts/art/map.mjs`, `npm run art`), drawn top-down like the owner's U-Belt
+  street and satellite references: dense rooftops (rust, grey, teal and blue GI sheets with blue water tanks, flat
+  mid-rises), each district's street grid at its own angle (Sampaloc along España), avenues with yellow centre lines
+  and zebra crossings, tree-lined España, the elevated LRT-2 viaduct with purple edges and three stations, the Pasig
+  River with its esteros, bridges, water hyacinth, bancas and a ferry pontoon. Filipino details: Quiapo church with
+  vendor umbrellas on the plaza, a palengke, a jeepney terminal, barangay basketball courts, banderitas over fiesta
+  streets, rooftop clotheslines, blue Manila street signs, and a compass marked H / T / S / K (Hilaga, Timog,
+  Silangan, Kanluran). Street, station, area and river names are baked into the art as place names (the same in
+  English and Filipino), so the old `map.road.*`, `map.station.*`, `map.river` and `map.lrt` keys are gone.
+- **D-045 — One geometry file.** `src/map/mapGeometry.json` (roads, LRT-2, river, esteros, campus plots) is read by both
+  the art script and the game (`src/map/geometry.ts`), so the train, traffic and boats move exactly on the baked roads
+  and water. Campus stops moved slightly to fit the drawn city (UST 193,84; FEU 100,170; UE 240,232; San Beda 302,240;
+  CEU 376,238); a unit test keeps each stop on its plot and clear of avenues and the river.
+- **D-046 — Map layers.** One base image (`map_ubelt`) plus a night-lights overlay (`map_lights`, additive: 45% at hapon,
+  full at gabi) instead of four `map_ubelt_<phase>` images. Campus buildings (`map_campus_<id>`, original designs, no
+  logos or signage; a day and a lit-window night frame), pins, signs and the player's jeepney sit above the
+  time-of-day tint. Moving life: the LRT-2 alternates direction; jeepneys, tricycles and cars drive the avenues in the
+  right-hand lane and turn around at the edges; a ferry runs the river; with Reduced Motion off, water hyacinth drifts
+  downstream (west) and the water sparkles.
+- **D-047 — Owner changes to the map.** Campuses that are not playable show only "Coming soon!" (no game title, tagline or
+  teaser) in the list and on the campus card; the map pin keeps a "SOON" tarpaulin hung on the building. The School ID
+  chip on the map only shows the player; the character is changed from the landing's ID chip.

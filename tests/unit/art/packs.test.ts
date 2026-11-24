@@ -5,6 +5,8 @@ import commonManifest from '../../../public/assets/common/manifest.json';
 import commonPack from '../../../public/assets/common/pack.json';
 import homeManifest from '../../../public/assets/home/manifest.json';
 import homePack from '../../../public/assets/home/pack.json';
+import mapManifest from '../../../public/assets/map/manifest.json';
+import mapPack from '../../../public/assets/map/pack.json';
 
 interface ManifestEntry {
   key: string;
@@ -14,8 +16,8 @@ interface ManifestEntry {
   frame: number[] | null;
 }
 
-const manifest: ManifestEntry[] = [...homeManifest, ...commonManifest];
-const packFiles = [...homePack.home.files, ...commonPack.common.files];
+const manifest: ManifestEntry[] = [...homeManifest, ...commonManifest, ...mapManifest];
+const packFiles = [...homePack.home.files, ...commonPack.common.files, ...mapPack.map.files];
 const byKey = new Map(manifest.map((m) => [m.key, m]));
 const frames = (key: string): number => {
   const m = byKey.get(key) as ManifestEntry;
@@ -61,6 +63,17 @@ describe('baked art packs (scripts/art, DECISIONS R-006)', () => {
         `avatar_outfit_${g}`,
       ]),
       'avatar_lace',
+      'map_ubelt',
+      'map_lights',
+      'map_pin',
+      'tarp_soon',
+      'map_jeep',
+      'map_train',
+      'map_mini',
+      'map_boat',
+      'map_hyacinth',
+      'map_bird',
+      ...['ust', 'feu', 'nu', 'ue', 'sanbeda', 'ceu', 'pup'].map((c) => `map_campus_${c}`),
     ];
     const packed = new Set(packFiles.map((f) => f.key));
     for (const k of needed) {
@@ -86,6 +99,16 @@ describe('baked art packs (scripts/art, DECISIONS R-006)', () => {
     }
     expect(frames('avatar_lace')).toBe(6);
     expect(frames('shop_dorm')).toBe(3);
+  });
+
+  it('bakes a full-screen map and night lights, and a day and night frame per campus', () => {
+    for (const k of ['map_ubelt', 'map_lights']) {
+      expect(byKey.get(k)?.width).toBe(640);
+      expect(byKey.get(k)?.height).toBe(360);
+    }
+    for (const c of ['ust', 'feu', 'nu', 'ue', 'sanbeda', 'ceu', 'pup'])
+      expect(frames(`map_campus_${c}`)).toBe(2);
+    expect(frames('map_mini')).toBe(6);
   });
 });
 
