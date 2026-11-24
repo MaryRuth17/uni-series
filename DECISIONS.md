@@ -329,3 +329,10 @@ Specs: [SPEC.md](SPEC.md) (§), [SPEC-homepage.md](SPEC-homepage.md) (H§), [SPE
 - **L-024 — Food art.** 46 `food_<item>` icons (24×24) built from a few shapes (plate, skewer, cup, bowl, glass, bun);
   a unit test checks that every menu item and every stall has its art. The storefront art lists food in the same order
   as `data/menu.ts`, so the game's price tags line up.
+- **L-025 — The intro shows the PUP front (owner photos).** `lagoon_intro` is redrawn: the front gate (white
+  pillars and a maroon beam), the guardhouse, the tall plain white pylon, a fence with tarps, then the obelisk plaza
+  (the tall slim white obelisk with a dark plaque on its planter, the old stone ruins, a low wall with hedges, a
+  palm) under a bright dry-season sky. The camera pans from the gate to the obelisk and holds there before How to
+  play. Following SPEC §13 and SPEC-pup-lagoon §15, the pylon carries no initials and the gate beam shows a greeting
+  written by the game ("WELCOME, ISKOLAR NG BAYAN!" / "MALIGAYANG PAGDATING, ISKOLAR NG BAYAN!"), not the school's
+  official name sign.

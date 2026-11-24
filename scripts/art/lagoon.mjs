@@ -797,83 +797,185 @@ function storefront(key) {
 }
 
 // ---- The PUP intro panorama (960×360) -----------------------------------------------------------------
+// Left: the front gate (two white pillars and a maroon beam whose banner text the game writes, a guardhouse,
+// the tall plain white pylon, a fence with tarps). Right: the obelisk plaza (the tall slim white obelisk on its
+// planter, old stone ruins, a low wall with hedges, palms). Drawn in our own style from the owner's photos;
+// no school initials or official signs (SPEC §13, SPEC-pup-lagoon §15).
+
+function bareBranches(p, x, y, len, seed) {
+  // Dry-season branches with a few leaves, like the photos.
+  let cx = x;
+  let cy = y;
+  for (let k = 0; k < len; k++) {
+    const nx = cx + (hash(seed, k) - 0.3) * 6;
+    const ny = cy - 2 - hash(seed, k, 1) * 3;
+    p.line(Math.round(cx), Math.round(cy), Math.round(nx), Math.round(ny), '#4a3a2e');
+    if (k % 3 === 0) {
+      const bx = nx + (hash(seed, k, 2) - 0.5) * 18;
+      p.line(Math.round(nx), Math.round(ny), Math.round(bx), Math.round(ny - 8), '#5a4a3a');
+      p.px(Math.round(bx), Math.round(ny - 8), '#5e8c3a');
+      p.px(Math.round(bx) + 1, Math.round(ny - 9), '#6fa04a');
+    }
+    cx = nx;
+    cy = ny;
+  }
+}
 
 function introPanorama() {
   const W = 960;
   const p = new Pix(W, 360);
-  p.vgrad(0, 0, W, 200, ['#8fc4ec', '#bfe0f7', '#f4ead2']);
-  // Clouds.
+  // Bright dry-season sky.
+  p.vgrad(0, 0, W, 240, ['#4f98e2', '#7fbcee', '#c4e2f6']);
   for (const [x, y, w] of [
-    [80, 40, 70],
-    [320, 24, 90],
-    [610, 50, 60],
-    [820, 30, 80],
+    [140, 46, 60],
+    [520, 30, 80],
+    [880, 56, 56],
   ]) {
-    p.ellipse(x, y, w / 2, 10, '#ffffff');
-    p.ellipse(x - w / 4, y + 4, w / 4, 8, '#ffffff');
-    p.ellipse(x + w / 4, y + 5, w / 4, 7, '#f4f8fb');
+    p.ellipse(x, y, w / 2, 7, '#ffffff');
+    p.ellipse(x - w / 4, y + 3, w / 4, 6, '#f4f8fb');
   }
-  // Lawn and hedges behind the plaza, then the far trees.
-  p.rect(0, 196, W, 66, '#7fb65a');
-  for (let y = 196; y < 262; y += 2) for (let x = (y / 2) % 2; x < W; x += 5) p.px(x, y, '#8fc46a');
-  for (let x = -20; x < W + 40; x += 38) canopy(p, x, 168, 30, x + 5, '#4f8a3c');
-  for (let x = 0; x < W; x += 24) {
-    p.ellipse(x + 12, 250, 13, 7, '#4f8a3c');
-    p.ellipse(x + 10, 248, 9, 4, '#6fae4e');
+  // Far trees all along.
+  for (let x = -20; x < W + 40; x += 34) canopy(p, x, 206, 28, x + 9, '#3f7d3a');
+  // Campus lawn behind the fence, and the driveway through the gate.
+  p.rect(0, 230, W, 38, '#7fb65a');
+  for (let x = 0; x < W; x += 4) p.px(x, 231 + (x % 3), '#8fc46a');
+  p.rect(70, 228, 212, 40, '#b9b4a8');
+  for (let y = 232; y < 268; y += 6) p.hline(70, y, 212, '#aca79a');
+  // Sidewalk and the road in front.
+  p.rect(0, 268, W, 14, '#c9c4b6');
+  p.hline(0, 268, W, '#e0dbd0');
+  p.rect(0, 282, W, 78, '#5e5a66');
+  for (let x = 0; x < W; x += 3)
+    if (hash(x, 1) < 0.3) p.px(x, 284 + Math.floor(hash(x, 2) * 70), '#6a6672');
+  for (let x = 10; x < W; x += 48) p.rect(x, 322, 24, 2, '#e8e4dc');
+
+  // ---- The front gate (x 30–480) ----
+  // Fence: red-painted base with a black iron grille, tarps hung on it.
+  p.rect(300, 236, 190, 32, '#2b2233');
+  for (let x = 302; x < 490; x += 5) p.vline(x, 238, 22, '#55505f');
+  p.rect(300, 258, 190, 10, '#b8402f');
+  p.hline(300, 258, 190, '#d9604a');
+  p.rect(316, 236, 44, 22, '#f2c14e');
+  p.rect(318, 238, 40, 6, '#d94b3d');
+  p.rect(318, 246, 18, 10, '#3b6fb6');
+  p.rect(338, 246, 20, 10, '#ffffff');
+  // Guardhouse with a red roof.
+  p.rect(372, 212, 70, 8, '#b8402f');
+  p.hline(372, 212, 70, '#d9604a');
+  p.rect(378, 220, 58, 48, '#f1ece4');
+  p.rect(386, 230, 18, 14, '#3b4a6b');
+  p.hline(386, 230, 18, '#6d7ea3');
+  p.rect(414, 232, 14, 36, '#8a5a3a');
+  // The tall plain white pylon (slanted top), front face and shaded side.
+  for (let y = 70; y < 268; y++) {
+    const topCut = Math.max(0, 70 + (y < 96 ? 0 : 0));
+    void topCut;
   }
-  // The main building: long white hall with maroon bands and the tall central pylon (original design).
-  const bx = 220;
-  const bw = 520;
-  const by = 150;
-  p.rect(bx, by, bw, 110, '#f1ece4');
-  p.rect(bx, by, bw, 8, '#8a2b2b');
-  for (let r = 0; r < 3; r++) {
-    p.rect(bx, by + 30 + r * 28, bw, 3, '#8a2b2b');
-    for (let x = bx + 10; x < bx + bw - 10; x += 14) {
-      if (Math.abs(x - (bx + bw / 2)) < 40) continue;
-      p.rect(x, by + 14 + r * 28, 8, 12, '#3b4a6b');
-      p.hline(x, by + 14 + r * 28, 8, '#6d7ea3');
+  const px0 = 448;
+  for (let x = 0; x < 44; x++) {
+    const top = 64 + Math.round(x * 0.45);
+    p.vline(px0 + x, top, 268 - top, x < 30 ? '#f4f1ea' : '#cfc9bc');
+  }
+  for (const gx of [458, 466, 474]) p.vline(gx, 100, 150, '#e2ddd0');
+  p.rect(px0, 262, 44, 6, '#b8b2a6');
+  // The gate: inner frame, then the main frame with the maroon beam (banner text drawn by the game).
+  p.rect(120, 178, 10, 90, '#e8e4da');
+  p.rect(232, 178, 10, 90, '#e8e4da');
+  p.rect(110, 172, 142, 8, '#d8d2c4');
+  p.rect(52, 150, 18, 118, '#f4f1ea');
+  p.vline(52, 150, 118, '#ffffff');
+  p.vline(69, 150, 118, '#cfc9bc');
+  p.rect(282, 150, 18, 118, '#f4f1ea');
+  p.vline(282, 150, 118, '#ffffff');
+  p.vline(299, 150, 118, '#cfc9bc');
+  p.rect(40, 146, 272, 22, '#7a2626');
+  p.hline(40, 146, 272, '#9a3a32');
+  p.hline(40, 167, 272, '#4a1616');
+  p.rect(40, 142, 272, 4, '#f4f1ea');
+  // A guard's road barrier and a cone.
+  p.rect(150, 252, 60, 3, '#f4f1ea');
+  for (let x = 150; x < 210; x += 10) p.rect(x, 252, 5, 3, '#d94b3d');
+  p.rect(214, 258, 6, 10, '#f08a3c');
+  p.hline(213, 262, 8, '#ffffff');
+  // Bare branches over the gate.
+  canopy(p, 10, 40, 56, 21, '#3f7d3a');
+  bareBranches(p, 20, 150, 18, 7);
+  bareBranches(p, 150, 120, 14, 9);
+  bareBranches(p, 340, 140, 16, 11);
+
+  // ---- The obelisk plaza (x 520–960) ----
+  // Low stone wall with hedges on top.
+  p.rect(520, 236, 440, 32, '#b8b2a6');
+  for (let x = 520; x < 960; x += 12) p.vline(x, 236, 32, '#a49e92');
+  p.hline(520, 236, 440, '#d0cabe');
+  for (let x = 520; x < 960; x += 10) {
+    p.ellipse(x + 5, 232, 6, 5, '#4f8a3c');
+    p.ellipse(x + 4, 230, 4, 3, '#6fae4e');
+  }
+  // Old stone ruins: a church-like facade with an arched door and a pediment.
+  const rx = 590;
+  p.rect(rx, 196, 64, 72, '#a8a294');
+  for (let y = 198; y < 268; y += 6) p.hline(rx, y, 64, '#9a9486');
+  p.rect(rx + 8, 186, 48, 12, '#b2ac9e');
+  for (let k = 0; k < 12; k++)
+    p.rect(rx + 14 + k * 2, 186 - Math.min(k, 11 - k), 2, Math.min(k, 11 - k), '#b2ac9e');
+  p.rect(rx + 24, 226, 16, 42, '#4a4440');
+  p.ellipse(rx + 32, 226, 8, 6, '#4a4440');
+  p.rect(rx + 26, 200, 12, 14, '#8a8478');
+  p.ellipse(rx + 32, 200, 6, 4, '#8a8478');
+  p.vline(rx + 6, 200, 68, '#c2bcae');
+  p.vline(rx + 57, 200, 68, '#c2bcae');
+  // Palm and mango trees around.
+  for (const [x, r] of [
+    [700, 34],
+    [900, 40],
+  ]) {
+    p.rect(x - 3, 210, 6, 58, '#5a4632');
+    canopy(p, x, 196, r, x, '#3f7d3a');
+  }
+  {
+    // Palm.
+    const x = 830;
+    for (let y = 150; y < 268; y++)
+      p.rect(x - 2 + Math.round((y - 150) / 40), y, 4, 1, y % 6 === 0 ? '#7a6a52' : '#8a7a5e');
+    for (let k = 0; k < 7; k++) {
+      const a = Math.PI + (k / 6) * Math.PI;
+      for (let d = 0; d < 26; d++)
+        p.px(
+          Math.round(x + Math.cos(a) * d),
+          Math.round(150 + Math.sin(a) * d * 0.6 + (d * d) / 60),
+          k % 2 ? '#3f7d3a' : '#5e9c48',
+        );
     }
   }
-  const cx = bx + bw / 2;
-  for (let y = 20; y < by + 10; y++) {
-    const half = 6 + Math.floor((y - 20) / 22);
-    p.rect(cx - half, y, half * 2 + 1, 1, '#ece2c6');
-    p.px(cx + half, y, '#c9b998');
-    p.px(cx - half, y, '#fff8e6');
+  // The obelisk: a tall slim white shaft with a dark plaque at its foot, on a planter with hedges.
+  const ox = 770;
+  for (let y = 40; y < 250; y++) {
+    const half = 5 + Math.floor((y - 40) / 70);
+    p.hline(ox - half, y, half * 2 + 1, '#f6f3ec');
+    p.px(ox + half, y, '#d6d0c4');
+    p.px(ox + half - 1, y, '#e4dfd4');
+    p.px(ox - half, y, '#ffffff');
   }
-  p.rect(cx - 4, 10, 9, 10, '#e2b23c');
-  p.rect(cx - 2, 4, 5, 6, '#f2c94e');
-  p.rect(cx - 30, by + 60, 60, 50, '#e8e2d4');
-  p.rect(cx - 14, by + 78, 28, 32, '#3e3446');
-  for (let k = 0; k < 4; k++) p.rect(cx - 26 + k * 16, by + 60, 4, 50, '#ffffff');
-  p.rect(bx, by + 108, bw, 4, '#00000030');
-  // Ground: plaza paving, lawn, flagpole, hedges.
-  p.rect(0, 262, W, 98, '#d9d5c8');
-  for (let y = 262; y < 360; y += 10) p.hline(0, y, W, '#cbc6b8');
-  for (let x = 0; x < W; x += 20) p.vline(x, 262, 98, '#cbc6b8');
-  p.rect(0, 256, W, 8, '#5e9c48');
-  for (let x = 0; x < W; x += 3) p.px(x, 256 + (x % 2), '#7fbf5a');
-  p.vline(140, 120, 140, '#c9d1d9');
-  // The Philippine flag: blue over red, a white triangle at the hoist with the sun.
-  p.rect(141, 122, 26, 8, '#2a5bb0');
-  p.rect(141, 130, 26, 8, '#d0302a');
-  for (let k = 0; k < 8; k++) p.rect(141, 122 + k, 1 + k, 16 - 2 * k, '#ffffff');
-  p.px(144, 130, '#f2c14e');
-  p.px(143, 129, '#f2c14e');
-  // Big shade trees in front.
-  for (const [x, y, r] of [
-    [40, 200, 54],
-    [880, 196, 60],
-    [600, 300, 0],
-  ]) {
-    if (!r) continue;
-    p.rect(x - 4, y, 8, 70, '#5a4632');
-    canopy(p, x, y - 20, r, x, '#3f7d3a');
+  for (let k = 0; k < 6; k++) p.hline(ox - k, 40 - 6 + k, k * 2 + 1, '#f6f3ec');
+  p.rect(ox - 2, 26, 5, 8, '#c9a04a');
+  p.px(ox, 24, '#e2b23c');
+  p.rect(ox - 7, 228, 15, 18, '#8a2b2b');
+  p.stroke(ox - 7, 228, 15, 18, '#5a1a1a');
+  p.rect(ox - 16, 248, 33, 6, '#e8e4da');
+  p.rect(ox - 70, 254, 140, 14, '#e8e4da');
+  p.hline(ox - 70, 254, 140, '#ffffff');
+  for (let x = ox - 66; x < ox + 66; x += 8) {
+    p.ellipse(x + 4, 252, 5, 4, '#4f8a3c');
+    p.px(x + 3, 250, '#6fae4e');
   }
-  // A pergola on the right (photo detail).
-  for (let x = 770; x < 870; x += 16) p.rect(x, 230, 4, 34, '#f1ece4');
-  p.rect(764, 226, 112, 5, '#e0dbd0');
+  // White ramps on each side of the planter.
+  p.line(ox - 120, 268, ox - 72, 256, '#f4f1ea');
+  p.line(ox + 72, 256, ox + 120, 268, '#f4f1ea');
+  // A blue-and-red kiosk umbrella and a delivery truck far right (photo life).
+  p.rect(930, 228, 30, 40, '#e8e2d4');
+  p.rect(930, 228, 30, 8, '#b8402f');
+  bareBranches(p, 950, 150, 16, 13);
   return p;
 }
 
