@@ -7,13 +7,113 @@
     "frame": null
   },
   {
+    "key": "coin_1",
+    "url": "assets/lagoon/coin_1.png",
+    "width": 12,
+    "height": 12,
+    "frame": null
+  },
+  {
+    "key": "coin_5",
+    "url": "assets/lagoon/coin_5.png",
+    "width": 14,
+    "height": 14,
+    "frame": null
+  },
+  {
+    "key": "coin_10",
+    "url": "assets/lagoon/coin_10.png",
+    "width": 16,
+    "height": 16,
+    "frame": null
+  },
+  {
+    "key": "coin_20",
+    "url": "assets/lagoon/coin_20.png",
+    "width": 18,
+    "height": 18,
+    "frame": null
+  },
+  {
+    "key": "bill_50",
+    "url": "assets/lagoon/bill_50.png",
+    "width": 36,
+    "height": 18,
+    "frame": null
+  },
+  {
+    "key": "bill_100",
+    "url": "assets/lagoon/bill_100.png",
+    "width": 36,
+    "height": 18,
+    "frame": null
+  },
+  {
+    "key": "note_card",
+    "url": "assets/lagoon/note_card.png",
+    "width": 424,
+    "height": 300,
+    "frame": null
+  },
+  {
+    "key": "note_hud",
+    "url": "assets/lagoon/note_hud.png",
+    "width": 124,
+    "height": 176,
+    "frame": null
+  },
+  {
+    "key": "note_how",
+    "url": "assets/lagoon/note_how.png",
+    "width": 472,
+    "height": 300,
+    "frame": null
+  },
+  {
+    "key": "ui_check",
+    "url": "assets/lagoon/ui_check.png",
+    "width": 24,
+    "height": 12,
+    "frame": [
+      12,
+      12
+    ]
+  },
+  {
+    "key": "ui_bowl",
+    "url": "assets/lagoon/ui_bowl.png",
+    "width": 24,
+    "height": 12,
+    "frame": [
+      12,
+      12
+    ]
+  },
+  {
+    "key": "ui_slot",
+    "url": "assets/lagoon/ui_slot.png",
+    "width": 48,
+    "height": 16,
+    "frame": [
+      16,
+      16
+    ]
+  },
+  {
+    "key": "ui_tag",
+    "url": "assets/lagoon/ui_tag.png",
+    "width": 16,
+    "height": 12,
+    "frame": null
+  },
+  {
     "key": "lagoon_how",
     "url": "assets/lagoon/lagoon_how.png",
-    "width": 192,
-    "height": 48,
+    "width": 416,
+    "height": 72,
     "frame": [
-      48,
-      48
+      104,
+      72
     ]
   },
   {

@@ -111,3 +111,58 @@ export const LOOKS = [
   { skin: SKINS[2], hair: '#5a3a22', shirt: '#3a9a6a', pants: '#3b4a6b' },
   { skin: SKINS[4], hair: '#2b2233', shirt: '#f2c14e', pants: '#2b2233', long: true },
 ];
+
+/**
+ * A big street tree (acacia or narra): a forked trunk with branches showing through, and a crown of many
+ * leaf clusters in four shades with bright leaf specks, so it reads as foliage rather than a ball.
+ */
+export function acacia(
+  p,
+  x,
+  groundY,
+  h,
+  spread,
+  seed,
+  { base = '#3f7d3a', trunk = '#5a4632' } = {},
+) {
+  const crownY = groundY - h;
+  // Trunk and branches.
+  p.rect(x - 4, crownY + h * 0.35, 8, groundY - (crownY + h * 0.35), trunk);
+  p.vline(x - 4, crownY + h * 0.35, groundY - (crownY + h * 0.35), shade(trunk, 0.2));
+  p.vline(x + 3, crownY + h * 0.35, groundY - (crownY + h * 0.35), shade(trunk, -0.25));
+  for (let k = 0; k < 6; k++) {
+    const ex = x + (hash(seed, k, 9) - 0.5) * spread * 1.6;
+    const ey = crownY + hash(seed, k, 10) * h * 0.3;
+    p.line(x, Math.round(crownY + h * 0.4), Math.round(ex), Math.round(ey), trunk);
+    p.line(
+      x + 1,
+      Math.round(crownY + h * 0.4),
+      Math.round(ex) + 1,
+      Math.round(ey),
+      shade(trunk, -0.2),
+    );
+  }
+  // Leaf clusters, darkest first.
+  const shades = [shade(base, -0.28), shade(base, -0.12), base, shade(base, 0.16)];
+  shades.forEach((c, layer) => {
+    const n = Math.round((spread * h) / 140);
+    for (let k = 0; k < n; k++) {
+      const a = hash(seed, layer, k, 1) * Math.PI * 2;
+      const d = Math.sqrt(hash(seed, layer, k, 2));
+      const cx = x + Math.cos(a) * d * spread;
+      const cy = crownY + Math.sin(a) * d * h * 0.32 - layer * 2;
+      const r = 4 + Math.floor(hash(seed, layer, k, 3) * 6) - layer;
+      if (hash(seed, layer, k, 4) < 0.12 && layer < 2) continue; // gaps show sky and branches
+      p.disc(Math.round(cx), Math.round(cy), Math.max(2, r), c);
+    }
+  });
+  for (let k = 0; k < (spread * h) / 30; k++) {
+    const a = hash(seed, k, 5) * Math.PI * 2;
+    const d = Math.sqrt(hash(seed, k, 6));
+    p.px(
+      Math.round(x + Math.cos(a) * d * spread),
+      Math.round(crownY + Math.sin(a) * d * h * 0.3 - 4),
+      shade(base, 0.4),
+    );
+  }
+}

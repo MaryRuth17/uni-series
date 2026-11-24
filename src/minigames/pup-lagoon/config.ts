@@ -195,9 +195,9 @@ export const IPON_SHOP: readonly IponShopItem[] = [
 export const VIEW = {
   topBar: { h: 24 },
   mapRight: 512,
-  listahan: { x: 512, y: 30, w: 120, h: 172 },
-  busog: { x: 512, y: 208, w: 120, h: 16 },
-  wallet: { x: 512, y: 292, w: 120, h: 60 },
+  listahan: { x: 514, y: 28, w: 124, h: 176 },
+  busog: { x: 516, y: 208, w: 120, h: 38 },
+  wallet: { x: 516, y: 252, w: 120, h: 102 },
 };
 
 /** The storefront screen (owner change, DECISIONS L-026): a 512×220 front, the menu, the button bar. */

@@ -14,7 +14,6 @@ import { t } from '../../../core/i18n';
 import { services } from '../../../core/services';
 import { FADE_MS } from '../../../home/config';
 import { Button } from '../../../ui/Button';
-import { panel } from '../../../ui/Panel';
 import { COLORS, SCENES, TEXT, textStyle } from '../../../ui/theme';
 import { OPENING } from '../config';
 import { LAGOON_INTRO } from './LagoonIntroScene';
@@ -162,28 +161,38 @@ export class LagoonOpeningScene extends Phaser.Scene {
   /** The "How to play" card: four steps with pictures. */
   private showHow(): void {
     this.stage = 'how';
-    const c = this.add.container(320, 196).setDepth(UI_DEPTH + 5);
+    const c = this.add.container(320, 186).setDepth(UI_DEPTH + 5);
     c.add(this.add.rectangle(0, -16, 640, 400, COLORS.ink, 0.45).setInteractive());
-    c.add(panel(this, 0, 0, 440, 280));
-    c.add(this.add.text(0, -122, t('pupLagoon.how.title'), textStyle(16, TEXT.red)).setOrigin(0.5));
+    // A notebook page with four steps, each a taped-in picture, a number badge, a title and a note.
+    c.add(this.add.image(0, 0, 'note_how'));
+    c.add(this.add.text(0, -124, t('pupLagoon.how.title'), textStyle(16, TEXT.red)).setOrigin(0.5));
     for (let i = 0; i < 4; i++) {
-      const x = -196 + (i % 2) * 206;
-      const y = -96 + Math.floor(i / 2) * 92;
-      c.add(this.add.image(x + 24, y + 24, 'lagoon_how', i));
+      const x = -222 + (i % 2) * 226;
+      const y = -100 + Math.floor(i / 2) * 108;
+      c.add(this.add.rectangle(x + 52, y + 36, 110, 78, 0xffffff).setStrokeStyle(1, 0xb8a888));
+      c.add(this.add.image(x, y, 'lagoon_how', i).setOrigin(0));
+      c.add(this.add.rectangle(x + 52, y - 3, 30, 8, 0xf2e6a8, 0.8));
+      c.add(this.add.circle(x + 2, y + 2, 8, COLORS.red).setStrokeStyle(1, COLORS.ink));
+      c.add(this.add.text(x + 2, y + 2, String(i + 1), textStyle(8, TEXT.cream)).setOrigin(0.5));
       c.add(
-        this.add.text(x + 54, y + 2, t(`pupLagoon.how.step${i + 1}.title`), textStyle(8, TEXT.red)),
+        this.add.text(
+          x + 112,
+          y,
+          t(`pupLagoon.how.step${i + 1}.title`),
+          textStyle(8, TEXT.red, { wordWrap: { width: 104 } }),
+        ),
       );
       c.add(
         this.add.text(
-          x + 54,
-          y + 16,
+          x + 112,
+          y + 24,
           t(`pupLagoon.how.step${i + 1}.text`),
-          textStyle(8, TEXT.ink, { wordWrap: { width: 140 } }),
+          textStyle(8, TEXT.ink, { wordWrap: { width: 104 } }),
         ),
       );
     }
     c.add(
-      new Button(this, 0, 112, t('pupLagoon.how.go'), () => this.toVacantCard(), {
+      new Button(this, 0, 124, t('pupLagoon.how.go'), () => this.toVacantCard(), {
         width: 120,
         height: 24,
         fill: COLORS.yellow,

@@ -15,6 +15,7 @@ import { services } from '../../../core/services';
 import { FADE_MS } from '../../../home/config';
 import { Button } from '../../../ui/Button';
 import { openOverlay } from '../../../ui/overlay';
+import { panel } from '../../../ui/Panel';
 import { COLORS, TEXT, textStyle } from '../../../ui/theme';
 import { avatarSprite } from '../../../ui/avatar';
 import { PAUSE } from '../../../scenes/PauseScene';
@@ -25,8 +26,9 @@ import { lineText, loadProgress } from '../lagoonSave';
 import { purchaseEffect } from '../logic/Catalog';
 import { LagoonVacant } from '../logic/LagoonVacant';
 import type { GeneratedVacant } from '../logic/ListahanGen';
-import { moneyTotal, toPieces } from '../logic/Money';
+import { moneyTotal } from '../logic/Money';
 import type { StallKey } from '../logic/types';
+import { bowlRow, walletGrid } from '../objects/lagoonUi';
 import { LAGOON_INTRO, LAGOON_STALLS } from './LagoonIntroScene';
 
 interface FrontLayout {
@@ -156,19 +158,18 @@ export class LagoonStallsScene extends Phaser.Scene {
       const [x, y] = L.items[i] ?? [0, 0];
       const e = purchaseEffect(m.key, undefined, g.promo);
       const sold = this.vacant.isSoldOut(m.key);
+      const label = this.add
+        .text(
+          x + 2,
+          F.y + y + 34,
+          sold ? t('pupLagoon.board.soldOut') : `₱${e.price}`,
+          textStyle(8, sold ? TEXT.grey : TEXT.red),
+        )
+        .setOrigin(0.5);
       add(
-        this.add
-          .text(
-            x,
-            F.y + y + 28,
-            sold ? t('pupLagoon.board.soldOut') : `₱${e.price}`,
-            textStyle(8, sold ? TEXT.grey : TEXT.red, {
-              backgroundColor: '#FFF4DC',
-              padding: { x: 2, y: 0 },
-            }),
-          )
-          .setOrigin(0.5, 0),
+        this.add.nineslice(x, F.y + y + 34, 'ui_tag', undefined, label.width + 12, 13, 5, 3, 3, 3),
       );
+      add(label);
     });
     if (!isOpen) {
       const msg =
@@ -425,68 +426,69 @@ export class LagoonStallsScene extends Phaser.Scene {
       this.hud.add(o);
       return o;
     };
-    add(this.add.rectangle(576, 192, 128, 336, 0x3a3346));
+    add(this.add.rectangle(576, 192, 128, 336, 0x9a7650));
+    for (let i = 0; i < 220; i++)
+      add(
+        this.add.rectangle(
+          513 + ((i * 37) % 126),
+          25 + ((i * 53) % 334),
+          1,
+          1,
+          i % 3 ? 0x7e5e3e : 0xb08a60,
+        ),
+      );
+    const pin = (x: number, y: number): void => {
+      add(this.add.circle(x + 1, y + 1, 3, 0x000000, 0.3));
+      add(this.add.circle(x, y, 3, COLORS.red).setStrokeStyle(1, COLORS.ink));
+      add(this.add.rectangle(x - 1, y - 1, 1, 1, 0xffffff));
+    };
+
     const Lh = VIEW.listahan;
-    add(
-      this.add
-        .rectangle(Lh.x + Lh.w / 2, Lh.y + Lh.h / 2, Lh.w, Lh.h, 0xfffbef)
-        .setStrokeStyle(1, COLORS.ink),
-    );
-    add(this.add.text(Lh.x + 6, Lh.y + 4, t('pupLagoon.hud.listahan'), textStyle(8, TEXT.grey)));
-    let y = Lh.y + 18;
+    add(this.add.image(Lh.x, Lh.y, 'note_hud').setOrigin(0));
+    add(this.add.text(Lh.x + 16, Lh.y + 9, t('pupLagoon.hud.listahan'), textStyle(8, TEXT.grey)));
+    let y = Lh.y + 24;
     for (const line of v.gen.lines) {
       const done = v.listahan.isLineDone(line.id);
       const units = line.qty > 1 ? ` ${v.listahan.doneUnits(line.id)}/${line.qty}` : '';
+      add(this.add.image(Lh.x + 19, y + 5, 'ui_check', done ? 1 : 0));
       const text = add(
         this.add.text(
-          Lh.x + 6,
+          Lh.x + 27,
           y,
-          `${done ? '[x]' : '[ ]'} ${lineText(line)}${units}`,
-          textStyle(8, done ? TEXT.grey : TEXT.ink, { wordWrap: { width: Lh.w - 10 } }),
+          `${lineText(line)}${units}`,
+          textStyle(8, done ? TEXT.grey : TEXT.ink, { wordWrap: { width: Lh.w - 36 } }),
         ),
       );
-      y += text.height + 3;
+      if (done)
+        add(this.add.rectangle(Lh.x + 27, y + 5, text.width, 1, 0x8a8494).setOrigin(0, 0.5));
+      y += Math.max(12, text.height + 2);
     }
+
     const B = VIEW.busog;
-    add(
-      this.add
-        .rectangle(B.x + B.w / 2, B.y + B.h / 2, B.w, B.h, 0xfff4dc)
-        .setStrokeStyle(1, COLORS.ink),
-    );
-    add(
-      this.add
-        .text(
-          B.x + B.w / 2,
-          B.y + B.h / 2,
-          t('pupLagoon.hud.busog', { n: v.busog, target: v.gen.busogTarget }),
-          textStyle(8),
-        )
-        .setOrigin(0.5),
-    );
-    const W = VIEW.wallet;
-    add(
-      this.add
-        .rectangle(W.x + W.w / 2, W.y + W.h / 2, W.w, W.h, 0xfff4dc)
-        .setStrokeStyle(1, COLORS.ink),
-    );
+    add(panel(this, B.x + B.w / 2, B.y + B.h / 2, B.w, B.h));
+    pin(B.x + B.w / 2, B.y + 3);
     add(
       this.add.text(
-        W.x + 6,
-        W.y + 4,
+        B.x + 8,
+        B.y + 6,
+        t('pupLagoon.hud.busog', { n: v.busog, target: v.gen.busogTarget }),
+        textStyle(8),
+      ),
+    );
+    bowlRow(this, add, B.x + 8, B.y + 26, v.busog, v.gen.busogTarget);
+
+    const W = VIEW.wallet;
+    add(panel(this, W.x + W.w / 2, W.y + W.h / 2, W.w, W.h));
+    pin(W.x + W.w / 2, W.y + 3);
+    add(
+      this.add.text(
+        W.x + 8,
+        W.y + 6,
         t('pupLagoon.hud.wallet', { total: moneyTotal(v.wallet.money) }),
         textStyle(8),
       ),
     );
-    add(
-      this.add.text(
-        W.x + 6,
-        W.y + 20,
-        toPieces(v.wallet.money)
-          .map((p) => `₱${p}`)
-          .join(' '),
-        textStyle(8, TEXT.ink, { wordWrap: { width: W.w - 10 } }),
-      ),
-    );
+    walletGrid(this, add, W.x + 8, W.y + 32, v.wallet.money, 56);
   }
 
   // ---- Keys and pause ----------------------------------------------------------------------------
