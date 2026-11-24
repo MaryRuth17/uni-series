@@ -6,12 +6,14 @@ import { landingAssets } from './landing.mjs';
 import { uiAssets } from './ui.mjs';
 import { avatarAssets } from './avatar.mjs';
 import { mapAssets } from './map.mjs';
+import { lagoonAssets } from './lagoon.mjs';
 import { Pix } from './pix.mjs';
 
 const SETS = [
   { name: 'home', dir: 'public/assets/home', assets: landingAssets() },
   { name: 'common', dir: 'public/assets/common', assets: [...uiAssets(), ...avatarAssets()] },
   { name: 'map', dir: 'public/assets/map', assets: mapAssets() },
+  { name: 'lagoon', dir: 'public/assets/lagoon', assets: lagoonAssets() },
 ];
 
 for (const set of SETS) {
@@ -161,6 +163,88 @@ if (previewAt > 0) {
         );
       }
     writeFileSync(join(dir, `map-${night ? 'gabi' : 'day'}.png`), big.png());
+  }
+  // Lagoon previews: the map composed at its §10.1 positions, a storefront, the intro panorama.
+  {
+    const s = new Pix(640, 360);
+    s.rect(0, 0, 640, 360, '#3a3346');
+    s.blit(get('lagoon_ground').pix, 0, 24);
+    s.blit(get('lagoon_stallrow').pix, 96, 28);
+    for (const [k, x] of [
+      ['palamig', 140],
+      ['merienda', 220],
+      ['lugawan', 300],
+      ['ihaw', 400],
+    ])
+      s.blit(frame(`stall_window_${k}`, k === 'ihaw' ? 0 : 1), x - 32, 38);
+    for (const [k, y] of [
+      ['karinderya', 110],
+      ['silog', 176],
+      ['halohalo', 242],
+    ])
+      s.blit(frame(`kiosk_${k}`, 1), 8, y);
+    s.blit(get('lagoon_pond_rail').pix, 410 - 70, 225 - 48);
+    s.blit(frame('cart_tusok', 0), 455 - 20, 160 - 20);
+    s.blit(frame('water_station', 1), 475, 286);
+    s.blit(get('lagoon_plaza_sign').pix, 250 - 36, 190 - 40);
+    for (const x of [170, 290, 410]) {
+      s.blit(get('lagoon_bench').pix, x - 24, 304);
+      s.blit(frame('lagoon_sitter', (x / 10) % 12), x - 14, 296);
+      s.blit(frame('lagoon_sitter', (x / 10 + 3) % 12), x + 2, 296);
+    }
+    s.blit(get('lagoon_latag_1').pix, 156, 226);
+    s.blit(get('lagoon_latag_2').pix, 300, 226);
+    s.blit(get('lagoon_latag_3').pix, 330, 98);
+    s.blit(get('lagoon_latag_4').pix, 150, 110);
+    s.blit(frame('lagoon_dancer', 0), 218, 214);
+    s.blit(frame('lagoon_dancer', 6), 236, 218);
+    s.blit(frame('lagoon_singer', 0), 266, 214);
+    s.blit(get('lagoon_canopy').pix, 0, 24);
+    const big = new Pix(1280, 720);
+    for (let y = 0; y < 360; y++)
+      for (let x = 0; x < 640; x++) {
+        const c = s.get(x, y);
+        if (!c || !c[3]) continue;
+        big.rect(
+          x * 2,
+          y * 2,
+          2,
+          2,
+          `#${c
+            .slice(0, 3)
+            .map((v) => v.toString(16).padStart(2, '0'))
+            .join('')}`,
+        );
+      }
+    writeFileSync(join(dir, 'lagoon-map.png'), big.png());
+    const fronts = new Pix(800, 340);
+    fronts.blit(get('front_tusok').pix, 0, 0);
+    fronts.blit(get('front_karinderya').pix, 400, 0);
+    fronts.blit(get('front_palamig').pix, 0, 170);
+    fronts.blit(get('front_ihaw').pix, 400, 170);
+    writeFileSync(join(dir, 'lagoon-fronts.png'), fronts.png());
+    writeFileSync(join(dir, 'lagoon-intro.png'), get('lagoon_intro').pix.png());
+    const foods = new Pix(24 * 12, 24 * 4);
+    SETS.find((x) => x.name === 'lagoon')
+      .assets.filter((a) => a.key.startsWith('food_'))
+      .forEach((a, i) => foods.blit(a.pix, (i % 12) * 24, Math.floor(i / 12) * 24));
+    const fbig = new Pix(foods.w * 3, foods.h * 3);
+    for (let y = 0; y < foods.h; y++)
+      for (let x = 0; x < foods.w; x++) {
+        const c = foods.get(x, y);
+        if (c && c[3])
+          fbig.rect(
+            x * 3,
+            y * 3,
+            3,
+            3,
+            `#${c
+              .slice(0, 3)
+              .map((v) => v.toString(16).padStart(2, '0'))
+              .join('')}`,
+          );
+      }
+    writeFileSync(join(dir, 'lagoon-food.png'), fbig.png());
   }
   console.log(`previews → ${dir}`);
 }

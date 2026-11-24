@@ -88,7 +88,7 @@ export const ROSTER: readonly RosterEntry[] = [
     x: 555,
     y: 248,
     status: 'playable',
-    introScene: 'LagoonIntroScene',
+    introScene: 'LagoonOpening',
     stickerId: 'sticker-pup',
   },
 ];

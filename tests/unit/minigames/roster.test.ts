@@ -15,7 +15,7 @@ describe('roster (SPEC-homepage §5)', () => {
     }
     const playable = ROSTER.filter((r) => r.status === 'playable');
     expect(playable.map((r) => r.id)).toEqual(['pup-lagoon']);
-    expect(playable[0].introScene).toBe('LagoonIntroScene');
+    expect(playable[0].introScene).toBe('LagoonOpening');
   });
 });
 

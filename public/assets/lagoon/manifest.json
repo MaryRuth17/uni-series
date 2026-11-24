@@ -1,0 +1,594 @@
+[
+  {
+    "key": "lagoon_ground",
+    "url": "assets/lagoon/lagoon_ground.png",
+    "width": 512,
+    "height": 336,
+    "frame": null
+  },
+  {
+    "key": "lagoon_canopy",
+    "url": "assets/lagoon/lagoon_canopy.png",
+    "width": 512,
+    "height": 336,
+    "frame": null
+  },
+  {
+    "key": "lagoon_pond_rail",
+    "url": "assets/lagoon/lagoon_pond_rail.png",
+    "width": 140,
+    "height": 96,
+    "frame": null
+  },
+  {
+    "key": "lagoon_plaza_sign",
+    "url": "assets/lagoon/lagoon_plaza_sign.png",
+    "width": 72,
+    "height": 56,
+    "frame": null
+  },
+  {
+    "key": "lagoon_stallrow",
+    "url": "assets/lagoon/lagoon_stallrow.png",
+    "width": 400,
+    "height": 68,
+    "frame": null
+  },
+  {
+    "key": "cart_tusok",
+    "url": "assets/lagoon/cart_tusok.png",
+    "width": 80,
+    "height": 32,
+    "frame": [
+      40,
+      32
+    ]
+  },
+  {
+    "key": "water_station",
+    "url": "assets/lagoon/water_station.png",
+    "width": 40,
+    "height": 28,
+    "frame": [
+      20,
+      28
+    ]
+  },
+  {
+    "key": "lagoon_bench",
+    "url": "assets/lagoon/lagoon_bench.png",
+    "width": 48,
+    "height": 20,
+    "frame": null
+  },
+  {
+    "key": "lagoon_sitter",
+    "url": "assets/lagoon/lagoon_sitter.png",
+    "width": 192,
+    "height": 20,
+    "frame": [
+      16,
+      20
+    ]
+  },
+  {
+    "key": "lagoon_dancer",
+    "url": "assets/lagoon/lagoon_dancer.png",
+    "width": 128,
+    "height": 24,
+    "frame": [
+      16,
+      24
+    ]
+  },
+  {
+    "key": "lagoon_singer",
+    "url": "assets/lagoon/lagoon_singer.png",
+    "width": 40,
+    "height": 24,
+    "frame": [
+      20,
+      24
+    ]
+  },
+  {
+    "key": "lagoon_intro",
+    "url": "assets/lagoon/lagoon_intro.png",
+    "width": 960,
+    "height": 360,
+    "frame": null
+  },
+  {
+    "key": "lagoon_how",
+    "url": "assets/lagoon/lagoon_how.png",
+    "width": 192,
+    "height": 48,
+    "frame": [
+      48,
+      48
+    ]
+  },
+  {
+    "key": "lagoon_latag_1",
+    "url": "assets/lagoon/lagoon_latag_1.png",
+    "width": 44,
+    "height": 36,
+    "frame": null
+  },
+  {
+    "key": "lagoon_latag_2",
+    "url": "assets/lagoon/lagoon_latag_2.png",
+    "width": 44,
+    "height": 36,
+    "frame": null
+  },
+  {
+    "key": "lagoon_latag_3",
+    "url": "assets/lagoon/lagoon_latag_3.png",
+    "width": 44,
+    "height": 36,
+    "frame": null
+  },
+  {
+    "key": "lagoon_latag_4",
+    "url": "assets/lagoon/lagoon_latag_4.png",
+    "width": 44,
+    "height": 36,
+    "frame": null
+  },
+  {
+    "key": "stall_window_palamig",
+    "url": "assets/lagoon/stall_window_palamig.png",
+    "width": 128,
+    "height": 48,
+    "frame": [
+      64,
+      48
+    ]
+  },
+  {
+    "key": "stall_window_merienda",
+    "url": "assets/lagoon/stall_window_merienda.png",
+    "width": 128,
+    "height": 48,
+    "frame": [
+      64,
+      48
+    ]
+  },
+  {
+    "key": "stall_window_lugawan",
+    "url": "assets/lagoon/stall_window_lugawan.png",
+    "width": 128,
+    "height": 48,
+    "frame": [
+      64,
+      48
+    ]
+  },
+  {
+    "key": "stall_window_ihaw",
+    "url": "assets/lagoon/stall_window_ihaw.png",
+    "width": 128,
+    "height": 48,
+    "frame": [
+      64,
+      48
+    ]
+  },
+  {
+    "key": "kiosk_karinderya",
+    "url": "assets/lagoon/kiosk_karinderya.png",
+    "width": 160,
+    "height": 50,
+    "frame": [
+      80,
+      50
+    ]
+  },
+  {
+    "key": "kiosk_silog",
+    "url": "assets/lagoon/kiosk_silog.png",
+    "width": 160,
+    "height": 50,
+    "frame": [
+      80,
+      50
+    ]
+  },
+  {
+    "key": "kiosk_halohalo",
+    "url": "assets/lagoon/kiosk_halohalo.png",
+    "width": 160,
+    "height": 50,
+    "frame": [
+      80,
+      50
+    ]
+  },
+  {
+    "key": "front_karinderya",
+    "url": "assets/lagoon/front_karinderya.png",
+    "width": 400,
+    "height": 170,
+    "frame": null
+  },
+  {
+    "key": "front_tusok",
+    "url": "assets/lagoon/front_tusok.png",
+    "width": 400,
+    "height": 170,
+    "frame": null
+  },
+  {
+    "key": "front_palamig",
+    "url": "assets/lagoon/front_palamig.png",
+    "width": 400,
+    "height": 170,
+    "frame": null
+  },
+  {
+    "key": "front_ihaw",
+    "url": "assets/lagoon/front_ihaw.png",
+    "width": 400,
+    "height": 170,
+    "frame": null
+  },
+  {
+    "key": "front_merienda",
+    "url": "assets/lagoon/front_merienda.png",
+    "width": 400,
+    "height": 170,
+    "frame": null
+  },
+  {
+    "key": "front_lugawan",
+    "url": "assets/lagoon/front_lugawan.png",
+    "width": 400,
+    "height": 170,
+    "frame": null
+  },
+  {
+    "key": "front_halohalo",
+    "url": "assets/lagoon/front_halohalo.png",
+    "width": 400,
+    "height": 170,
+    "frame": null
+  },
+  {
+    "key": "front_silog",
+    "url": "assets/lagoon/front_silog.png",
+    "width": 400,
+    "height": 170,
+    "frame": null
+  },
+  {
+    "key": "front_water",
+    "url": "assets/lagoon/front_water.png",
+    "width": 400,
+    "height": 170,
+    "frame": null
+  },
+  {
+    "key": "food_adobo_meal",
+    "url": "assets/lagoon/food_adobo_meal.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_curry_meal",
+    "url": "assets/lagoon/food_curry_meal.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_teriyaki_meal",
+    "url": "assets/lagoon/food_teriyaki_meal.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_chopsuey_meal",
+    "url": "assets/lagoon/food_chopsuey_meal.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_liempo_meal",
+    "url": "assets/lagoon/food_liempo_meal.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_tonkatsu_meal",
+    "url": "assets/lagoon/food_tonkatsu_meal.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_fishball",
+    "url": "assets/lagoon/food_fishball.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_kikiam",
+    "url": "assets/lagoon/food_kikiam.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_squidball",
+    "url": "assets/lagoon/food_squidball.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_tokneneng",
+    "url": "assets/lagoon/food_tokneneng.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_kwekkwek",
+    "url": "assets/lagoon/food_kwekkwek.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_fewa",
+    "url": "assets/lagoon/food_fewa.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_gulaman",
+    "url": "assets/lagoon/food_gulaman.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_melon",
+    "url": "assets/lagoon/food_melon.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_buko",
+    "url": "assets/lagoon/food_buko.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_softdrinks",
+    "url": "assets/lagoon/food_softdrinks.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_water_bottle",
+    "url": "assets/lagoon/food_water_bottle.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_iced_coffee",
+    "url": "assets/lagoon/food_iced_coffee.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_betamax",
+    "url": "assets/lagoon/food_betamax.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_isaw",
+    "url": "assets/lagoon/food_isaw.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_hotdog_stick",
+    "url": "assets/lagoon/food_hotdog_stick.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_bbq",
+    "url": "assets/lagoon/food_bbq.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_mais",
+    "url": "assets/lagoon/food_mais.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_bbq_rice",
+    "url": "assets/lagoon/food_bbq_rice.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_pandesal",
+    "url": "assets/lagoon/food_pandesal.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_turon",
+    "url": "assets/lagoon/food_turon.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_kamotecue",
+    "url": "assets/lagoon/food_kamotecue.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_puto",
+    "url": "assets/lagoon/food_puto.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_bananacue",
+    "url": "assets/lagoon/food_bananacue.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_siopao",
+    "url": "assets/lagoon/food_siopao.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_lugaw",
+    "url": "assets/lagoon/food_lugaw.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_tokwa",
+    "url": "assets/lagoon/food_tokwa.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_lugaw_egg",
+    "url": "assets/lagoon/food_lugaw_egg.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_goto",
+    "url": "assets/lagoon/food_goto.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_mami",
+    "url": "assets/lagoon/food_mami.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_icecandy",
+    "url": "assets/lagoon/food_icecandy.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_iskrambol",
+    "url": "assets/lagoon/food_iskrambol.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_lecheflan",
+    "url": "assets/lagoon/food_lecheflan.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_maiscon",
+    "url": "assets/lagoon/food_maiscon.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_halohalo",
+    "url": "assets/lagoon/food_halohalo.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_hotsilog",
+    "url": "assets/lagoon/food_hotsilog.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_longsilog",
+    "url": "assets/lagoon/food_longsilog.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_tapsilog",
+    "url": "assets/lagoon/food_tapsilog.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_sisig_rice",
+    "url": "assets/lagoon/food_sisig_rice.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_tumbler_water",
+    "url": "assets/lagoon/food_tumbler_water.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_free_iced_tea",
+    "url": "assets/lagoon/food_free_iced_tea.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  }
+]

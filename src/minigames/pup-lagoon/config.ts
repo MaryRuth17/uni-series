@@ -218,6 +218,8 @@ export const VIEW = {
   busog: { x: 512, y: 208, w: 120, h: 16 },
   wallet: { x: 512, y: 292, w: 120, h: 60 },
   board: { x: 256, y: 186, w: 300, h: 236 },
+  /** The storefront pop-up: a 400×170 front, the menu grid and buttons, over the map area. */
+  front: { x: 256, y: 193, w: 492, h: 334 },
   /** NPC students stand this far apart in a pila. */
   queueGap: 10,
 };
@@ -233,3 +235,53 @@ export const STALL_KEYS_ORDER: readonly StallKey[] = [
   'halohalo',
   'silog',
 ];
+
+/** The arrival intro (LagoonOpeningScene): pan across the PUP panorama, then How to play. */
+export const OPENING = {
+  width: 960,
+  panMs: 4200,
+  jeepMs: 5200,
+  /** Students crossing the plaza: [walker variant, start x, direction, speed px/s]. */
+  walkers: [
+    [1, 120, 1, 22],
+    [3, 420, -1, 18],
+    [5, 540, 1, 20],
+    [2, 760, -1, 24],
+    [6, 880, -1, 16],
+  ] as const,
+};
+
+/**
+ * Life on the Lagoon map (owner request, L6): latag sellers, performers in the plaza, students on the
+ * benches and browsing. Positions are feet points on the 640×360 map.
+ */
+export const LAGOON_LIFE = {
+  /** [latag variant 1–4, x, y]: flowers, crochet, baked goods, stickers. */
+  latag: [
+    [1, 178, 262],
+    [2, 322, 262],
+    [3, 352, 134],
+    [4, 172, 146],
+  ] as const,
+  /** [dancer outfit 0–1, x, y] and the singer with a guitar. */
+  dancers: [
+    [0, 226, 238],
+    [1, 244, 242],
+  ] as const,
+  singer: { x: 276, y: 238 },
+  /** Students browsing or watching: [walker variant, x, y, faces left]. */
+  browsers: [
+    [4, 198, 266, true],
+    [6, 302, 266, false],
+    [2, 260, 254, false],
+  ] as const,
+  /** Two students on each bench (sitter look 0–5). */
+  sitters: [
+    [0, 3],
+    [1, 4],
+    [2, 5],
+  ] as const,
+  bench: { y: 314 },
+  sitterMs: 900,
+  danceMs: 260,
+};
