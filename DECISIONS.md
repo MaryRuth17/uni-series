@@ -236,3 +236,27 @@ Specs: [SPEC.md](SPEC.md) (§), [SPEC-homepage.md](SPEC-homepage.md) (H§), [SPE
   sticker is earned (drawn as a shape: Pixelify Sans has no ★). *(§4.2)*
 - **D-039 — List view** scrolls by drag (touch), wheel and arrow keys; a drag snaps to the nearest card when released, and
   a drag never counts as a tap on a card. *(§4.5)*
+
+### H4 (part 1) — Intro art, crisp text, girl/boy, language (builder, 2026-11-24)
+
+- **D-040 — Render at 3×.** The logical grid stays 640×360, but the canvas is 1920×1080 (`RENDER_SCALE`, `src/ui/view.ts`)
+  and every camera zooms 3× (scenes use `sceneConfig(key)`; extra cameras use `addViewCamera`). Text is drawn at
+  `resolution: 3`, so it is sharp instead of an upscaled blur. Pixel art still snaps to the 640×360 grid
+  (`pixelArt: true`). Pointer code uses `worldX/worldY`; drag deltas divide screen pixels by `RENDER_SCALE`.
+- **D-041 — Girl or boy on the School ID.** `Profile.gender` (`'girl' | 'boy'`) picks the avatar set; each has its own body,
+  hair (8) and outfit (4: casual, uniform polo with skirt or slacks, hoodie, org shirt) sheets; skins (6) and laces (6)
+  are shared. Saves from before the choice load as `'girl'` (the H1 look). The avatar is layered in `src/ui/avatar.ts`
+  and shown on the ID card, the landing and map chips and on the Lagoon map.
+- **D-042 — English by default, Filipino as an option.** EN / FIL buttons on the landing (top right) and the existing
+  Settings row switch the language; `en.json` holds the English menus ("LET'S PLAY!", "Tap to start"), `fil.json` the
+  Filipino ones ("TARA, LARO!", "Pindutin para magsimula"). In-world Taglish (barker calls, signs, Lagoon words such as
+  baon, listahan, Pumila, Tara!) stays the same in both, as part of the setting. Keys without a Filipino entry fall
+  back to English.
+- **D-043 — Art pipeline (R-006).** Art is drawn in code by Node scripts in `scripts/art/` (no new dependencies: our own
+  PNG encoder and pixel canvas with bevels, dithering, outlines and two bitmap fonts) and baked into
+  `public/assets/<set>/*.png` plus a Phaser `pack.json` and a `manifest.json` of sizes (read by
+  `tests/unit/art/packs.test.ts`). Rebuild with `npm run art`; `node scripts/art/build.mjs --preview <dir>` writes composed
+  landing previews. Shops have three frames (closed, lit, night); the night frame keeps signs and windows bright.
+  The UI kit is nine-slice (`ui_panel`, `ui_button`, `ui_board`) with 16×16 icons; the logo is sign-painter lettering.
+  Remaining H4 work: campus map art and the Lagoon set (L6).
+- **D-021 update:** at 3× text resolution the fallback ₱ is legible, so no pixel ₱ glyph is needed in the font.

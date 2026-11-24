@@ -1,11 +1,12 @@
 /**
  * PreloaderScene (SPEC-homepage §6 transitions)
  * Shows: the loading bar as a road with a tiny jeepney whose signboard shows the percent, and
- * "Sumasakay na…". Loads shared assets (none until the art pass) and Pixelify Sans, then starts the
+ * "Sumasakay na…". Loads the art packs (assets/home, assets/common) and Pixelify Sans, then starts the
  * toast layer and the Landing screen.
  * Listens to: the loader's 'progress' event.
  */
 import Phaser from 'phaser';
+import { sceneConfig } from '../ui/view';
 import { gameEvents } from '../core/GameEvents';
 import { t } from '../core/i18n';
 import { services } from '../core/services';
@@ -20,7 +21,7 @@ export class PreloaderScene extends Phaser.Scene {
   private sign!: Phaser.GameObjects.Text;
 
   constructor() {
-    super(SCENES.preloader);
+    super(sceneConfig(SCENES.preloader));
   }
 
   preload(): void {
@@ -35,6 +36,9 @@ export class PreloaderScene extends Phaser.Scene {
     this.add.text(320, ROAD.y + 24, t('ui.loading'), textStyle(8, TEXT.cream)).setOrigin(0.5);
 
     this.load.on('progress', (value: number) => this.setProgress(value * 0.8));
+    // Baked art (scripts/art, DECISIONS R-006): the landing street and the shared UI kit and avatar parts.
+    this.load.pack('home', 'assets/home/pack.json', 'home');
+    this.load.pack('common', 'assets/common/pack.json', 'common');
   }
 
   create(): void {

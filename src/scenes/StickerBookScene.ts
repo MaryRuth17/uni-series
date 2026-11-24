@@ -5,6 +5,7 @@
  * Listens to: pointer; Esc closes.
  */
 import Phaser from 'phaser';
+import { sceneConfig } from '../ui/view';
 import { t } from '../core/i18n';
 import { services } from '../core/services';
 import { ROSTER } from '../minigames/roster';
@@ -17,7 +18,7 @@ export class StickerBookScene extends Phaser.Scene {
   private from = SCENES.landing as string;
 
   constructor() {
-    super(SCENES.stickerBook);
+    super(sceneConfig(SCENES.stickerBook));
   }
 
   init(data: OverlayData): void {

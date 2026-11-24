@@ -4,11 +4,12 @@
  * Listens to: nothing.
  */
 import Phaser from 'phaser';
+import { sceneConfig } from '../ui/view';
 import { SCENES } from '../ui/theme';
 
 export class BootScene extends Phaser.Scene {
   constructor() {
-    super(SCENES.boot);
+    super(sceneConfig(SCENES.boot));
   }
 
   create(): void {

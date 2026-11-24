@@ -6,6 +6,7 @@
  * Listens to: pointer; Esc closes.
  */
 import Phaser from 'phaser';
+import { sceneConfig } from '../ui/view';
 import { gameEvents } from '../core/GameEvents';
 import { t } from '../core/i18n';
 import { services } from '../core/services';
@@ -21,7 +22,7 @@ export class SettingsScene extends Phaser.Scene {
   private confirm: Phaser.GameObjects.Container | null = null;
 
   constructor() {
-    super(SCENES.settings);
+    super(sceneConfig(SCENES.settings));
   }
 
   init(data: OverlayData): void {

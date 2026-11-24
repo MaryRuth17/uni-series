@@ -15,6 +15,16 @@ describe('IdCard (SPEC-homepage §3.3)', () => {
     expect(cycle('outfit', 1, 1)).toBe(2);
   });
 
+  it('starts as a girl and accepts only girl or boy', () => {
+    expect(emptyProfile().gender).toBe('girl');
+    expect(validateProfile({ ...emptyProfile(), name: 'Migo', gender: 'boy' })).toEqual({
+      ok: true,
+    });
+    expect(
+      validateProfile({ ...emptyProfile(), name: 'Ana', gender: 'other' as unknown as 'girl' }),
+    ).toEqual({ ok: false, reason: 'gender' });
+  });
+
   it('needs a name and valid parts', () => {
     expect(validateProfile(emptyProfile())).toEqual({ ok: false, reason: 'name' });
     expect(validateProfile({ ...emptyProfile(), name: 'Ana' })).toEqual({ ok: true });

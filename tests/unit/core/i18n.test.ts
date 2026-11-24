@@ -8,7 +8,7 @@ describe('i18n', () => {
   afterEach(() => setLanguage('en'));
 
   it('looks up keys and fills parameters', () => {
-    expect(t('landing.play')).toBe('TARA, LARO!');
+    expect(t('landing.play')).toBe("LET'S PLAY!");
     expect(t('landing.welcomeBack', { name: 'Ana' })).toBe('Welcome back, Ana!');
     expect(t('map.ipon', { ipon: 240 })).toBe('₱240');
   });
@@ -17,6 +17,8 @@ describe('i18n', () => {
     setLanguage('fil');
     expect(t('settings.music')).toBe('Musika');
     expect(t('landing.play')).toBe('TARA, LARO!');
+    // "SOON" has no Filipino entry, so it falls back to English.
+    expect(t('map.soon')).toBe('SOON');
     expect(t('no.such.key')).toBe('no.such.key');
     expect(hasKey('no.such.key')).toBe(false);
   });

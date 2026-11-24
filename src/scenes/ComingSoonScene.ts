@@ -4,6 +4,7 @@
  * Listens to: pointer; Enter or Esc goes back to the campus map.
  */
 import Phaser from 'phaser';
+import { sceneConfig } from '../ui/view';
 import { t } from '../core/i18n';
 import { FADE_MS } from '../home/config';
 import { Button } from '../ui/Button';
@@ -14,7 +15,7 @@ export class ComingSoonScene extends Phaser.Scene {
   private leaving = false;
 
   constructor() {
-    super(SCENES.comingSoon);
+    super(sceneConfig(SCENES.comingSoon));
   }
 
   create(data: { id?: string }): void {

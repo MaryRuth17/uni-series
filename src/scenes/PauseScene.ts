@@ -7,6 +7,7 @@
  * Listens to: pointer; Esc or P resumes.
  */
 import Phaser from 'phaser';
+import { sceneConfig } from '../ui/view';
 import { t } from '../core/i18n';
 import { FADE_MS } from '../home/config';
 import { Button } from '../ui/Button';
@@ -20,7 +21,7 @@ export class PauseScene extends Phaser.Scene {
   private from = SCENES.campusMap as string;
 
   constructor() {
-    super(PAUSE);
+    super(sceneConfig(PAUSE));
   }
 
   init(data: Partial<OverlayData>): void {

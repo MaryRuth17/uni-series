@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { RENDER_SCALE, VIEW_H, VIEW_W } from '../ui/view';
 import { LagoonIntroScene } from '../minigames/pup-lagoon/scenes/LagoonIntroScene';
 import { LagoonMapScene } from '../minigames/pup-lagoon/scenes/LagoonMapScene';
 import { AlbumScene } from '../scenes/AlbumScene';
@@ -17,8 +18,9 @@ import { ToastScene } from '../scenes/ToastScene';
 export const gameConfig: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   parent: 'game',
-  width: 640,
-  height: 360,
+  // Renders at 3× the 640×360 layout grid so text stays sharp (DECISIONS D-040).
+  width: VIEW_W * RENDER_SCALE,
+  height: VIEW_H * RENDER_SCALE,
   pixelArt: true,
   roundPixels: true,
   backgroundColor: '#2B2233',

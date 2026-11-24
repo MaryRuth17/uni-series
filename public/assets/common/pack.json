@@ -1,0 +1,124 @@
+{
+  "common": {
+    "files": [
+      {
+        "type": "image",
+        "key": "logo_uniseries",
+        "url": "assets/common/logo_uniseries.png"
+      },
+      {
+        "type": "image",
+        "key": "ui_panel",
+        "url": "assets/common/ui_panel.png"
+      },
+      {
+        "type": "image",
+        "key": "ui_button",
+        "url": "assets/common/ui_button.png"
+      },
+      {
+        "type": "image",
+        "key": "ui_board",
+        "url": "assets/common/ui_board.png"
+      },
+      {
+        "type": "image",
+        "key": "icon_settings",
+        "url": "assets/common/icon_settings.png"
+      },
+      {
+        "type": "image",
+        "key": "icon_credits",
+        "url": "assets/common/icon_credits.png"
+      },
+      {
+        "type": "image",
+        "key": "icon_stickers",
+        "url": "assets/common/icon_stickers.png"
+      },
+      {
+        "type": "image",
+        "key": "icon_album",
+        "url": "assets/common/icon_album.png"
+      },
+      {
+        "type": "image",
+        "key": "icon_home",
+        "url": "assets/common/icon_home.png"
+      },
+      {
+        "type": "image",
+        "key": "icon_map",
+        "url": "assets/common/icon_map.png"
+      },
+      {
+        "type": "image",
+        "key": "icon_list",
+        "url": "assets/common/icon_list.png"
+      },
+      {
+        "type": "spritesheet",
+        "key": "avatar_body_girl",
+        "url": "assets/common/avatar_body_girl.png",
+        "frameConfig": {
+          "frameWidth": 48,
+          "frameHeight": 48
+        }
+      },
+      {
+        "type": "spritesheet",
+        "key": "avatar_hair_girl",
+        "url": "assets/common/avatar_hair_girl.png",
+        "frameConfig": {
+          "frameWidth": 48,
+          "frameHeight": 48
+        }
+      },
+      {
+        "type": "spritesheet",
+        "key": "avatar_outfit_girl",
+        "url": "assets/common/avatar_outfit_girl.png",
+        "frameConfig": {
+          "frameWidth": 48,
+          "frameHeight": 48
+        }
+      },
+      {
+        "type": "spritesheet",
+        "key": "avatar_body_boy",
+        "url": "assets/common/avatar_body_boy.png",
+        "frameConfig": {
+          "frameWidth": 48,
+          "frameHeight": 48
+        }
+      },
+      {
+        "type": "spritesheet",
+        "key": "avatar_hair_boy",
+        "url": "assets/common/avatar_hair_boy.png",
+        "frameConfig": {
+          "frameWidth": 48,
+          "frameHeight": 48
+        }
+      },
+      {
+        "type": "spritesheet",
+        "key": "avatar_outfit_boy",
+        "url": "assets/common/avatar_outfit_boy.png",
+        "frameConfig": {
+          "frameWidth": 48,
+          "frameHeight": 48
+        }
+      },
+      {
+        "type": "spritesheet",
+        "key": "avatar_lace",
+        "url": "assets/common/avatar_lace.png",
+        "frameConfig": {
+          "frameWidth": 48,
+          "frameHeight": 48
+        }
+      }
+    ]
+  }
+}

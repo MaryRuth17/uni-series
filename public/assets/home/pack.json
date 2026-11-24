@@ -1,0 +1,296 @@
+{
+  "home": {
+    "files": [
+      {
+        "type": "image",
+        "key": "sky_umaga",
+        "url": "assets/home/sky_umaga.png"
+      },
+      {
+        "type": "image",
+        "key": "city_far_umaga",
+        "url": "assets/home/city_far_umaga.png"
+      },
+      {
+        "type": "image",
+        "key": "sky_tanghali",
+        "url": "assets/home/sky_tanghali.png"
+      },
+      {
+        "type": "image",
+        "key": "city_far_tanghali",
+        "url": "assets/home/city_far_tanghali.png"
+      },
+      {
+        "type": "image",
+        "key": "sky_hapon",
+        "url": "assets/home/sky_hapon.png"
+      },
+      {
+        "type": "image",
+        "key": "city_far_hapon",
+        "url": "assets/home/city_far_hapon.png"
+      },
+      {
+        "type": "image",
+        "key": "sky_gabi",
+        "url": "assets/home/sky_gabi.png"
+      },
+      {
+        "type": "image",
+        "key": "city_far_gabi",
+        "url": "assets/home/city_far_gabi.png"
+      },
+      {
+        "type": "image",
+        "key": "cloud_1",
+        "url": "assets/home/cloud_1.png"
+      },
+      {
+        "type": "image",
+        "key": "cloud_2",
+        "url": "assets/home/cloud_2.png"
+      },
+      {
+        "type": "image",
+        "key": "cloud_3",
+        "url": "assets/home/cloud_3.png"
+      },
+      {
+        "type": "image",
+        "key": "lrt_track",
+        "url": "assets/home/lrt_track.png"
+      },
+      {
+        "type": "spritesheet",
+        "key": "lrt_train",
+        "url": "assets/home/lrt_train.png",
+        "frameConfig": {
+          "frameWidth": 220,
+          "frameHeight": 24
+        }
+      },
+      {
+        "type": "spritesheet",
+        "key": "shop_dorm",
+        "url": "assets/home/shop_dorm.png",
+        "frameConfig": {
+          "frameWidth": 116,
+          "frameHeight": 112
+        }
+      },
+      {
+        "type": "spritesheet",
+        "key": "shop_print",
+        "url": "assets/home/shop_print.png",
+        "frameConfig": {
+          "frameWidth": 116,
+          "frameHeight": 112
+        }
+      },
+      {
+        "type": "spritesheet",
+        "key": "shop_carinderia",
+        "url": "assets/home/shop_carinderia.png",
+        "frameConfig": {
+          "frameWidth": 116,
+          "frameHeight": 112
+        }
+      },
+      {
+        "type": "spritesheet",
+        "key": "shop_sarisari",
+        "url": "assets/home/shop_sarisari.png",
+        "frameConfig": {
+          "frameWidth": 116,
+          "frameHeight": 112
+        }
+      },
+      {
+        "type": "spritesheet",
+        "key": "shop_milktea",
+        "url": "assets/home/shop_milktea.png",
+        "frameConfig": {
+          "frameWidth": 116,
+          "frameHeight": 112
+        }
+      },
+      {
+        "type": "image",
+        "key": "wires",
+        "url": "assets/home/wires.png"
+      },
+      {
+        "type": "spritesheet",
+        "key": "banderita",
+        "url": "assets/home/banderita.png",
+        "frameConfig": {
+          "frameWidth": 8,
+          "frameHeight": 9
+        }
+      },
+      {
+        "type": "image",
+        "key": "sidewalk",
+        "url": "assets/home/sidewalk.png"
+      },
+      {
+        "type": "image",
+        "key": "street",
+        "url": "assets/home/street.png"
+      },
+      {
+        "type": "image",
+        "key": "cart_fishball",
+        "url": "assets/home/cart_fishball.png"
+      },
+      {
+        "type": "image",
+        "key": "cart_sorbetes",
+        "url": "assets/home/cart_sorbetes.png"
+      },
+      {
+        "type": "image",
+        "key": "cart_taho",
+        "url": "assets/home/cart_taho.png"
+      },
+      {
+        "type": "image",
+        "key": "stop_sign",
+        "url": "assets/home/stop_sign.png"
+      },
+      {
+        "type": "spritesheet",
+        "key": "streetlight",
+        "url": "assets/home/streetlight.png",
+        "frameConfig": {
+          "frameWidth": 22,
+          "frameHeight": 86
+        }
+      },
+      {
+        "type": "image",
+        "key": "tricycle",
+        "url": "assets/home/tricycle.png"
+      },
+      {
+        "type": "spritesheet",
+        "key": "cat",
+        "url": "assets/home/cat.png",
+        "frameConfig": {
+          "frameWidth": 16,
+          "frameHeight": 12
+        }
+      },
+      {
+        "type": "image",
+        "key": "dog",
+        "url": "assets/home/dog.png"
+      },
+      {
+        "type": "spritesheet",
+        "key": "barker",
+        "url": "assets/home/barker.png",
+        "frameConfig": {
+          "frameWidth": 16,
+          "frameHeight": 26
+        }
+      },
+      {
+        "type": "spritesheet",
+        "key": "walker_1",
+        "url": "assets/home/walker_1.png",
+        "frameConfig": {
+          "frameWidth": 16,
+          "frameHeight": 24
+        }
+      },
+      {
+        "type": "spritesheet",
+        "key": "walker_2",
+        "url": "assets/home/walker_2.png",
+        "frameConfig": {
+          "frameWidth": 16,
+          "frameHeight": 24
+        }
+      },
+      {
+        "type": "spritesheet",
+        "key": "walker_3",
+        "url": "assets/home/walker_3.png",
+        "frameConfig": {
+          "frameWidth": 16,
+          "frameHeight": 24
+        }
+      },
+      {
+        "type": "spritesheet",
+        "key": "walker_4",
+        "url": "assets/home/walker_4.png",
+        "frameConfig": {
+          "frameWidth": 16,
+          "frameHeight": 24
+        }
+      },
+      {
+        "type": "spritesheet",
+        "key": "walker_5",
+        "url": "assets/home/walker_5.png",
+        "frameConfig": {
+          "frameWidth": 16,
+          "frameHeight": 24
+        }
+      },
+      {
+        "type": "spritesheet",
+        "key": "walker_6",
+        "url": "assets/home/walker_6.png",
+        "frameConfig": {
+          "frameWidth": 16,
+          "frameHeight": 24
+        }
+      },
+      {
+        "type": "spritesheet",
+        "key": "jeep_1",
+        "url": "assets/home/jeep_1.png",
+        "frameConfig": {
+          "frameWidth": 80,
+          "frameHeight": 40
+        }
+      },
+      {
+        "type": "spritesheet",
+        "key": "jeep_2",
+        "url": "assets/home/jeep_2.png",
+        "frameConfig": {
+          "frameWidth": 80,
+          "frameHeight": 40
+        }
+      },
+      {
+        "type": "spritesheet",
+        "key": "jeep_3",
+        "url": "assets/home/jeep_3.png",
+        "frameConfig": {
+          "frameWidth": 80,
+          "frameHeight": 40
+        }
+      },
+      {
+        "type": "spritesheet",
+        "key": "jeep_4",
+        "url": "assets/home/jeep_4.png",
+        "frameConfig": {
+          "frameWidth": 80,
+          "frameHeight": 40
+        }
+      },
+      {
+        "type": "image",
+        "key": "jeep_board",
+        "url": "assets/home/jeep_board.png"
+      }
+    ]
+  }
+}

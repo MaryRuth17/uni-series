@@ -4,6 +4,7 @@
  * Listens to: gameEvents 'toast' and 'save:failed' (shows the "Hindi ma-save" warning).
  */
 import Phaser from 'phaser';
+import { sceneConfig, VIEW_H, VIEW_W } from '../ui/view';
 import { gameEvents } from '../core/GameEvents';
 import { t } from '../core/i18n';
 import { COLORS, SCENES, TEXT, textStyle } from '../ui/theme';
@@ -18,14 +19,13 @@ export class ToastScene extends Phaser.Scene {
   private showing = false;
 
   constructor() {
-    super(SCENES.toast);
+    super(sceneConfig(SCENES.toast));
   }
 
   create(): void {
-    const { width, height } = this.scale;
     this.bg = this.add.rectangle(0, 0, 10, 18, COLORS.ink, 0.92).setStrokeStyle(1, COLORS.cream);
     this.label = this.add.text(0, 0, '', textStyle(8, TEXT.cream)).setOrigin(0.5);
-    this.box = this.add.container(width / 2, height - 30, [this.bg, this.label]).setAlpha(0);
+    this.box = this.add.container(VIEW_W / 2, VIEW_H - 30, [this.bg, this.label]).setAlpha(0);
 
     const offToast = gameEvents.on('toast', ({ text, ms }) => this.enqueue(text, ms ?? DEFAULT_MS));
     const offFail = gameEvents.on('save:failed', () => this.enqueue(t('ui.storageWarn'), 3000));

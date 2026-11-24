@@ -89,11 +89,28 @@ describe('SaveManager', () => {
     expect(migrate('nope', d)).toBeNull();
   });
 
+  it('profiles saved before the girl/boy choice load as girl (D-041)', () => {
+    const d = defaultSave(now(), false);
+    const old = migrate(
+      { version: 1, profile: { name: 'Ana', skin: 1, hair: 2, outfit: 0, lace: 3 } },
+      d,
+    );
+    expect(old?.profile?.gender).toBe('girl');
+    const boy = migrate(
+      {
+        version: 1,
+        profile: { gender: 'boy', name: 'Migo', skin: 0, hair: 0, outfit: 0, lace: 0 },
+      },
+      d,
+    );
+    expect(boy?.profile?.gender).toBe('boy');
+  });
+
   it('reset progress keeps settings', () => {
     const m = new SaveManager(new MemoryStorage(), { now });
     m.update((d) => {
       d.settings.language = 'fil';
-      d.profile = { name: 'Ana', skin: 1, hair: 2, outfit: 0, lace: 3 };
+      d.profile = { gender: 'girl', name: 'Ana', skin: 1, hair: 2, outfit: 0, lace: 3 };
       d.minigames['pup-lagoon'] = { vacants: 3 };
     });
     m.resetProgress();

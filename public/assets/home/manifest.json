@@ -1,0 +1,356 @@
+[
+  {
+    "key": "sky_umaga",
+    "url": "assets/home/sky_umaga.png",
+    "width": 640,
+    "height": 186,
+    "frame": null
+  },
+  {
+    "key": "city_far_umaga",
+    "url": "assets/home/city_far_umaga.png",
+    "width": 640,
+    "height": 66,
+    "frame": null
+  },
+  {
+    "key": "sky_tanghali",
+    "url": "assets/home/sky_tanghali.png",
+    "width": 640,
+    "height": 186,
+    "frame": null
+  },
+  {
+    "key": "city_far_tanghali",
+    "url": "assets/home/city_far_tanghali.png",
+    "width": 640,
+    "height": 66,
+    "frame": null
+  },
+  {
+    "key": "sky_hapon",
+    "url": "assets/home/sky_hapon.png",
+    "width": 640,
+    "height": 186,
+    "frame": null
+  },
+  {
+    "key": "city_far_hapon",
+    "url": "assets/home/city_far_hapon.png",
+    "width": 640,
+    "height": 66,
+    "frame": null
+  },
+  {
+    "key": "sky_gabi",
+    "url": "assets/home/sky_gabi.png",
+    "width": 640,
+    "height": 186,
+    "frame": null
+  },
+  {
+    "key": "city_far_gabi",
+    "url": "assets/home/city_far_gabi.png",
+    "width": 640,
+    "height": 66,
+    "frame": null
+  },
+  {
+    "key": "cloud_1",
+    "url": "assets/home/cloud_1.png",
+    "width": 46,
+    "height": 20,
+    "frame": null
+  },
+  {
+    "key": "cloud_2",
+    "url": "assets/home/cloud_2.png",
+    "width": 34,
+    "height": 20,
+    "frame": null
+  },
+  {
+    "key": "cloud_3",
+    "url": "assets/home/cloud_3.png",
+    "width": 58,
+    "height": 20,
+    "frame": null
+  },
+  {
+    "key": "lrt_track",
+    "url": "assets/home/lrt_track.png",
+    "width": 640,
+    "height": 150,
+    "frame": null
+  },
+  {
+    "key": "lrt_train",
+    "url": "assets/home/lrt_train.png",
+    "width": 440,
+    "height": 24,
+    "frame": [
+      220,
+      24
+    ]
+  },
+  {
+    "key": "shop_dorm",
+    "url": "assets/home/shop_dorm.png",
+    "width": 348,
+    "height": 112,
+    "frame": [
+      116,
+      112
+    ]
+  },
+  {
+    "key": "shop_print",
+    "url": "assets/home/shop_print.png",
+    "width": 348,
+    "height": 112,
+    "frame": [
+      116,
+      112
+    ]
+  },
+  {
+    "key": "shop_carinderia",
+    "url": "assets/home/shop_carinderia.png",
+    "width": 348,
+    "height": 112,
+    "frame": [
+      116,
+      112
+    ]
+  },
+  {
+    "key": "shop_sarisari",
+    "url": "assets/home/shop_sarisari.png",
+    "width": 348,
+    "height": 112,
+    "frame": [
+      116,
+      112
+    ]
+  },
+  {
+    "key": "shop_milktea",
+    "url": "assets/home/shop_milktea.png",
+    "width": 348,
+    "height": 112,
+    "frame": [
+      116,
+      112
+    ]
+  },
+  {
+    "key": "wires",
+    "url": "assets/home/wires.png",
+    "width": 640,
+    "height": 40,
+    "frame": null
+  },
+  {
+    "key": "banderita",
+    "url": "assets/home/banderita.png",
+    "width": 32,
+    "height": 9,
+    "frame": [
+      8,
+      9
+    ]
+  },
+  {
+    "key": "sidewalk",
+    "url": "assets/home/sidewalk.png",
+    "width": 640,
+    "height": 18,
+    "frame": null
+  },
+  {
+    "key": "street",
+    "url": "assets/home/street.png",
+    "width": 640,
+    "height": 42,
+    "frame": null
+  },
+  {
+    "key": "cart_fishball",
+    "url": "assets/home/cart_fishball.png",
+    "width": 48,
+    "height": 40,
+    "frame": null
+  },
+  {
+    "key": "cart_sorbetes",
+    "url": "assets/home/cart_sorbetes.png",
+    "width": 40,
+    "height": 34,
+    "frame": null
+  },
+  {
+    "key": "cart_taho",
+    "url": "assets/home/cart_taho.png",
+    "width": 40,
+    "height": 34,
+    "frame": null
+  },
+  {
+    "key": "stop_sign",
+    "url": "assets/home/stop_sign.png",
+    "width": 48,
+    "height": 46,
+    "frame": null
+  },
+  {
+    "key": "streetlight",
+    "url": "assets/home/streetlight.png",
+    "width": 44,
+    "height": 86,
+    "frame": [
+      22,
+      86
+    ]
+  },
+  {
+    "key": "tricycle",
+    "url": "assets/home/tricycle.png",
+    "width": 46,
+    "height": 32,
+    "frame": null
+  },
+  {
+    "key": "cat",
+    "url": "assets/home/cat.png",
+    "width": 32,
+    "height": 12,
+    "frame": [
+      16,
+      12
+    ]
+  },
+  {
+    "key": "dog",
+    "url": "assets/home/dog.png",
+    "width": 22,
+    "height": 12,
+    "frame": null
+  },
+  {
+    "key": "barker",
+    "url": "assets/home/barker.png",
+    "width": 64,
+    "height": 26,
+    "frame": [
+      16,
+      26
+    ]
+  },
+  {
+    "key": "walker_1",
+    "url": "assets/home/walker_1.png",
+    "width": 64,
+    "height": 24,
+    "frame": [
+      16,
+      24
+    ]
+  },
+  {
+    "key": "walker_2",
+    "url": "assets/home/walker_2.png",
+    "width": 64,
+    "height": 24,
+    "frame": [
+      16,
+      24
+    ]
+  },
+  {
+    "key": "walker_3",
+    "url": "assets/home/walker_3.png",
+    "width": 64,
+    "height": 24,
+    "frame": [
+      16,
+      24
+    ]
+  },
+  {
+    "key": "walker_4",
+    "url": "assets/home/walker_4.png",
+    "width": 64,
+    "height": 24,
+    "frame": [
+      16,
+      24
+    ]
+  },
+  {
+    "key": "walker_5",
+    "url": "assets/home/walker_5.png",
+    "width": 64,
+    "height": 24,
+    "frame": [
+      16,
+      24
+    ]
+  },
+  {
+    "key": "walker_6",
+    "url": "assets/home/walker_6.png",
+    "width": 64,
+    "height": 24,
+    "frame": [
+      16,
+      24
+    ]
+  },
+  {
+    "key": "jeep_1",
+    "url": "assets/home/jeep_1.png",
+    "width": 160,
+    "height": 40,
+    "frame": [
+      80,
+      40
+    ]
+  },
+  {
+    "key": "jeep_2",
+    "url": "assets/home/jeep_2.png",
+    "width": 160,
+    "height": 40,
+    "frame": [
+      80,
+      40
+    ]
+  },
+  {
+    "key": "jeep_3",
+    "url": "assets/home/jeep_3.png",
+    "width": 160,
+    "height": 40,
+    "frame": [
+      80,
+      40
+    ]
+  },
+  {
+    "key": "jeep_4",
+    "url": "assets/home/jeep_4.png",
+    "width": 160,
+    "height": 40,
+    "frame": [
+      80,
+      40
+    ]
+  },
+  {
+    "key": "jeep_board",
+    "url": "assets/home/jeep_board.png",
+    "width": 112,
+    "height": 12,
+    "frame": null
+  }
+]

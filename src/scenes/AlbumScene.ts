@@ -4,6 +4,7 @@
  * Listens to: pointer; Esc closes.
  */
 import Phaser from 'phaser';
+import { sceneConfig } from '../ui/view';
 import { t } from '../core/i18n';
 import { services } from '../core/services';
 import type { LagoonProgress } from '../minigames/pup-lagoon/logic/Progress';
@@ -16,7 +17,7 @@ export class AlbumScene extends Phaser.Scene {
   private from = SCENES.landing as string;
 
   constructor() {
-    super(SCENES.album);
+    super(sceneConfig(SCENES.album));
   }
 
   init(data: OverlayData): void {
