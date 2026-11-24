@@ -4,7 +4,7 @@
 // How to play pictures.
 import { Pix, shade, sheet } from './pix.mjs';
 import { foodPix } from './lagoon-food.mjs';
-import { INK, LOOKS, blitScaled, canopy, person } from './lagoon-common.mjs';
+import { INK, LOOKS, canopy, person } from './lagoon-common.mjs';
 
 // ---- Money ----------------------------------------------------------------------------------------
 
