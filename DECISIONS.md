@@ -17,6 +17,9 @@ Specs: [SPEC.md](SPEC.md) (§), [SPEC-homepage.md](SPEC-homepage.md) (H§), [SPE
 - **Q-005 — Reference photos in the public repo.** *Current default:* the images in `docs/reference/` stay local only
   (gitignored), because the repo is public and their rights are unclear. If the owner took them or they have a licence
   that allows it, commit them.
+- **Q-006 — What does the Payong do now?** It only made walking faster in the rain, and there is no walking since
+  L-026. *Current default:* it stays in the Ipon Shop list unchanged until L5 gives it a new use (for example, rain no
+  longer makes lines longer).
 
 ## Resolved
 
@@ -336,3 +339,24 @@ Specs: [SPEC.md](SPEC.md) (§), [SPEC-homepage.md](SPEC-homepage.md) (H§), [SPE
   play. Following SPEC §13 and SPEC-pup-lagoon §15, the pylon carries no initials and the gate beam shows a greeting
   written by the game ("WELCOME, ISKOLAR NG BAYAN!" / "MALIGAYANG PAGDATING, ISKOLAR NG BAYAN!"), not the school's
   official name sign.
+- **L-026 — No Lagoon map; the stalls are the play screen (owner).** The flow is now: arriving at PUP (intro) → How to
+  play → the Vacant card (the listahan) → the storefronts. `LagoonStallsScene` (key `LagoonStalls`) replaces the walkable
+  map: one stall front at a time with Prev / Next (and ← / →, keys 1–8), Pumila joins the line at once, the line of
+  students and the player stand in front of the counter, Prev / Next lock while the player is in a line, Esc / Leave
+  line steps out, the water station has Refill. The map art, the latag sellers, performers and benches (L-020, L-021),
+  `Walker`, the waypoint graph (L-012) and the map pila layout (L-013) are removed. This overrides SPEC-pup-lagoon §4.2
+  and §10.1.
+- **L-027 — Detailed storefronts from the owner's photos.** Each stall's front is a 512×220 picture
+  (`scripts/art/lagoon-fronts.mjs`); its layout (food positions in menu order, name, promo sign, steam points) lives in
+  `data/storefronts.json`, which the art script and the game share, and a test checks there is one food position per
+  orderable item. Kiosks (karinderya, silog, halo-halo): food-photo banners, a printed promo sign taped to the tiled wall
+  ("₱70.00 + FREE DRINK!" at the karinderya), a red glass case with a fluorescent tube and steel trays, a TOYO jug and
+  bottles, the name on the red front. Stall-row stalls (palamig, merienda, lugawan, ihaw, tusok): a concrete overhang, a
+  menu board and a black name board, shelves and a fridge behind, a table with a green floral cloth, wooden crates and a
+  styrofoam box, big juice dispensers with blue diamond labels (palamig), pots on a burner, a charcoal grill, a wok, a
+  FEWA board and sawsawan jars. Steam and smoke rise from the pots, grill and wok. No real stall names or brands.
+- **L-028 — The intro shows the Anonas St front (owner's street view).** Utility poles with a tangle of wires, big
+  acacias, the maroon wall with a dark stone marker and a bronze relief, the gate under a white canopy with a maroon beam
+  (the game writes "WELCOME, ISKOLAR NG BAYAN!" / "MABUHAY, ISKOLAR NG BAYAN!"), the white fence on a red base, the
+  tall white pylon of three slabs (plain: no initials, SPEC §13), a pedicab, barricades and vendor umbrellas. Replaces
+  L-025's gate-and-obelisk panorama.

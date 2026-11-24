@@ -1,0 +1,138 @@
+{
+  "_doc": "Storefront layout (owner request, L6): each stall's front is a 512x220 image (scripts/art/lagoon-fronts.mjs). Points are in that image. items: centres of the food on display, in data/menu.ts order (price tags go under them). name: where the game writes the stall name. sign: the printed promo sign (kiosks). steam: where steam or smoke rises.",
+  "karinderya": {
+    "style": "kiosk",
+    "items": [
+      [222, 118],
+      [274, 118],
+      [326, 118],
+      [378, 118],
+      [430, 118],
+      [482, 118]
+    ],
+    "name": { "x": 256, "y": 178, "color": "#FFF4DC" },
+    "sign": { "x": 104, "y": 40, "w": 88, "h": 76 },
+    "vendor": [30, 34],
+    "steam": [
+      [274, 96],
+      [378, 96]
+    ]
+  },
+  "silog": {
+    "style": "kiosk",
+    "items": [
+      [240, 118],
+      [310, 118],
+      [380, 118],
+      [450, 118]
+    ],
+    "name": { "x": 256, "y": 178, "color": "#FFF4DC" },
+    "sign": { "x": 104, "y": 40, "w": 88, "h": 76 },
+    "vendor": [30, 34],
+    "steam": [
+      [240, 96],
+      [450, 96]
+    ]
+  },
+  "halohalo": {
+    "style": "kiosk",
+    "items": [
+      [230, 118],
+      [292, 118],
+      [354, 118],
+      [416, 118],
+      [478, 118]
+    ],
+    "name": { "x": 256, "y": 178, "color": "#FFF4DC" },
+    "sign": { "x": 104, "y": 40, "w": 88, "h": 76 },
+    "vendor": [30, 34],
+    "steam": []
+  },
+  "palamig": {
+    "style": "row",
+    "items": [
+      [130, 126],
+      [186, 126],
+      [242, 126],
+      [298, 126],
+      [354, 126],
+      [410, 126]
+    ],
+    "name": { "x": 386, "y": 44, "color": "#FFF4DC" },
+    "vendor": [430, 46],
+    "steam": []
+  },
+  "merienda": {
+    "style": "row",
+    "items": [
+      [110, 126],
+      [170, 126],
+      [230, 126],
+      [290, 126],
+      [350, 126],
+      [410, 126]
+    ],
+    "name": { "x": 386, "y": 44, "color": "#FFF4DC" },
+    "vendor": [440, 46],
+    "steam": [[410, 98]]
+  },
+  "lugawan": {
+    "style": "row",
+    "items": [
+      [140, 126],
+      [206, 126],
+      [272, 126],
+      [338, 126],
+      [404, 126]
+    ],
+    "name": { "x": 386, "y": 44, "color": "#FFF4DC" },
+    "vendor": [440, 46],
+    "steam": [
+      [86, 70],
+      [140, 98],
+      [338, 98]
+    ]
+  },
+  "ihaw": {
+    "style": "row",
+    "items": [
+      [120, 126],
+      [180, 126],
+      [240, 126],
+      [300, 126],
+      [360, 126],
+      [420, 126]
+    ],
+    "name": { "x": 386, "y": 44, "color": "#FFF4DC" },
+    "vendor": [452, 46],
+    "steam": [
+      [150, 92],
+      [230, 92],
+      [310, 92]
+    ]
+  },
+  "tusok": {
+    "style": "row",
+    "items": [
+      [110, 126],
+      [166, 126],
+      [222, 126],
+      [278, 126],
+      [334, 126],
+      [410, 126]
+    ],
+    "name": { "x": 386, "y": 44, "color": "#FFF4DC" },
+    "vendor": [300, 46],
+    "steam": [
+      [196, 104],
+      [236, 104]
+    ]
+  },
+  "water": {
+    "style": "water",
+    "items": [[256, 132]],
+    "name": { "x": 256, "y": 24, "color": "#FFF4DC" },
+    "vendor": null,
+    "steam": []
+  }
+}

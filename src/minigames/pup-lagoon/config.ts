@@ -78,7 +78,6 @@ export const EVENTS = {
   /** Tag weight multipliers while it rains; hot days force a Malamig line. */
   rainTagWeights: { sabaw: 3 } as Partial<Record<Tag, number>>,
   hotBusyStalls: ['halohalo', 'palamig'] as readonly StallKey[],
-  rainWalkFactor: 0.7,
 };
 
 /** Busog targets for the Busog! stamp (§9.3 table, by tier; OC-3). */
@@ -192,36 +191,29 @@ export const IPON_SHOP: readonly IponShopItem[] = [
   })),
 ];
 
-/** Walking (used by the map view from L2). */
-export const WALK_SPEED = 80;
-
 /** Map layout at 640×360 (SPEC-pup-lagoon §10.1). The HUD keeps the right column (x 512–640). */
 export const VIEW = {
   topBar: { h: 24 },
   mapRight: 512,
-  stallRow: { x: 96, y: 28, w: 400, h: 68 },
-  windows: { palamig: 140, merienda: 220, lugawan: 300, ihaw: 400 } as Readonly<
-    Partial<Record<StallKey, number>>
-  >,
-  window: { w: 64, h: 48, cy: 62 },
-  kiosks: { karinderya: 110, silog: 176, halohalo: 242 } as Readonly<
-    Partial<Record<StallKey, number>>
-  >,
-  kiosk: { x: 8, w: 80, h: 50 },
-  plaza: { x: 250, y: 190, r: 56 },
-  lagoon: { x: 410, y: 225, w: 124, h: 80 },
-  tusokCart: { x: 455, y: 160, w: 36, h: 28 },
-  tambayan: { x: 110, y: 296, w: 360, h: 56 },
-  benches: [170, 290, 410],
-  water: { x: 485, y: 300, w: 20, h: 28 },
   listahan: { x: 512, y: 30, w: 120, h: 172 },
   busog: { x: 512, y: 208, w: 120, h: 16 },
   wallet: { x: 512, y: 292, w: 120, h: 60 },
-  board: { x: 256, y: 186, w: 300, h: 236 },
-  /** The storefront pop-up: a 400×170 front, the menu grid and buttons, over the map area. */
-  front: { x: 256, y: 193, w: 492, h: 334 },
-  /** NPC students stand this far apart in a pila. */
-  queueGap: 10,
+};
+
+/** The storefront screen (owner change, DECISIONS L-026): a 512×220 front, the menu, the button bar. */
+export const FRONT = {
+  x: 0,
+  y: 24,
+  w: 512,
+  h: 220,
+  menuY: 250,
+  menuRowH: 27,
+  barY: 344,
+  /** The line of students in front of the stall: first place, spacing, how many are drawn. */
+  lineX: 300,
+  lineGap: 24,
+  lineMax: 8,
+  steamMs: 450,
 };
 
 /** Stall order for keys 1–8 (§10.3, §7 order). */
@@ -242,7 +234,7 @@ export const OPENING = {
   /** The pan runs from the front gate (left) to the obelisk plaza (camera centre x). */
   panTo: 600,
   /** Centre of the gate's maroon beam, where the welcome banner is written. */
-  banner: { x: 176, y: 157 },
+  banner: { x: 592, y: 201 },
   panMs: 4200,
   /** How long the obelisk stays on screen before How to play opens. */
   holdMs: 1400,
@@ -255,39 +247,4 @@ export const OPENING = {
     [2, 760, -1, 24],
     [6, 880, -1, 16],
   ] as const,
-};
-
-/**
- * Life on the Lagoon map (owner request, L6): latag sellers, performers in the plaza, students on the
- * benches and browsing. Positions are feet points on the 640×360 map.
- */
-export const LAGOON_LIFE = {
-  /** [latag variant 1–4, x, y]: flowers, crochet, baked goods, stickers. */
-  latag: [
-    [1, 178, 262],
-    [2, 322, 262],
-    [3, 352, 134],
-    [4, 172, 146],
-  ] as const,
-  /** [dancer outfit 0–1, x, y] and the singer with a guitar. */
-  dancers: [
-    [0, 226, 238],
-    [1, 244, 242],
-  ] as const,
-  singer: { x: 276, y: 238 },
-  /** Students browsing or watching: [walker variant, x, y, faces left]. */
-  browsers: [
-    [4, 198, 266, true],
-    [6, 302, 266, false],
-    [2, 260, 254, false],
-  ] as const,
-  /** Two students on each bench (sitter look 0–5). */
-  sitters: [
-    [0, 3],
-    [1, 4],
-    [2, 5],
-  ] as const,
-  bench: { y: 314 },
-  sitterMs: 900,
-  danceMs: 260,
 };
