@@ -1,12 +1,15 @@
 /**
- * LagoonMapScene — the Lagoon during a vacant (SPEC-pup-lagoon §4.2, §10.1, §10.3) — L2 greybox
- * Shows: the whole Lagoon as labelled shapes at the §10.1 positions (stall row with windows, red kiosks,
- * plaza with the LAGOON sign, the Lagoon, tusok cart, tambayan benches, water station), locked stalls with
- * closed shutters, live pila lines of students, the player, the top bar (vacant, slot, event, pause) and
- * the HUD column (listahan, busog meter, wallet). Tap a stall to open its menu board (even from far away);
- * Pumila walks there along the paths and joins the line; tap the ground to walk; the player can leave a
- * line any time. Buying at the counter arrives in L3.
- * Listens to: pointer; keyboard (1–8 menu boards, Enter = Pumila, Esc = close / leave, P = pause);
+ * LagoonMapScene — the Lagoon during a vacant (SPEC-pup-lagoon §4.2, §10.1, §10.3) — L6 art
+ * Shows: the illustrated Lagoon at the §10.1 positions (stall row with windows, red kiosks, the tusok cart
+ * with its FEWA board, the brick plaza with the LAGOON planter, the green lagoon with white posts and
+ * railings, the tambayan benches, the water station, shade trees), locked stalls with closed shutters,
+ * life (students on the benches, latag sellers, dancers and a singer in the plaza), live pila lines of
+ * students, the player, the top bar (vacant, slot, event, pause) and the HUD column (listahan, busog
+ * meter, wallet). Tap a stall to see its storefront (sign, food on display with prices, the vendor, the
+ * menu); Prev / Next flip through the stalls; Pumila walks there and joins the line; tap the ground to
+ * walk. Buying at the counter arrives in L3.
+ * Listens to: pointer (taps, stall hover names); keyboard (1–8 storefronts, Left / Right = prev / next,
+ * Enter = Pumila, Esc = close / leave, P = pause);
  * LagoonVacant events (pilaChanged, atCounter); the frame update (walking and the pila, clamped to 100 ms).
  */
 import Phaser from 'phaser';
@@ -20,7 +23,7 @@ import { panel } from '../../../ui/Panel';
 import { COLORS, TEXT, textStyle } from '../../../ui/theme';
 import { avatarSprite } from '../../../ui/avatar';
 import { PAUSE } from '../../../scenes/PauseScene';
-import { EVENTS, STALL_KEYS_ORDER, VIEW, WALK_SPEED } from '../config';
+import { EVENTS, LAGOON_LIFE, STALL_KEYS_ORDER, VIEW, WALK_SPEED } from '../config';
 import { MENU } from '../data/menu';
 import { STALLS, stallDef } from '../data/stalls';
 import { STALL_NODE, START_NODE, WAYPOINT_EDGES, WAYPOINT_NODES } from '../data/waypoints';
@@ -60,6 +63,7 @@ export class LagoonMapScene extends Phaser.Scene {
   private boardPila: Phaser.GameObjects.Text | null = null;
   private status!: Phaser.GameObjects.Container;
   private hud!: Phaser.GameObjects.Container;
+  private tip: Phaser.GameObjects.Text | null = null;
 
   constructor() {
     super(sceneConfig(LAGOON_MAP));
@@ -117,95 +121,149 @@ export class LagoonMapScene extends Phaser.Scene {
   // ---- Drawing ---------------------------------------------------------------------------------
 
   private drawGround(): void {
-    const ground = this.add
-      .rectangle(
-        VIEW.mapRight / 2,
-        (360 + VIEW.topBar.h) / 2,
-        VIEW.mapRight,
-        360 - VIEW.topBar.h,
-        0xd9d6cc,
-      )
-      .setInteractive();
+    const ground = this.add.image(0, VIEW.topBar.h, 'lagoon_ground').setOrigin(0).setInteractive();
     ground.on('pointerup', (p: Phaser.Input.Pointer) =>
       this.walkTo(GRAPH.nearest(p.worldX, p.worldY)),
     );
-
     const P = VIEW.plaza;
-    this.add.circle(P.x, P.y, P.r, 0xb5563d).setStrokeStyle(4, 0xf2eee4);
-    this.add.circle(P.x, P.y, P.r - 18).setStrokeStyle(3, 0xf2eee4);
     this.add
-      .polygon(P.x, P.y, [12, 0, 36, 0, 48, 20, 36, 40, 12, 40, 0, 20], 0xc75b3b)
-      .setStrokeStyle(1, COLORS.ink);
-    this.add.rectangle(P.x, P.y - 4, 44, 12, 0xd94b3d).setStrokeStyle(1, COLORS.ink);
-    this.add.text(P.x, P.y - 4, t('pupLagoon.map.sign'), textStyle(8, TEXT.cream)).setOrigin(0.5);
-
+      .image(P.x, P.y + 16, 'lagoon_plaza_sign')
+      .setOrigin(0.5, 1)
+      .setDepth(this.depthAt(P.y + 16));
     const L = VIEW.lagoon;
-    this.add.ellipse(L.x, L.y, L.w + 6, L.h + 6, 0xbdb8ac);
-    this.add.ellipse(L.x, L.y, L.w, L.h, 0x5e8c61);
-    this.add.text(L.x, L.y, t('pupLagoon.map.lagoon'), textStyle(8, TEXT.cream)).setOrigin(0.5);
-
-    const T = VIEW.tambayan;
-    this.add
-      .rectangle(T.x + T.w / 2, T.y + T.h / 2, T.w, T.h, 0xcfc8b6)
-      .setStrokeStyle(1, 0xa8a090);
-    this.add.text(T.x + 6, T.y + 40, t('pupLagoon.map.tambayan'), textStyle(8, TEXT.grey));
-    for (const x of VIEW.benches) {
-      this.add.rectangle(x, T.y + 18, 48, 20, 0x8b5a3c).setStrokeStyle(1, COLORS.ink);
+    this.add.image(L.x, L.y, 'lagoon_pond_rail').setDepth(this.depthAt(L.y));
+    if (!services().save.data.settings.reducedMotion) {
+      // Ripples on the water.
+      for (let i = 0; i < 6; i++) {
+        const r = this.add
+          .ellipse(L.x - 40 + ((i * 17) % 80), L.y - 20 + ((i * 23) % 40), 8, 3)
+          .setStrokeStyle(1, 0x8fbf8a, 0.8)
+          .setDepth(1);
+        this.tweens.add({
+          targets: r,
+          scale: 2,
+          alpha: 0,
+          duration: 1800,
+          delay: i * 600,
+          repeat: -1,
+          repeatDelay: 1400,
+        });
+      }
     }
-    for (const x of [140, 230, 350, 440]) this.add.circle(x, T.y + 6, 14, 0x4f7f3a, 0.55);
+    for (const x of VIEW.benches)
+      this.add
+        .image(x, LAGOON_LIFE.bench.y, 'lagoon_bench')
+        .setDepth(this.depthAt(LAGOON_LIFE.bench.y));
+    this.drawLife();
+    // Shade trees over everything on the ground.
+    this.add.image(0, VIEW.topBar.h, 'lagoon_canopy').setOrigin(0).setDepth(70);
+  }
+
+  /** People on the map: students on the benches, latag sellers, dancers and a singer (owner, L6). */
+  private drawLife(): void {
+    const reduced = services().save.data.settings.reducedMotion;
+    const make = (key: string, texture: string, frames: number[], ms: number): void => {
+      if (this.anims.exists(key)) return;
+      this.anims.create({
+        key,
+        frames: this.anims.generateFrameNumbers(texture, { frames }),
+        duration: ms * frames.length,
+        repeat: -1,
+      });
+    };
+    make('lagoon_dance_0', 'lagoon_dancer', [0, 1, 2, 3], LAGOON_LIFE.danceMs);
+    make('lagoon_dance_1', 'lagoon_dancer', [4, 5, 6, 7], LAGOON_LIFE.danceMs);
+    make('lagoon_sing', 'lagoon_singer', [0, 1], LAGOON_LIFE.danceMs * 2);
+    for (let i = 0; i < 6; i++)
+      make(`lagoon_sit_${i}`, 'lagoon_sitter', [i * 2, i * 2 + 1], LAGOON_LIFE.sitterMs);
+    const person = (sprite: Phaser.GameObjects.Sprite, anim: string | null): void => {
+      sprite.setOrigin(0.5, 1).setDepth(this.depthAt(sprite.y));
+      if (anim && !reduced) sprite.play({ key: anim, startFrame: Math.floor(sprite.x) % 2 });
+    };
+    VIEW.benches.forEach((x, b) => {
+      const [a, c] = LAGOON_LIFE.sitters[b];
+      person(
+        this.add.sprite(x - 6, LAGOON_LIFE.bench.y + 2, 'lagoon_sitter', a * 2),
+        `lagoon_sit_${a}`,
+      );
+      person(
+        this.add.sprite(x + 10, LAGOON_LIFE.bench.y + 2, 'lagoon_sitter', c * 2),
+        `lagoon_sit_${c}`,
+      );
+    });
+    for (const [v, x, y] of LAGOON_LIFE.latag)
+      this.add.image(x, y, `lagoon_latag_${v}`).setOrigin(0.5, 1).setDepth(this.depthAt(y));
+    for (const [outfit, x, y] of LAGOON_LIFE.dancers)
+      person(this.add.sprite(x, y, 'lagoon_dancer', outfit * 4), `lagoon_dance_${outfit}`);
+    person(
+      this.add.sprite(LAGOON_LIFE.singer.x, LAGOON_LIFE.singer.y, 'lagoon_singer', 0),
+      'lagoon_sing',
+    );
+    for (const [v, x, y, left] of LAGOON_LIFE.browsers)
+      person(this.add.sprite(x, y, `walker_${v}`, 0).setScale(0.75).setFlipX(left), null);
+  }
+
+  /** People and props sort by their feet: lower on the screen draws in front. */
+  private depthAt(y: number): number {
+    return 20 + y / 10;
   }
 
   private drawStalls(): void {
     const open = new Set(this.vacant.gen.open);
     const R = VIEW.stallRow;
-    this.add
-      .rectangle(R.x + R.w / 2, R.y + R.h / 2, R.w, R.h, 0xf2eee4)
-      .setStrokeStyle(1, COLORS.ink);
-    this.add.rectangle(R.x + R.w / 2, R.y + 4, R.w, 8, 0x2b3a5e);
-
+    this.add.image(R.x, R.y, 'lagoon_stallrow').setOrigin(0).setDepth(2);
+    const reduced = services().save.data.settings.reducedMotion;
     for (const s of STALLS) {
       const isOpen = open.has(s.key);
       const box = this.stallBox(s.key);
       if (!box) continue;
-      const fill =
-        s.key in VIEW.kiosks
-          ? isOpen
-            ? 0xd94b3d
-            : 0x9a8f8f
-          : s.key === 'water'
-            ? 0x9db4c0
-            : isOpen
-              ? 0xfff4dc
-              : 0x2b3a5e;
-      const rect = this.add
-        .rectangle(box.x, box.y, box.w, box.h, fill)
-        .setStrokeStyle(1, COLORS.ink);
-      if (s.key === 'water' && !isOpen) rect.setAlpha(0.4);
-      const name = s.key === 'water' ? t('pupLagoon.stall.water') : t(`pupLagoon.stall.${s.key}`);
-      const label = isOpen || s.key === 'water' ? name : t('pupLagoon.map.closed');
-      // The tusok cart and the water station are too small to hold their names: label them outside.
-      const outside = s.key === 'tusok' || s.key === 'water';
-      const at = outside
-        ? s.key === 'tusok'
-          ? { x: box.x, y: box.y - box.h / 2 - 2, ox: 0.5, oy: 1, wrap: 90 }
-          : { x: box.x - box.w / 2 - 3, y: box.y, ox: 1, oy: 0.5, wrap: 70 }
-        : { x: box.x, y: box.y, ox: 0.5, oy: 0.5, wrap: box.w - 4 };
-      const color = outside ? TEXT.ink : isOpen && !(s.key in VIEW.kiosks) ? TEXT.ink : TEXT.cream;
-      this.add
-        .text(
-          at.x,
-          at.y,
-          label,
-          textStyle(8, color, { align: 'center', wordWrap: { width: at.wrap } }),
-        )
-        .setOrigin(at.ox, at.oy);
-      if (isOpen && s.key !== 'water') {
-        // Red and yellow balloon pairs at every open stall (§11 art notes).
-        this.add.circle(box.x - box.w / 2 + 6, box.y - box.h / 2 + 6, 3, 0xd94b3d);
-        this.add.circle(box.x - box.w / 2 + 12, box.y - box.h / 2 + 6, 3, 0xf2c14e);
+      let img: Phaser.GameObjects.Image;
+      if (VIEW.windows[s.key] !== undefined) {
+        img = this.add.image(box.x, box.y, `stall_window_${s.key}`, isOpen ? 1 : 0).setDepth(3);
+      } else if (VIEW.kiosks[s.key] !== undefined) {
+        img = this.add
+          .image(box.x, box.y, `kiosk_${s.key}`, isOpen ? 1 : 0)
+          .setDepth(this.depthAt(box.y + box.h / 2));
+      } else if (s.key === 'tusok') {
+        const cart = this.add
+          .image(box.x, box.y, 'cart_tusok', 0)
+          .setDepth(this.depthAt(box.y + box.h / 2));
+        if (isOpen && !reduced) {
+          // Steam puffs from the wok.
+          let f = 0;
+          this.time.addEvent({
+            delay: 500,
+            loop: true,
+            callback: () => cart.setFrame((f = 1 - f)),
+          });
+        }
+        if (!isOpen) cart.setTint(0x9a9494);
+        img = cart;
+      } else {
+        img = this.add
+          .image(box.x, box.y, 'water_station', isOpen ? 1 : 0)
+          .setDepth(this.depthAt(box.y + box.h / 2));
       }
-      rect.setInteractive({ useHandCursor: true }).on('pointerup', () => this.openBoard(s.key));
+      img.setInteractive({ useHandCursor: true }).on('pointerup', () => this.openBoard(s.key));
+      // Hover (desktop): the stall's name pops up above it.
+      img.on('pointerover', () => this.showTip(s.key, box.x, box.y - box.h / 2 - 4));
+      img.on('pointerout', () => this.tip?.destroy());
     }
+  }
+
+  private showTip(stall: StallKey, x: number, y: number): void {
+    this.tip?.destroy();
+    const open = this.vacant.gen.open.includes(stall);
+    const name = stall === 'water' ? t('pupLagoon.stall.water') : t(`pupLagoon.stall.${stall}`);
+    this.tip = this.add
+      .text(
+        Phaser.Math.Clamp(x, 60, VIEW.mapRight - 60),
+        Math.max(VIEW.topBar.h + 12, y),
+        open ? name : `${name}: ${t('pupLagoon.map.closed')}`,
+        textStyle(8, TEXT.cream, { backgroundColor: '#2B2233', padding: { x: 4, y: 2 } }),
+      )
+      .setOrigin(0.5, 1)
+      .setDepth(88);
   }
 
   private stallBox(key: StallKey): { x: number; y: number; w: number; h: number } | null {
@@ -239,14 +297,21 @@ export class LagoonMapScene extends Phaser.Scene {
     this.queues.get(stall)?.destroy();
     const node = GRAPH.node(STALL_NODE[stall]);
     const dir = QUEUE_DIR[stall];
-    const c = this.add.container(node.x, node.y).setDepth(18);
+    const c = this.add.container(node.x, node.y).setDepth(this.depthAt(node.y));
     const place = this.vacant.location?.stall === stall ? this.vacant.playerPlace() : null;
     const total = this.vacant.pilaLength(stall);
     for (let i = 0; i < total; i++) {
       if (place !== null && i === place) continue; // the player stands here
       const x = dir.x * i * VIEW.queueGap;
       const y = dir.y * i * VIEW.queueGap;
-      c.add(this.add.rectangle(x, y - 6, 7, 12, 0x8a8494).setStrokeStyle(1, COLORS.ink));
+      const v = ((i + stall.length) % 6) + 1;
+      c.add(
+        this.add
+          .sprite(x, y, `walker_${v}`, 0)
+          .setOrigin(0.5, 1)
+          .setScale(0.75)
+          .setFlipX(dir.x > 0),
+      );
     }
     this.queues.set(stall, c);
     if (place !== null && !this.walker.moving) {
@@ -413,88 +478,150 @@ export class LagoonMapScene extends Phaser.Scene {
     }
   }
 
-  // ---- Menu boards (§10.2) ---------------------------------------------------------------------
+  // ---- Storefronts (owner request, L6; replaces the §10.2 menu board) -----------------------------
 
+  /** The front of a stall: its sign, food on display with prices, the vendor, and the menu below. */
   private openBoard(stall: StallKey): void {
     this.closeBoard();
-    const B = VIEW.board;
+    this.tip?.destroy();
+    const B = VIEW.front;
     const g = this.vacant.gen;
     const isOpen = g.open.includes(stall);
     const c = this.add.container(B.x, B.y).setDepth(90);
+    const top = -B.h / 2 + 6;
+    c.add(this.add.rectangle(0, 0, VIEW.mapRight, 360, COLORS.ink, 0.4).setInteractive());
     c.add(panel(this, 0, 0, B.w, B.h).setInteractive());
+    const front = this.add.image(0, top + 85, `front_${stall}`);
+    if (!isOpen) front.setTint(0x8a8494);
+    c.add(front);
     const name = stall === 'water' ? t('pupLagoon.stall.water') : t(`pupLagoon.stall.${stall}`);
-    c.add(this.add.text(-B.w / 2 + 52, -B.h / 2 + 8, name, textStyle(8, TEXT.red)));
-    const vendor = stallDef(stall).vendor;
-    c.add(
-      this.add
-        .rectangle(-B.w / 2 + 24, -B.h / 2 + 22, 32, 32, 0xe8b48f)
-        .setStrokeStyle(1, COLORS.ink),
-    );
-    if (vendor)
-      c.add(
-        this.add.text(
-          -B.w / 2 + 52,
-          -B.h / 2 + 20,
-          t(`pupLagoon.vendor.${vendor}`),
-          textStyle(8, TEXT.grey),
-        ),
-      );
-    this.boardPila = null;
-
-    let y = -B.h / 2 + 46;
-    if (!isOpen) {
-      const msg = stall === 'water' ? t('pupLagoon.board.needsTumbler') : t('pupLagoon.map.closed');
+    c.add(this.add.text(0, top + 17, name, textStyle(16, TEXT.red)).setOrigin(0.5));
+    const items = MENU.filter((m) => m.stall === stall && m.orderable !== false);
+    if (stall === 'tusok')
       c.add(
         this.add
           .text(
             0,
-            0,
-            msg,
-            textStyle(8, TEXT.ink, { align: 'center', wordWrap: { width: B.w - 30 } }),
+            top + 44,
+            t('pupLagoon.front.fewa'),
+            textStyle(8, TEXT.cream, { backgroundColor: '#D94B3D', padding: { x: 4, y: 2 } }),
           )
           .setOrigin(0.5),
       );
-    } else {
-      for (const m of MENU) {
-        if (m.stall !== stall || m.orderable === false) continue;
-        const e = purchaseEffect(m.key, undefined, g.promo);
-        const sold = this.vacant.isSoldOut(m.key);
-        const tags = [...e.tags, ...(e.free?.tags ?? [])]
-          .map((tag) => t(`pupLagoon.tag.${tag}`))
-          .join(', ');
-        const color = sold ? TEXT.grey : TEXT.ink;
-        c.add(this.add.text(-B.w / 2 + 10, y, t(m.nameKey), textStyle(8, color)));
-        c.add(
-          this.add
-            .text(
-              B.w / 2 - 10,
-              y,
-              sold ? t('pupLagoon.board.soldOut') : `₱${e.price}`,
-              textStyle(8, color),
-            )
-            .setOrigin(1, 0),
-        );
-        c.add(
-          this.add.text(
-            -B.w / 2 + 18,
-            y + 10,
-            `${tags} · ${t('pupLagoon.board.busog', { n: e.busog * e.copies })}`,
-            textStyle(8, TEXT.grey),
-          ),
-        );
-        y += 24;
-      }
-      if (stall !== 'water') {
-        this.boardPila = this.add
-          .text(-B.w / 2 + 10, B.h / 2 - 22, '', textStyle(8))
-          .setOrigin(0, 0.5);
-        c.add(this.boardPila);
-      }
+    const vendor = stallDef(stall).vendor;
+    if (vendor)
+      c.add(
+        this.add
+          .text(
+            -192,
+            top + 166,
+            t(`pupLagoon.vendor.${vendor}`),
+            textStyle(8, TEXT.cream, { backgroundColor: '#2B2233', padding: { x: 3, y: 1 } }),
+          )
+          .setOrigin(0, 1),
+      );
+    this.boardPila = null;
+
+    if (!isOpen) {
+      const msg =
+        stall === 'water' ? t('pupLagoon.board.needsTumbler') : t('pupLagoon.front.closed');
+      c.add(
+        this.add
+          .text(
+            0,
+            top + 90,
+            msg,
+            textStyle(16, TEXT.cream, {
+              align: 'center',
+              wordWrap: { width: 300 },
+              backgroundColor: '#2B2233',
+              padding: { x: 6, y: 4 },
+            }),
+          )
+          .setOrigin(0.5),
+      );
+    }
+    // Price tags under the food on the counter (they follow promos and sell-outs).
+    const slot = 300 / Math.max(items.length, 1);
+    const tagY = top + (stall === 'tusok' ? 74 : stall === 'water' ? 112 : 66) + 50;
+    items.forEach((m, i) => {
+      const e = purchaseEffect(m.key, undefined, g.promo);
+      const sold = this.vacant.isSoldOut(m.key);
+      c.add(
+        this.add
+          .text(
+            -150 + slot * i + slot / 2,
+            tagY,
+            sold ? t('pupLagoon.board.soldOut') : `₱${e.price}`,
+            textStyle(8, sold ? TEXT.grey : TEXT.red, {
+              backgroundColor: '#FFF4DC',
+              padding: { x: 2, y: 0 },
+            }),
+          )
+          .setOrigin(0.5, 0),
+      );
+    });
+    // The menu: food, name, price, cravings and busog.
+    const gridTop = top + 174;
+    items.forEach((m, i) => {
+      const e = purchaseEffect(m.key, undefined, g.promo);
+      const sold = this.vacant.isSoldOut(m.key);
+      const x = -B.w / 2 + 10 + (i % 3) * 158;
+      const y = gridTop + Math.floor(i / 3) * 42;
+      const color = sold ? TEXT.grey : TEXT.ink;
+      c.add(this.add.image(x + 12, y + 14, `food_${m.key}`).setAlpha(sold ? 0.4 : 1));
+      c.add(
+        this.add.text(
+          x + 28,
+          y + 2,
+          t(m.nameKey),
+          textStyle(8, color, { wordWrap: { width: 92 } }),
+        ),
+      );
+      c.add(
+        this.add
+          .text(
+            x + 152,
+            y + 2,
+            sold ? t('pupLagoon.board.soldOut') : `₱${e.price}`,
+            textStyle(8, sold ? TEXT.grey : TEXT.red),
+          )
+          .setOrigin(1, 0),
+      );
+      const tags = [...e.tags, ...(e.free?.tags ?? [])]
+        .map((tag) => t(`pupLagoon.tag.${tag}`))
+        .join(', ');
+      c.add(
+        this.add.text(
+          x + 28,
+          y + 26,
+          `${tags} · ${t('pupLagoon.board.busog', { n: e.busog * e.copies })}`,
+          textStyle(8, TEXT.grey, { wordWrap: { width: 126 } }),
+        ),
+      );
+    });
+
+    const by = B.h / 2 - 16;
+    c.add(
+      new Button(this, -B.w / 2 + 44, by, t('pupLagoon.front.prev'), () => this.flipBoard(-1), {
+        width: 76,
+        height: 20,
+      }),
+    );
+    c.add(
+      new Button(this, B.w / 2 - 44, by, t('pupLagoon.front.next'), () => this.flipBoard(1), {
+        width: 76,
+        height: 20,
+      }),
+    );
+    if (isOpen && stall !== 'water') {
+      this.boardPila = this.add.text(-B.w / 2 + 90, by, '', textStyle(8)).setOrigin(0, 0.5);
+      c.add(this.boardPila);
     }
     if (isOpen) {
       c.add(
-        new Button(this, 40, B.h / 2 - 22, t('pupLagoon.ui.queue'), () => this.queueAt(stall), {
-          width: 72,
+        new Button(this, 30, by, t('pupLagoon.ui.queue'), () => this.queueAt(stall), {
+          width: 80,
           height: 20,
           fill: COLORS.yellow,
           textColor: TEXT.red,
@@ -502,13 +629,17 @@ export class LagoonMapScene extends Phaser.Scene {
       );
     }
     c.add(
-      new Button(this, 110, B.h / 2 - 22, t('ui.close'), () => this.closeBoard(), {
-        width: 56,
-        height: 20,
-      }),
+      new Button(this, 112, by, t('ui.close'), () => this.closeBoard(), { width: 60, height: 20 }),
     );
     this.board = c;
     this.boardStall = stall;
+  }
+
+  /** Prev / Next: the stalls in their 1–8 order, then the water station. */
+  private flipBoard(dir: 1 | -1): void {
+    const order: StallKey[] = [...STALL_KEYS_ORDER, 'water'];
+    const i = order.indexOf(this.boardStall ?? order[0]);
+    this.openBoard(order[(i + dir + order.length) % order.length]);
   }
 
   private closeBoard(): void {
@@ -577,6 +708,12 @@ export class LagoonMapScene extends Phaser.Scene {
         this.openBoard(stall),
       ),
     );
+    kb.on('keydown-LEFT', () => {
+      if (this.board) this.flipBoard(-1);
+    });
+    kb.on('keydown-RIGHT', () => {
+      if (this.board) this.flipBoard(1);
+    });
     kb.on('keydown-ENTER', () => {
       if (this.boardStall && this.vacant.gen.open.includes(this.boardStall))
         this.queueAt(this.boardStall);

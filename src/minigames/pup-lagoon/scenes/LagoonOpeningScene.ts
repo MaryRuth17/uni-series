@@ -1,0 +1,204 @@
+/**
+ * LagoonOpeningScene — arriving at PUP (owner request, L6): a short intro, then how to play
+ * Shows: a camera pan across the PUP campus panorama (lagoon_intro: the main hall with its pylon, shade
+ * trees, the flag, a pergola) with students walking and a jeepney passing, the title "Lagoon Merienda"
+ * dropping in with its tagline, then the "How to play" card (4 steps with pictures). Got it! goes on to
+ * the Vacant card (LagoonIntroScene). Tap or Enter skips the pan; after the first time, Skip jumps
+ * straight to the Vacant card.
+ * Listens to: pointer; keyboard (Enter / Space = next, Esc = back to the campus map).
+ */
+import Phaser from 'phaser';
+import { addViewCamera, sceneConfig } from '../../../ui/view';
+import { t } from '../../../core/i18n';
+import { services } from '../../../core/services';
+import { FADE_MS } from '../../../home/config';
+import { Button } from '../../../ui/Button';
+import { panel } from '../../../ui/Panel';
+import { COLORS, SCENES, TEXT, textStyle } from '../../../ui/theme';
+import { OPENING } from '../config';
+import { LAGOON_INTRO } from './LagoonIntroScene';
+
+export const LAGOON_OPENING = 'LagoonOpening';
+const HOW_SEEN = 'pup-lagoon-how';
+/** Objects at this depth and above belong to the fixed UI camera. */
+const UI_DEPTH = 50;
+
+export class LagoonOpeningScene extends Phaser.Scene {
+  private stage: 'pan' | 'how' | 'leaving' = 'pan';
+  private uiCam!: Phaser.Cameras.Scene2D.Camera;
+
+  constructor() {
+    super(sceneConfig(LAGOON_OPENING));
+  }
+
+  create(): void {
+    this.stage = 'pan';
+    const reduced = services().save.data.settings.reducedMotion;
+    const seen = services().save.data.settings.tutorialSeen[HOW_SEEN] === true;
+
+    this.add.image(0, 0, 'lagoon_intro').setOrigin(0);
+    this.makeAnims();
+    // Students crossing the plaza and a jeepney passing on the road in front.
+    OPENING.walkers.forEach(([variant, x, dir, speed], i) => {
+      const w = this.add
+        .sprite(x, 318 + (i % 2) * 14, `walker_${variant}`)
+        .setOrigin(0.5, 1)
+        .setFlipX(dir < 0)
+        .setDepth(10 + i);
+      if (!reduced) {
+        w.play(`walker_${variant}_walk`);
+        this.tweens.add({
+          targets: w,
+          x: x + (dir * speed * OPENING.panMs) / 1000,
+          duration: OPENING.panMs,
+        });
+      }
+    });
+    if (!reduced) {
+      const jeep = this.add
+        .sprite(-60, 360, 'jeep_2')
+        .setOrigin(0.5, 1)
+        .setFlipX(true)
+        .setDepth(20);
+      jeep.play('jeep_2_drive');
+      this.tweens.add({ targets: jeep, x: 1020, duration: OPENING.jeepMs, delay: 600 });
+    }
+
+    // The main camera pans across the campus; a fixed camera draws the title and buttons.
+    const main = this.cameras.main;
+    main.setBounds(0, 0, OPENING.width, 360);
+    main.centerOn(320, 180);
+    this.uiCam = addViewCamera(this);
+
+    const title = this.add
+      .text(320, -30, t('roster.pup-lagoon.title'), textStyle(32, TEXT.red))
+      .setOrigin(0.5)
+      .setStroke('#FFF4DC', 6)
+      .setDepth(UI_DEPTH);
+    const tagline = this.add
+      .text(320, 92, t('roster.pup-lagoon.tagline'), textStyle(16, TEXT.ink))
+      .setOrigin(0.5)
+      .setStroke('#FFF4DC', 4)
+      .setAlpha(0)
+      .setDepth(UI_DEPTH);
+    const hint = this.add
+      .text(
+        320,
+        344,
+        t('pupLagoon.intro.tap'),
+        textStyle(8, TEXT.cream, { backgroundColor: '#2B2233', padding: { x: 4, y: 2 } }),
+      )
+      .setOrigin(0.5)
+      .setDepth(UI_DEPTH);
+    if (seen) {
+      new Button(this, 604, 20, t('pupLagoon.intro.skip'), () => this.toVacantCard(), {
+        width: 56,
+        height: 20,
+      }).setDepth(UI_DEPTH);
+    }
+    const tap = this.add
+      .zone(320, 180, 640, 360)
+      .setInteractive()
+      .setDepth(UI_DEPTH - 1);
+    tap.on('pointerup', () => this.next());
+
+    if (reduced) {
+      title.setY(60);
+      tagline.setAlpha(1);
+      main.centerOn(OPENING.width / 2, 180);
+    } else {
+      main.pan(OPENING.width - 320, 180, OPENING.panMs, 'Sine.easeInOut');
+      this.tweens.add({ targets: title, y: 60, duration: 700, delay: 500, ease: 'Back.easeOut' });
+      this.tweens.add({ targets: tagline, alpha: 1, duration: 500, delay: 1100 });
+      this.tweens.add({ targets: hint, alpha: 0.4, duration: 700, yoyo: true, repeat: -1 });
+    }
+    this.time.delayedCall(reduced ? 1500 : OPENING.panMs + 400, () => {
+      if (this.stage === 'pan') this.showHow();
+    });
+
+    this.syncCameras();
+    const kb = this.input.keyboard;
+    kb?.on('keydown-ENTER', () => this.next());
+    kb?.on('keydown-SPACE', () => this.next());
+    kb?.on('keydown-ESC', () => this.leave(SCENES.campusMap));
+    this.events.once('shutdown', () => kb?.removeAllListeners());
+    for (const cam of [main, this.uiCam]) cam.fadeIn(FADE_MS, 0x2b, 0x22, 0x33);
+  }
+
+  private makeAnims(): void {
+    const make = (key: string, texture: string, frames: number[], frameRate: number): void => {
+      if (this.anims.exists(key)) return;
+      this.anims.create({
+        key,
+        frames: this.anims.generateFrameNumbers(texture, { frames }),
+        frameRate,
+        repeat: -1,
+      });
+    };
+    for (let v = 1; v <= 6; v++) make(`walker_${v}_walk`, `walker_${v}`, [0, 1, 2, 3], 6);
+    make('jeep_2_drive', 'jeep_2', [0, 1], 8);
+  }
+
+  /** World objects to the panning camera, UI (depth ≥ UI_DEPTH) to the fixed one. */
+  private syncCameras(): void {
+    for (const obj of this.children.list) {
+      const depth = (obj as unknown as { depth: number }).depth;
+      if (depth >= UI_DEPTH) this.cameras.main.ignore(obj);
+      else this.uiCam.ignore(obj);
+    }
+  }
+
+  private next(): void {
+    if (this.stage === 'pan') this.showHow();
+    else if (this.stage === 'how') this.toVacantCard();
+  }
+
+  /** The "How to play" card: four steps with pictures. */
+  private showHow(): void {
+    this.stage = 'how';
+    const c = this.add.container(320, 196).setDepth(UI_DEPTH + 5);
+    c.add(this.add.rectangle(0, -16, 640, 400, COLORS.ink, 0.45).setInteractive());
+    c.add(panel(this, 0, 0, 440, 280));
+    c.add(this.add.text(0, -122, t('pupLagoon.how.title'), textStyle(16, TEXT.red)).setOrigin(0.5));
+    for (let i = 0; i < 4; i++) {
+      const x = -196 + (i % 2) * 206;
+      const y = -96 + Math.floor(i / 2) * 92;
+      c.add(this.add.image(x + 24, y + 24, 'lagoon_how', i));
+      c.add(
+        this.add.text(x + 54, y + 2, t(`pupLagoon.how.step${i + 1}.title`), textStyle(8, TEXT.red)),
+      );
+      c.add(
+        this.add.text(
+          x + 54,
+          y + 16,
+          t(`pupLagoon.how.step${i + 1}.text`),
+          textStyle(8, TEXT.ink, { wordWrap: { width: 140 } }),
+        ),
+      );
+    }
+    c.add(
+      new Button(this, 0, 112, t('pupLagoon.how.go'), () => this.toVacantCard(), {
+        width: 120,
+        height: 24,
+        fill: COLORS.yellow,
+        textColor: TEXT.red,
+        fontSize: 16,
+      }),
+    );
+    c.setScale(0.9).setAlpha(0);
+    this.tweens.add({ targets: c, scale: 1, alpha: 1, duration: 220, ease: 'Back.easeOut' });
+    this.cameras.main.ignore(c);
+  }
+
+  private toVacantCard(): void {
+    services().settings.setTutorialSeen(HOW_SEEN, true);
+    this.leave(LAGOON_INTRO);
+  }
+
+  private leave(target: string): void {
+    if (this.stage === 'leaving') return;
+    this.stage = 'leaving';
+    for (const cam of [this.cameras.main, this.uiCam]) cam.fadeOut(FADE_MS, 0x2b, 0x22, 0x33);
+    this.cameras.main.once('camerafadeoutcomplete', () => this.scene.start(target));
+  }
+}

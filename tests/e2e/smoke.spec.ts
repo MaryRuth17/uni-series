@@ -85,6 +85,12 @@ test('first launch: tap to start, School ID, map, ride to PUP, Lagoon, pause, ba
   await tap(page, 555, 244); // PUP pin
   await page.waitForTimeout(400);
   await tap(page, 360, 331); // Ride!
+  // L6: the PUP intro (Enter skips the pan), then How to play (Enter = Got it!).
+  await waitForScene(page, 'LagoonOpening');
+  await page.waitForTimeout(600);
+  await page.keyboard.press('Enter');
+  await page.waitForTimeout(400);
+  await page.keyboard.press('Enter');
   await waitForScene(page, 'LagoonIntroScene'); // the Vacant card
   await page.waitForTimeout(500);
   await page.keyboard.press('Enter'); // Tara!
@@ -92,7 +98,9 @@ test('first launch: tap to start, School ID, map, ride to PUP, Lagoon, pause, ba
   await page.waitForTimeout(500);
 
   // L2: open the karinderya menu board (key 1), Pumila (Enter), walk there and join the line.
-  await page.keyboard.press('1');
+  await page.keyboard.press('1'); // the karinderya storefront
+  await page.keyboard.press('ArrowRight'); // Next: the tusok cart (FEWA)
+  await page.keyboard.press('ArrowLeft'); // back to the karinderya
   await page.keyboard.press('Enter');
   const location = (): Promise<string | null> =>
     page.evaluate(() => {

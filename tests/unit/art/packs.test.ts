@@ -7,6 +7,10 @@ import homeManifest from '../../../public/assets/home/manifest.json';
 import homePack from '../../../public/assets/home/pack.json';
 import mapManifest from '../../../public/assets/map/manifest.json';
 import mapPack from '../../../public/assets/map/pack.json';
+import lagoonManifest from '../../../public/assets/lagoon/manifest.json';
+import lagoonPack from '../../../public/assets/lagoon/pack.json';
+import { MENU } from '../../../src/minigames/pup-lagoon/data/menu';
+import { STALLS } from '../../../src/minigames/pup-lagoon/data/stalls';
 
 interface ManifestEntry {
   key: string;
@@ -16,8 +20,18 @@ interface ManifestEntry {
   frame: number[] | null;
 }
 
-const manifest: ManifestEntry[] = [...homeManifest, ...commonManifest, ...mapManifest];
-const packFiles = [...homePack.home.files, ...commonPack.common.files, ...mapPack.map.files];
+const manifest: ManifestEntry[] = [
+  ...homeManifest,
+  ...commonManifest,
+  ...mapManifest,
+  ...lagoonManifest,
+];
+const packFiles = [
+  ...homePack.home.files,
+  ...commonPack.common.files,
+  ...mapPack.map.files,
+  ...lagoonPack.lagoon.files,
+];
 const byKey = new Map(manifest.map((m) => [m.key, m]));
 const frames = (key: string): number => {
   const m = byKey.get(key) as ManifestEntry;
@@ -120,5 +134,39 @@ describe('language (D-042)', () => {
       expect(en[key as keyof typeof en], key).toBeTruthy();
       expect(fil[key as keyof typeof fil], key).toBeTruthy();
     }
+  });
+});
+
+describe('Lagoon art (L6)', () => {
+  it('has food art for every menu item and a storefront for every stall', () => {
+    for (const m of MENU) expect(byKey.has(`food_${m.key}`), m.key).toBe(true);
+    expect(byKey.has('food_fewa')).toBe(true);
+    for (const s of STALLS) expect(byKey.has(`front_${s.key}`), s.key).toBe(true);
+    for (const k of ['palamig', 'merienda', 'lugawan', 'ihaw'])
+      expect(frames(`stall_window_${k}`), k).toBe(2);
+    for (const k of ['karinderya', 'silog', 'halohalo']) expect(frames(`kiosk_${k}`), k).toBe(2);
+  });
+
+  it('has the map, the people and the intro', () => {
+    for (const k of [
+      'lagoon_ground',
+      'lagoon_canopy',
+      'lagoon_pond_rail',
+      'lagoon_plaza_sign',
+      'lagoon_stallrow',
+      'cart_tusok',
+      'water_station',
+      'lagoon_bench',
+      'lagoon_intro',
+      'lagoon_latag_1',
+      'lagoon_latag_4',
+    ])
+      expect(byKey.has(k), k).toBe(true);
+    expect(frames('lagoon_sitter')).toBe(12);
+    expect(frames('lagoon_dancer')).toBe(8);
+    expect(frames('lagoon_singer')).toBe(2);
+    expect(frames('lagoon_how')).toBe(4);
+    expect(byKey.get('lagoon_ground')?.width).toBe(512);
+    expect(byKey.get('lagoon_intro')?.width).toBe(960);
   });
 });

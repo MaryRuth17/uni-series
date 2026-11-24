@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { RENDER_SCALE, VIEW_H, VIEW_W } from '../ui/view';
 import { LagoonIntroScene } from '../minigames/pup-lagoon/scenes/LagoonIntroScene';
+import { LagoonOpeningScene } from '../minigames/pup-lagoon/scenes/LagoonOpeningScene';
 import { LagoonMapScene } from '../minigames/pup-lagoon/scenes/LagoonMapScene';
 import { AlbumScene } from '../scenes/AlbumScene';
 import { BootScene } from '../scenes/BootScene';
@@ -38,6 +39,7 @@ export const gameConfig: Phaser.Types.Core.GameConfig = {
     StickerBookScene,
     AlbumScene,
     CreditsScene,
+    LagoonOpeningScene,
     LagoonIntroScene,
     LagoonMapScene,
     PauseScene,

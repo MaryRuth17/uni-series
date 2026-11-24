@@ -303,3 +303,29 @@ Specs: [SPEC.md](SPEC.md) (§), [SPEC-homepage.md](SPEC-homepage.md) (H§), [SPE
 - **D-051 — No map credit on screen (owner).** "Map data © OpenStreetMap contributors" is removed from the map (and the
   `map.credit` key); the attribution stays on the Credits screen (`credits.map`) and in CREDITS.md. This overrides
   SPEC-homepage §4.6 / §10's on-map credit.
+
+### L6 (part 1) — Lagoon art, PUP intro, storefronts (builder, 2026-11-24)
+
+- **L-019 — Arriving at PUP (owner).** A new `LagoonOpeningScene` (the roster's intro scene now) pans across an
+  original PUP panorama (`lagoon_intro`, 960×360: the white hall with maroon bands and a tall pylon, shade trees, the
+  Philippine flag, a pergola; no seals or signage) with students walking and a jeepney passing, drops in the title,
+  then shows a "How to play" card (4 steps with pictures). Got it! opens the Vacant card. Tap / Enter skips the pan;
+  after the first time (`tutorialSeen['pup-lagoon-how']`), a Skip button jumps straight to the Vacant card.
+- **L-020 — Lagoon map art** (`scripts/art/lagoon.mjs`, set `lagoon`), drawn from the owner's photos without tracing:
+  grey square paving, the stall row (white block wall, navy awning, accordion shutters, red and yellow balloons), red
+  kiosks with glass display cases, the tusok cart with a FEWA board, the brick plaza with white bands and the LAGOON
+  planter, the green lagoon with white posts, orange bands and black railings, the tambayan with terracotta planters,
+  shade trees drawn over everything. Closed stalls keep their shutters down (kiosks greyed).
+- **L-021 — Life on the map (owner).** Students on the benches (eating, laptops), four latag sellers (flowers, crochet,
+  baked goods, stickers) around the plaza, two dancers and a singer with a guitar in the plaza, and students browsing.
+  Pila lines use the landing's student sprites. Everything sorts by its feet. Reduced Motion stops the animations.
+- **L-022 — Storefronts replace the menu board (owner).** Tapping a stall (or keys 1–8) shows its front (400×170 art:
+  sign, food on display, the vendor, balloons; the TOYO jug at the karinderya; a FEWA banner at the tusok cart) with
+  live price tags, then the menu (food icon, name, price, cravings, busog). Prev / Next (and ← / →) flip through the
+  stalls in their 1–8 order, then the water station. Pumila and Close work as before. Hovering a stall on the map
+  shows its name.
+- **L-023 — FEWA.** "Footlong + Egg Wrapped Around" stays on Mang Caloy's tusok menu (₱30, busog 3), now with its own
+  food art (a hotdog wrapped in egg, in a bun) and a banner on the cart. No logic changed.
+- **L-024 — Food art.** 46 `food_<item>` icons (24×24) built from a few shapes (plate, skewer, cup, bowl, glass, bun);
+  a unit test checks that every menu item and every stall has its art. The storefront art lists food in the same order
+  as `data/menu.ts`, so the game's price tags line up.
