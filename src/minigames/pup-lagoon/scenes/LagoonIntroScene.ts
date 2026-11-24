@@ -2,7 +2,7 @@
  * LagoonIntroScene — the Vacant card (SPEC-pup-lagoon OC-1, §10.2 "Day card") — L2 greybox, finished in L4
  * Shows: the next vacant: number and time slot, any special (tutorial, petsa de peligro, payday), event
  * and rule, the baon as coins and bills (+ pasabay money), the busog target, the listahan, and stalls that
- * just opened. Tara! starts the vacant on the Lagoon map; Balik sa mapa returns to the campus map.
+ * just opened. Tara! goes to the stalls (LagoonStallsScene); Balik sa mapa returns to the campus map.
  * Listens to: pointer; Enter = Tara!, Esc = back.
  */
 import Phaser from 'phaser';
@@ -20,7 +20,7 @@ import { generateVacant, type GeneratedVacant } from '../logic/ListahanGen';
 import { Rhythm } from '../logic/Rhythm';
 
 export const LAGOON_INTRO = 'LagoonIntroScene';
-export const LAGOON_MAP = 'LagoonMap';
+export const LAGOON_STALLS = 'LagoonStalls';
 
 export class LagoonIntroScene extends Phaser.Scene {
   private leaving = false;
@@ -135,7 +135,7 @@ export class LagoonIntroScene extends Phaser.Scene {
     this.leaving = true;
     this.cameras.main.fadeOut(FADE_MS, 0x2b, 0x22, 0x33);
     this.cameras.main.once('camerafadeoutcomplete', () =>
-      this.scene.start(LAGOON_MAP, { gen: this.gen }),
+      this.scene.start(LAGOON_STALLS, { gen: this.gen }),
     );
   }
 

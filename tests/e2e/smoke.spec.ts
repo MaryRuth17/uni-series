@@ -94,10 +94,10 @@ test('first launch: tap to start, School ID, map, ride to PUP, Lagoon, pause, ba
   await waitForScene(page, 'LagoonIntroScene'); // the Vacant card
   await page.waitForTimeout(500);
   await page.keyboard.press('Enter'); // Tara!
-  await waitForScene(page, 'LagoonMap');
+  await waitForScene(page, 'LagoonStalls');
   await page.waitForTimeout(500);
 
-  // L2: open the karinderya menu board (key 1), Pumila (Enter), walk there and join the line.
+  // L6: the karinderya storefront (key 1), flip to the next stall and back, Pumila (Enter) joins the line.
   await page.keyboard.press('1'); // the karinderya storefront
   await page.keyboard.press('ArrowRight'); // Next: the tusok cart (FEWA)
   await page.keyboard.press('ArrowLeft'); // back to the karinderya
@@ -106,7 +106,7 @@ test('first launch: tap to start, School ID, map, ride to PUP, Lagoon, pause, ba
     page.evaluate(() => {
       const game = (window as unknown as { __uniGame: { scene: { getScene(k: string): unknown } } })
         .__uniGame;
-      const scene = game.scene.getScene('LagoonMap') as {
+      const scene = game.scene.getScene('LagoonStalls') as {
         vacant: { location: { stall: string } | null };
       };
       return scene.vacant.location?.stall ?? null;
