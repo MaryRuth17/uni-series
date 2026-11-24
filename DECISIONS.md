@@ -285,3 +285,10 @@ Specs: [SPEC.md](SPEC.md) (§), [SPEC-homepage.md](SPEC-homepage.md) (H§), [SPE
 - **D-047 — Owner changes to the map.** Campuses that are not playable show only "Coming soon!" (no game title, tagline or
   teaser) in the list and on the campus card; the map pin keeps a "SOON" tarpaulin hung on the building. The School ID
   chip on the map only shows the player; the character is changed from the landing's ID chip.
+- **D-048 — Calmer map, louder stops (owner: "too confusing").** The city fabric gets a paper wash (50% toward
+  `#efe5cf`, 45% desaturated; roads 15%) so campuses, avenues, the LRT-2 and the river read first; each campus ground
+  has a dark frame and drop shadow. Fewer labels (España, Recto, Morayta, Mendiola, Magsaysay, the three stations and
+  four area names, now in a lighter brown) and sparser night lights. Pins are larger (22×30) with a cream rim; soon
+  pins are slate blue, not grey. Each stop has one signboard: PUP in red on the yellow board with a pulsing gold ring
+  (none with Reduced Motion); the others on a cream board with a red "SOON" tag (the tarpaulin is gone). UST moved to
+  (177,98) along España so its pin clears the HUD.

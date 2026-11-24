@@ -25,8 +25,8 @@ export const ROSTER: readonly RosterEntry[] = [
     campus: 'UST',
     area: 'España',
     stop: 1,
-    x: 193,
-    y: 84,
+    x: 177,
+    y: 98,
     status: 'soon',
     stickerId: 'sticker-ust',
   },
@@ -111,7 +111,7 @@ export function entryAtStop(stop: number): RosterEntry {
  * campus plots in src/map/mapGeometry.json (the baked map, H4).
  */
 export const ROUTE_NODES: readonly RouteNode[] = [
-  { x: 193, y: 84, stop: 1 },
+  { x: 177, y: 98, stop: 1 },
   { x: 170, y: 140 },
   { x: 100, y: 170, stop: 2 },
   { x: 180, y: 176 },

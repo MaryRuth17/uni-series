@@ -120,6 +120,9 @@ const ROOFS = [
 ];
 const FLAT_ROOFS = ['#d6cfc2', '#c8c1b4', '#e0d8c8', '#bdb8b0'];
 const STREET = '#eadfc4';
+/** The calming wash (owner feedback on the busy map): share toward paper and grey. */
+const PAPER = '#efe5cf';
+const CALM = { city: 0.5, road: 0.15, desaturate: 0.45 };
 const ALLEY = '#d9caa8';
 
 /** Local grid coordinates: each district has its own street grid angle (like the real city). */
@@ -645,7 +648,7 @@ function baseMap() {
       for (let k = 0; k < 3; k++) waterTank(p, x + 2 + k * 5, y + 1);
       p.rect(x + 16, y + 4, 4, 3, shade(FLAT_ROOFS[0], -0.25));
       for (let k = 0; k < 8; k++)
-        if (hash(x, y, k, 61) < 0.6)
+        if (hash(x, y, k, 61) < 0.2)
           lights.px(
             x + Math.floor(hash(x, k, 62) * 20),
             y + Math.floor(hash(y, k, 63) * 10),
@@ -661,7 +664,7 @@ function baseMap() {
       for (let k = 0; k < 4; k++)
         p.px(x + k, y + 2, ['#ffffff', '#e98ab0', '#3b6fb6', '#f2c14e'][k]);
     }
-    if (hash(x, y, 73) < 0.3)
+    if (hash(x, y, 73) < 0.08)
       lights.px(
         x + 1 + Math.floor(hash(x, y, 74) * 3),
         y + 1 + Math.floor(hash(x, y, 75) * 4),
@@ -674,11 +677,32 @@ function baseMap() {
     tree(p, Math.round(q.x), Math.round(q.y), 1, '#3f7d3a');
   }
 
+  // 7b. Calm the city (owner, H4): a paper wash over houses, alleys and plots, a lighter one over
+  // roads, so campuses, avenues, the LRT-2 and the river read first.
+  for (let y = 0; y < H; y++)
+    for (let x = 0; x < W; x++) {
+      const k = kind[y * W + x];
+      if (k === 'water' || inCampus(x, y, 1)) continue;
+      const amount = k === 'road' ? CALM.road : CALM.city;
+      const [r, g, b] = p.get(x, y);
+      const grey = 0.3 * r + 0.59 * g + 0.11 * b;
+      const desat = [r, g, b].map((v) => v + (grey - v) * CALM.desaturate);
+      const paper = hex(PAPER);
+      p.px(x, y, toHex(desat.map((v, n) => v + (paper[n] - v) * amount)));
+    }
+  // A crisp frame around each campus ground so the stops stand out.
+  for (let y = 0; y < H; y++)
+    for (let x = 0; x < W; x++) {
+      if (inCampus(x, y)) continue;
+      if (inCampus(x, y, 1.6)) p.px(x, y, '#7a5f40');
+      else if (inCampus(x - 1, y - 1, 2.6)) p.px(x, y, '#5a463040');
+    }
+
   // 8. Streetlights along avenues (night overlay) and lamps on bridges.
   for (const r of ROADS) {
     if (r.kind === 'street') continue;
     const len = polyLength(r.points);
-    for (let d = 5; d < len; d += 10) {
+    for (let d = 5; d < len; d += 16) {
       const q = polyAt(r.points, d);
       for (const sgn of [-1, 1]) {
         const lx = Math.round(q.x - q.uy * sgn * (r.hw + 1));
@@ -758,24 +782,18 @@ function baseMap() {
   const signs = [
     ['ESPAÑA BLVD.', 287, 62],
     ['RECTO AVE.', 182, 214],
-    ['LEGARDA ST.', 372, 190],
     ['MAGSAYSAY BLVD.', 598, 199],
     ['MORAYTA', 126, 110],
-    ['QUEZON BLVD.', 64, 202],
-    ['LACSON AVE.', 352, 86],
-    ['NAGTAHAN', 432, 270],
     ['MENDIOLA', 340, 216],
   ];
   for (const [str, x, y] of signs) streetSign(p, x, y, str);
   for (const [key, sx] of Object.entries(GEO.lrt.stations))
     streetSign(p, sx, lrtAt(sx) - 13, key.toUpperCase(), '#6d3fae');
   streetSign(p, 624, 172, 'LRT-2', '#6d3fae');
-  areaLabel(p, 315, 99, 'SAMPALOC');
-  areaLabel(p, 40, 256, 'QUIAPO');
-  areaLabel(p, 470, 100, 'STA. MESA');
-  areaLabel(p, 452, 170, 'SAN MIGUEL');
-  areaLabel(p, 150, 322, 'STA. CRUZ');
-  areaLabel(p, 520, 322, 'PANDACAN');
+  areaLabel(p, 315, 99, 'SAMPALOC', '#9a8468');
+  areaLabel(p, 40, 256, 'QUIAPO', '#9a8468');
+  areaLabel(p, 470, 100, 'STA. MESA', '#9a8468');
+  areaLabel(p, 520, 322, 'PANDACAN', '#9a8468');
   {
     const q = polyAt(riverPts, 262);
     p.textCentered(
@@ -1018,40 +1036,29 @@ const CAMPUS_DRAW = {
 // ---- Sprites --------------------------------------------------------------------------------------
 
 /** Map pin: frame 0 playable (red), frame 1 soon (grey). */
+/** Map pin, 22×30 with a cream rim so it pops off the map: frame 0 playable (red), 1 soon (slate). */
 function pins() {
   return sheet(
     [
       ['#d94b3d', '#f2c14e'],
-      ['#9a96a0', '#e0dce4'],
+      ['#4a5578', '#efe5cf'],
     ].map(([body, dot]) => {
-      const p = new Pix(16, 22);
-      for (let y = 9; y < 20; y++) {
-        const half = Math.round(6 * (1 - (y - 9) / 11));
-        p.hline(8 - half, y, half * 2 + 1, shade(body, -0.15));
+      const p = new Pix(22, 30);
+      for (let y = 12; y < 26; y++) {
+        const half = Math.round(7 * (1 - (y - 12) / 14));
+        p.hline(11 - half, y, half * 2 + 1, shade(body, -0.15));
       }
-      p.disc(8, 8, 6, body);
-      p.disc(7, 7, 4, shade(body, 0.15));
-      p.disc(8, 8, 3, dot);
-      p.px(6, 4, shade(body, 0.5));
+      p.disc(11, 10, 8, body);
+      p.disc(10, 9, 6, shade(body, 0.12));
+      p.disc(11, 10, 4, dot);
+      p.disc(11, 10, 2, shade(dot, 0.4));
+      p.px(8, 5, shade(body, 0.55));
+      p.px(7, 6, shade(body, 0.4));
+      p.outline('#fff8e6');
       p.outline(INK);
       return p;
     }),
   );
-}
-
-function tarpSoon() {
-  const p = new Pix(32, 12);
-  p.rect(0, 0, 32, 12, '#f2c14e');
-  p.stroke(0, 0, 32, 12, '#d94b3d');
-  p.stroke(1, 1, 30, 10, '#ffe08a');
-  for (const [x, y] of [
-    [1, 1],
-    [30, 1],
-    [1, 10],
-    [30, 10],
-  ])
-    p.px(x, y, '#5a4632');
-  return p;
 }
 
 /** The player's jeepney on the map, side view facing left, wheels in two frames. */
@@ -1197,8 +1204,7 @@ export function mapAssets() {
   const out = [
     { key: 'map_ubelt', pix: map },
     { key: 'map_lights', pix: lights },
-    { key: 'map_pin', pix: pins(), frame: [16, 22] },
-    { key: 'tarp_soon', pix: tarpSoon() },
+    { key: 'map_pin', pix: pins(), frame: [22, 30] },
     { key: 'map_jeep', pix: mapJeep(), frame: [30, 18] },
     { key: 'map_train', pix: mapTrain() },
     { key: 'map_mini', pix: mapMini(), frame: [10, 6] },

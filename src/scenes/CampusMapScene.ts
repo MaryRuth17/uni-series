@@ -4,7 +4,7 @@
  * street signs), the time-of-day tint with night lights (map_lights), ambient life (an LRT-2 train every
  * 20–30 s, jeepneys, tricycles and cars on the avenues, a river ferry, drifting water hyacinth, sparkles on
  * the water, cloud shadows, birds), the 7 campus buildings with pins (PUP playable with its progress and
- * sticker mark, the rest a "SOON" tarpaulin), the player's jeepney, the HUD, the campus card, the list view
+ * sticker mark and a pulsing gold ring, the rest a "SOON" tag on their signboard), the player's jeepney, the HUD, the campus card, the list view
  * and the jeepney ride into the minigame. Tapping a stop zooms the world camera 10% toward it; a second,
  * fixed camera draws the UI so the HUD never zooms. Arriving from the landing, the map unfolds (0.92 → 1).
  * Listens to: pointer (taps, hover glow, list drag), mouse wheel (list), keyboard (arrows move between
@@ -431,7 +431,7 @@ export class CampusMapScene extends Phaser.Scene {
       }
 
       // Tap target: the building and its pin. Hover grows the pin and lights the ground (§4.2).
-      const zoneH = building.height + 24;
+      const zoneH = building.height + 34;
       const zone = this.add
         .zone(entry.x, baseY - zoneH / 2 + 2, Math.max(36, building.width), zoneH)
         .setDepth(DEPTH.stopUi)
@@ -446,22 +446,66 @@ export class CampusMapScene extends Phaser.Scene {
         glow.setFillStyle(PALETTE.glow, 0);
       });
 
-      // Campus name on a yellow signboard below.
+      // One signboard per stop (owner, H4): the playable campus on a yellow board in red,
+      // the rest on a cream board with a red "SOON" tag.
       const label = this.add
-        .text(entry.x, baseY + 9, entry.campus, textStyle(8))
+        .text(entry.x, baseY + 10, entry.campus, textStyle(8, playable ? TEXT.red : TEXT.ink))
         .setOrigin(0.5)
         .setDepth(DEPTH.stopUi + 0.1);
+      let signW = label.width + 12;
+      if (!playable) {
+        const soon = this.add
+          .text(0, baseY + 10, t('map.soon'), textStyle(8, TEXT.cream))
+          .setOrigin(0.5)
+          .setDepth(DEPTH.stopUi + 0.2);
+        const tagW = soon.width + 6;
+        signW = label.width + tagW + 14;
+        const left = entry.x - signW / 2;
+        label.setX(left + 6 + label.width / 2);
+        const tagX = left + signW - 4 - tagW / 2;
+        soon.setX(tagX);
+        this.add
+          .rectangle(tagX, baseY + 10, tagW, 9, COLORS.red)
+          .setStrokeStyle(1, COLORS.ink)
+          .setDepth(DEPTH.stopUi + 0.15);
+      }
       this.add
-        .nineslice(entry.x, baseY + 9, 'ui_board', undefined, label.width + 10, 13, 6, 6, 6, 6)
+        .nineslice(
+          entry.x,
+          baseY + 10,
+          playable ? 'ui_board' : 'ui_panel',
+          undefined,
+          signW,
+          15,
+          6,
+          6,
+          6,
+          6,
+        )
         .setDepth(DEPTH.stopUi);
 
       if (playable) {
+        // A gold ring pulses around the playable campus so it is found at a glance.
+        if (!this.reduced) {
+          const ring = this.add
+            .ellipse(entry.x, baseY - 2, building.width + 16, 20)
+            .setStrokeStyle(2, PALETTE.gold)
+            .setDepth(DEPTH.glow);
+          this.tweens.add({
+            targets: ring,
+            scale: 1.25,
+            alpha: 0,
+            duration: 1400,
+            repeat: -1,
+            ease: 'Sine.easeOut',
+          });
+        }
         const s = summaryFor(entry.id, save);
         if (s.pin) {
           this.add
             .text(
               entry.x,
-              baseY + 21,
+              baseY + 23,
               t(s.pin.key, s.pin.params),
               textStyle(8, TEXT.ink, { backgroundColor: '#FFF4DC', padding: { x: 2, y: 0 } }),
             )
@@ -470,18 +514,10 @@ export class CampusMapScene extends Phaser.Scene {
         }
         if (save.stickers.includes(entry.stickerId)) {
           this.add
-            .star(entry.x + 9, top - 16, 5, 3, 6, PALETTE.gold)
+            .star(entry.x + 11, top - 22, 5, 3, 6, PALETTE.gold)
             .setStrokeStyle(1, COLORS.ink)
             .setDepth(DEPTH.stopUi + 0.2);
         }
-      } else {
-        // A "SOON" tarpaulin hung on the building, Pinoy style.
-        const ty = baseY - 9;
-        this.add.image(entry.x, ty, 'tarp_soon').setDepth(DEPTH.stopUi);
-        this.add
-          .text(entry.x, ty, t('map.soon'), textStyle(8, TEXT.red))
-          .setOrigin(0.5)
-          .setDepth(DEPTH.stopUi + 0.1);
       }
     }
     this.moveHighlight();
