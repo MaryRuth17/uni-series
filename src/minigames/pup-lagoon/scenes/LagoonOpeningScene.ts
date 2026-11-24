@@ -1,7 +1,8 @@
 /**
  * LagoonOpeningScene — arriving at PUP (owner request, L6): a short intro, then how to play
- * Shows: a camera pan across the PUP campus panorama (lagoon_intro: the main hall with its pylon, shade
- * trees, the flag, a pergola) with students walking and a jeepney passing, the title "Lagoon Merienda"
+ * Shows: a camera pan across the PUP front (lagoon_intro, from the owner's photos: the gate with a
+ * welcome banner, the guardhouse, the tall white pylon, then the obelisk plaza with the old stone ruins)
+ * with students walking and a jeepney passing, the title "Lagoon Merienda"
  * dropping in with its tagline, then the "How to play" card (4 steps with pictures). Got it! goes on to
  * the Vacant card (LagoonIntroScene). Tap or Enter skips the pan; after the first time, Skip jumps
  * straight to the Vacant card.
@@ -37,11 +38,16 @@ export class LagoonOpeningScene extends Phaser.Scene {
     const seen = services().save.data.settings.tutorialSeen[HOW_SEEN] === true;
 
     this.add.image(0, 0, 'lagoon_intro').setOrigin(0);
+    // The gate's banner: a greeting, not the school's official sign (SPEC §13).
+    this.add
+      .text(OPENING.banner.x, OPENING.banner.y, t('pupLagoon.intro.gate'), textStyle(8, TEXT.cream))
+      .setOrigin(0.5)
+      .setDepth(5);
     this.makeAnims();
     // Students crossing the plaza and a jeepney passing on the road in front.
     OPENING.walkers.forEach(([variant, x, dir, speed], i) => {
       const w = this.add
-        .sprite(x, 318 + (i % 2) * 14, `walker_${variant}`)
+        .sprite(x, 279 + (i % 2) * 2, `walker_${variant}`)
         .setOrigin(0.5, 1)
         .setFlipX(dir < 0)
         .setDepth(10 + i);
@@ -105,14 +111,14 @@ export class LagoonOpeningScene extends Phaser.Scene {
     if (reduced) {
       title.setY(60);
       tagline.setAlpha(1);
-      main.centerOn(OPENING.width / 2, 180);
+      main.centerOn(OPENING.panTo, 180);
     } else {
-      main.pan(OPENING.width - 320, 180, OPENING.panMs, 'Sine.easeInOut');
+      main.pan(OPENING.panTo, 180, OPENING.panMs, 'Sine.easeInOut');
       this.tweens.add({ targets: title, y: 60, duration: 700, delay: 500, ease: 'Back.easeOut' });
       this.tweens.add({ targets: tagline, alpha: 1, duration: 500, delay: 1100 });
       this.tweens.add({ targets: hint, alpha: 0.4, duration: 700, yoyo: true, repeat: -1 });
     }
-    this.time.delayedCall(reduced ? 1500 : OPENING.panMs + 400, () => {
+    this.time.delayedCall(reduced ? 1500 : OPENING.panMs + OPENING.holdMs, () => {
       if (this.stage === 'pan') this.showHow();
     });
 

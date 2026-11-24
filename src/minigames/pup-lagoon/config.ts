@@ -239,7 +239,13 @@ export const STALL_KEYS_ORDER: readonly StallKey[] = [
 /** The arrival intro (LagoonOpeningScene): pan across the PUP panorama, then How to play. */
 export const OPENING = {
   width: 960,
+  /** The pan runs from the front gate (left) to the obelisk plaza (camera centre x). */
+  panTo: 600,
+  /** Centre of the gate's maroon beam, where the welcome banner is written. */
+  banner: { x: 176, y: 157 },
   panMs: 4200,
+  /** How long the obelisk stays on screen before How to play opens. */
+  holdMs: 1400,
   jeepMs: 5200,
   /** Students crossing the plaza: [walker variant, start x, direction, speed px/s]. */
   walkers: [
