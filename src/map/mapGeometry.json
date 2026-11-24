@@ -127,7 +127,7 @@
     ]
   ],
   "campuses": {
-    "ust-paskuhan": { "art": "ust", "x": 193, "y": 84, "shape": "diamond", "w": 112, "h": 92 },
+    "ust-paskuhan": { "art": "ust", "x": 177, "y": 98, "shape": "diamond", "w": 112, "h": 92 },
     "feu-deco": { "art": "feu", "x": 100, "y": 170, "shape": "rect", "w": 44, "h": 30 },
     "nu-peprally": { "art": "nu", "x": 272, "y": 159, "shape": "rect", "w": 40, "h": 28 },
     "ue-bookhunt": { "art": "ue", "x": 240, "y": 232, "shape": "rect", "w": 44, "h": 30 },

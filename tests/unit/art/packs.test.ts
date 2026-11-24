@@ -66,7 +66,6 @@ describe('baked art packs (scripts/art, DECISIONS R-006)', () => {
       'map_ubelt',
       'map_lights',
       'map_pin',
-      'tarp_soon',
       'map_jeep',
       'map_train',
       'map_mini',

@@ -141,7 +141,7 @@ if (previewAt > 0) {
     for (const [id, c] of Object.entries(geo.campuses)) {
       const img = frame(`map_campus_${shorts[id]}`, night ? 1 : 0);
       s.blit(img, Math.round(c.x - img.w / 2), c.y + 12 - img.h);
-      s.blit(frame('map_pin', id === 'pup-lagoon' ? 0 : 1), c.x - 8, c.y + 12 - img.h - 22);
+      s.blit(frame('map_pin', id === 'pup-lagoon' ? 0 : 1), c.x - 11, c.y + 12 - img.h - 28);
     }
     s.blit(frame('map_jeep', 0), 555 - 44 - 15, 248 + 6 - 9);
     const big = new Pix(1280, 720);

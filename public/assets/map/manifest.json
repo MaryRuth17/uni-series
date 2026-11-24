@@ -16,19 +16,12 @@
   {
     "key": "map_pin",
     "url": "assets/map/map_pin.png",
-    "width": 32,
-    "height": 22,
+    "width": 44,
+    "height": 30,
     "frame": [
-      16,
-      22
+      22,
+      30
     ]
-  },
-  {
-    "key": "tarp_soon",
-    "url": "assets/map/tarp_soon.png",
-    "width": 32,
-    "height": 12,
-    "frame": null
   },
   {
     "key": "map_jeep",

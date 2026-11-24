@@ -16,14 +16,9 @@
         "key": "map_pin",
         "url": "assets/map/map_pin.png",
         "frameConfig": {
-          "frameWidth": 16,
-          "frameHeight": 22
+          "frameWidth": 22,
+          "frameHeight": 30
         }
-      },
-      {
-        "type": "image",
-        "key": "tarp_soon",
-        "url": "assets/map/tarp_soon.png"
       },
       {
         "type": "spritesheet",
