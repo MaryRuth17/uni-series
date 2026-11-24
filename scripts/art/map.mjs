@@ -1061,43 +1061,32 @@ function pins() {
   );
 }
 
-/** The player's jeepney on the map, side view facing left, wheels in two frames. */
+/**
+ * The player's jeepney seen from above like the rest of the map, facing right: red body, white roof with a
+ * rack, chrome hood and headlights, a yellow stripe along the sides. It is rotated along the road in game.
+ */
 function mapJeep() {
-  return sheet(
-    [0, 1].map((frame) => {
-      const p = new Pix(30, 18);
-      const body = '#d94b3d';
-      p.rect(8, 2, 21, 2, shade(body, -0.2));
-      p.hline(8, 1, 21, '#55505f');
-      p.rect(8, 4, 21, 9, body);
-      p.hline(8, 4, 21, shade(body, 0.25));
-      for (let k = 0; k < 4; k++) {
-        p.rect(10 + k * 5, 5, 4, 3, '#2e3a55');
-        p.hline(10 + k * 5, 5, 4, '#5d6e92');
-      }
-      p.hline(8, 9, 21, '#f2c14e');
-      p.hline(8, 10, 21, '#3b6fb6');
-      p.rect(8, 12, 21, 1, '#c9d1d9');
-      p.rect(2, 7, 7, 6, body);
-      p.hline(2, 7, 7, shade(body, 0.25));
-      p.rect(1, 8, 2, 4, '#c9d1d9');
-      p.px(2, 9, '#fff6c9');
-      p.rect(6, 4, 3, 3, '#2e3a55');
-      p.px(4, 6, '#c9d1d9');
-      p.px(3, 5, '#c9d1d9');
-      for (const wx of [7, 24]) {
-        p.disc(wx, 14, 3, '#1f1b26');
-        p.px(wx, 14, '#8a929c');
-        if (frame === 0) p.px(wx - 1, 14, '#5a5f6a');
-        else p.px(wx, 13, '#5a5f6a');
-      }
-      p.outline(INK);
-      return p;
-    }),
-  );
+  const p = new Pix(18, 9);
+  const body = '#d94b3d';
+  p.rect(1, 1, 16, 7, body);
+  p.hline(1, 1, 16, '#f2c14e');
+  p.hline(1, 7, 16, '#f2c14e');
+  // Roof and rack.
+  p.rect(2, 2, 11, 5, '#f4efe6');
+  for (let x = 4; x < 13; x += 3) p.vline(x, 2, 5, '#c9c2b4');
+  p.hline(2, 2, 11, '#ffffff');
+  // Windshield, hood and chrome grille.
+  p.rect(13, 2, 1, 5, '#2e3a55');
+  p.rect(14, 2, 2, 5, shade(body, 0.1));
+  p.vline(16, 2, 5, '#c9d1d9');
+  p.px(16, 2, '#fff6c9');
+  p.px(16, 6, '#fff6c9');
+  // Rear step.
+  p.vline(1, 3, 3, '#55505f');
+  p.outline(INK);
+  return p;
 }
 
-/** LRT-2 train seen from above (two cars, purple edges), facing right. */
 function mapTrain() {
   const p = new Pix(36, 7);
   for (const x0 of [0, 18]) {
@@ -1205,7 +1194,7 @@ export function mapAssets() {
     { key: 'map_ubelt', pix: map },
     { key: 'map_lights', pix: lights },
     { key: 'map_pin', pix: pins(), frame: [22, 30] },
-    { key: 'map_jeep', pix: mapJeep(), frame: [30, 18] },
+    { key: 'map_jeep', pix: mapJeep() },
     { key: 'map_train', pix: mapTrain() },
     { key: 'map_mini', pix: mapMini(), frame: [10, 6] },
     { key: 'map_boat', pix: mapBoat() },
