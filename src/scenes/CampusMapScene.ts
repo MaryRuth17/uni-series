@@ -61,8 +61,6 @@ const DEPTH = {
 const ROUTE = new RoutePath(ROUTE_NODES);
 const CARD_OPEN_Y = 360 - MAP.card.h / 2 - 6;
 const CARD_HIDDEN_Y = 360 + MAP.card.h;
-/** The jeepney parks beside the campus building, not on it. */
-const JEEP_OFFSET = { x: -46, y: 14 };
 /** A building's footprint sits this far below the stop point. */
 const BASE_DY = 12;
 /** Lane offsets from the road's centre line (traffic keeps right). */
@@ -93,7 +91,8 @@ export class CampusMapScene extends Phaser.Scene {
   private selected = 7;
   private phase: Phase = 'tanghali';
   private jeep!: Phaser.GameObjects.Container;
-  private jeepSprite!: Phaser.GameObjects.Sprite;
+  private jeepSprite!: Phaser.GameObjects.Image;
+  private jeepBoard!: Phaser.GameObjects.Container;
   private jeepSign!: Phaser.GameObjects.Text;
   private card!: Phaser.GameObjects.Container;
   private cardEntry: RosterEntry | null = null;
@@ -202,7 +201,6 @@ export class CampusMapScene extends Phaser.Scene {
 
   private createAnims(): void {
     const anims: [string, string, number][] = [
-      ['map_jeep_drive', 'map_jeep', 8],
       ['map_bird_flap', 'map_bird', 6],
       ['map_hyacinth_bob', 'map_hyacinth', 1],
     ];
@@ -523,28 +521,33 @@ export class CampusMapScene extends Phaser.Scene {
     this.moveHighlight();
   }
 
+  /** The player's jeepney, parked on the road at the jeepney stop beside its campus (H4). */
   private drawJeep(stop: number): void {
     const p = ROUTE.stopPoint(stop);
-    this.jeepSprite = this.add.sprite(0, 0, 'map_jeep', 0).setOrigin(0.5, 1);
+    this.jeepSprite = this.add.image(0, 0, 'map_jeep').setRotation(this.parkedHeading(stop));
+    // The route board shows the destination only while riding (§4.4).
     this.jeepSign = this.add
-      .text(0, -24, entryAtStop(stop).area.toUpperCase(), textStyle(8, TEXT.red))
+      .text(0, -14, entryAtStop(stop).area.toUpperCase(), textStyle(8, TEXT.red))
       .setOrigin(0.5);
-    const board = this.add.nineslice(
-      0,
-      -24,
-      'ui_board',
-      undefined,
-      this.jeepSign.width + 10,
-      13,
-      6,
-      6,
-      6,
-      6,
-    );
+    const board = this.add.nineslice(0, -14, 'ui_board', undefined, 40, 13, 6, 6, 6, 6);
+    this.jeepBoard = this.add.container(0, 0, [board, this.jeepSign]).setVisible(false);
     this.jeep = this.add
-      .container(p.x + JEEP_OFFSET.x, p.y + JEEP_OFFSET.y, [this.jeepSprite, board, this.jeepSign])
+      .container(p.x, p.y, [this.jeepSprite, this.jeepBoard])
       .setDepth(DEPTH.jeep);
     if (this.phase === 'hapon') this.jeepSprite.setTint(0xffe6cf);
+  }
+
+  /** Which way the parked jeepney faces: along the road it stands on. */
+  private parkedHeading(stop: number): number {
+    const i = ROUTE.indexOfStop(stop);
+    const nodes = ROUTE.nodes;
+    const [a, b] = i > 0 ? [nodes[i - 1], nodes[i]] : [nodes[i], nodes[i + 1]];
+    return Math.atan2(b.y - a.y, b.x - a.x);
+  }
+
+  private setJeepSign(text: string): void {
+    this.jeepSign.setText(text);
+    (this.jeepBoard.list[0] as Phaser.GameObjects.NineSlice).setSize(this.jeepSign.width + 10, 13);
   }
 
   private drawHud(): void {
@@ -632,16 +635,6 @@ export class CampusMapScene extends Phaser.Scene {
         height: 24,
         icon: 'icon_album',
       }),
-    );
-    hud(
-      this.add
-        .text(
-          320,
-          352,
-          t('map.credit'),
-          textStyle(8, '#5A4632', { backgroundColor: '#F3E6C8', padding: { x: 3, y: 0 } }),
-        )
-        .setOrigin(0.5),
     );
   }
 
@@ -862,20 +855,17 @@ export class CampusMapScene extends Phaser.Scene {
     this.setView('map', false);
     const from = services().save.data.home.lastStop;
     services().save.update((d) => (d.home.lastStop = entry.stop));
-    this.jeepSign.setText(entry.area.toUpperCase());
+    this.setJeepSign(entry.area.toUpperCase());
+    this.jeepBoard.setVisible(true);
 
     if (this.reduced) {
       this.arrive(entry, false);
       return;
     }
-    const path = ROUTE.pathBetween(from, entry.stop).map((p) => ({
-      x: p.x + JEEP_OFFSET.x,
-      y: p.y + JEEP_OFFSET.y,
-    }));
+    const path = ROUTE.pathBetween(from, entry.stop);
     const length = polylineLength(path);
     const progress = { d: 0 };
     let skip: Button | null = null;
-    this.jeepSprite.play('map_jeep_drive');
     const tween = this.tweens.add({
       targets: progress,
       d: length,
@@ -883,13 +873,14 @@ export class CampusMapScene extends Phaser.Scene {
       ease: 'Sine.easeInOut',
       onUpdate: () => {
         const p = pointAt(path, progress.d);
-        // The sprite faces left; mirror it when driving right.
-        if (Math.abs(p.x - this.jeep.x) > 0.05) this.jeepSprite.setFlipX(p.x > this.jeep.x);
+        const ahead = pointAt(path, progress.d + 1);
+        // Turn along the road (the sprite faces right).
+        if (Math.hypot(ahead.x - p.x, ahead.y - p.y) > 0.1)
+          this.jeepSprite.setRotation(Math.atan2(ahead.y - p.y, ahead.x - p.x));
         this.jeep.setPosition(p.x, p.y);
       },
       onComplete: () => {
         skip?.destroy();
-        this.jeepSprite.stop();
         this.arrive(entry, true);
       },
     });
@@ -906,7 +897,7 @@ export class CampusMapScene extends Phaser.Scene {
 
   private arrive(entry: RosterEntry, animate: boolean): void {
     const end = ROUTE.stopPoint(entry.stop);
-    this.jeep.setPosition(end.x + JEEP_OFFSET.x, end.y + JEEP_OFFSET.y);
+    this.jeep.setPosition(end.x, end.y);
     const go = (): void =>
       this.fadeOut(() => {
         const target =
@@ -922,7 +913,7 @@ export class CampusMapScene extends Phaser.Scene {
     const bubble = this.add
       .text(
         this.jeep.x,
-        this.jeep.y - 40,
+        this.jeep.y - 30,
         t('map.para'),
         textStyle(8, TEXT.ink, { backgroundColor: '#FFF4DC', padding: { x: 3, y: 2 } }),
       )

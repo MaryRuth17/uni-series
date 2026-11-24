@@ -106,21 +106,30 @@ export function entryAtStop(stop: number): RosterEntry {
 }
 
 /**
- * The jeepney route: the stops in order, with road bends so the jeepney follows streets
- * (Recto under the LRT-2, then along Legarda and Magsaysay toward Sta. Mesa). Stops match the
- * campus plots in src/map/mapGeometry.json (the baked map, H4).
+ * The jeepney route, on the roads of the baked map (src/map/mapGeometry.json): each stop is the jeepney
+ * stop on the street beside its campus, and the jeepney drives España, Recto, Legarda, Mendiola,
+ * Magsaysay and Pureza between them (H4). Side trips (to NU, to the Mendiola stops) go up a street and
+ * come back down it, as a jeepney would.
  */
 export const ROUTE_NODES: readonly RouteNode[] = [
-  { x: 177, y: 98, stop: 1 },
-  { x: 170, y: 140 },
-  { x: 100, y: 170, stop: 2 },
-  { x: 180, y: 184 },
-  { x: 272, y: 159, stop: 3 },
-  { x: 240, y: 176 },
-  { x: 212, y: 170, stop: 4 },
-  { x: 262, y: 205 },
-  { x: 302, y: 240, stop: 5 },
-  { x: 376, y: 238, stop: 6 },
-  { x: 470, y: 222 },
-  { x: 555, y: 248, stop: 7 },
+  { x: 204, y: 132, stop: 1 }, // UST, on España
+  { x: 130, y: 192 },
+  { x: 100, y: 190, stop: 2 }, // FEU, on Recto
+  { x: 130, y: 192 },
+  { x: 245, y: 206 },
+  { x: 296, y: 208 },
+  { x: 296, y: 168, stop: 3 }, // NU, up Jhocson
+  { x: 296, y: 208 },
+  { x: 245, y: 206 },
+  { x: 212, y: 202, stop: 4 }, // UE, on Recto
+  { x: 245, y: 206 },
+  { x: 300, y: 208 },
+  { x: 340, y: 205 },
+  { x: 340, y: 232, stop: 5 }, // San Beda, on Mendiola
+  { x: 340, y: 248, stop: 6 }, // CEU, on Mendiola
+  { x: 340, y: 205 },
+  { x: 398, y: 200 },
+  { x: 500, y: 194 },
+  { x: 540, y: 191 },
+  { x: 540, y: 224, stop: 7 }, // PUP, on Pureza
 ];

@@ -26,12 +26,9 @@
   {
     "key": "map_jeep",
     "url": "assets/map/map_jeep.png",
-    "width": 60,
-    "height": 18,
-    "frame": [
-      30,
-      18
-    ]
+    "width": 18,
+    "height": 9,
+    "frame": null
   },
   {
     "key": "map_train",

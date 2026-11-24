@@ -143,7 +143,7 @@ if (previewAt > 0) {
       s.blit(img, Math.round(c.x - img.w / 2), c.y + 12 - img.h);
       s.blit(frame('map_pin', id === 'pup-lagoon' ? 0 : 1), c.x - 11, c.y + 12 - img.h - 28);
     }
-    s.blit(frame('map_jeep', 0), 555 - 44 - 15, 248 + 6 - 9);
+    s.blit(frame('map_jeep', 0), 540 - 9, 224 - 4);
     const big = new Pix(1280, 720);
     for (let y = 0; y < 360; y++)
       for (let x = 0; x < 640; x++) {

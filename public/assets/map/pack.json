@@ -21,13 +21,9 @@
         }
       },
       {
-        "type": "spritesheet",
+        "type": "image",
         "key": "map_jeep",
-        "url": "assets/map/map_jeep.png",
-        "frameConfig": {
-          "frameWidth": 30,
-          "frameHeight": 18
-        }
+        "url": "assets/map/map_jeep.png"
       },
       {
         "type": "image",

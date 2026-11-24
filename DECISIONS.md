@@ -296,3 +296,10 @@ Specs: [SPEC.md](SPEC.md) (§), [SPEC-homepage.md](SPEC-homepage.md) (H§), [SPE
   some colour in the rooftops without competing with the stops. Campus grounds are soft gold, like the owner's
   reference map, with a light frame. Street signs a softer blue, LRT signs a softer purple. "SOON" tags are slate;
   red is kept for the playable PUP pin. UE moved north of the LRT-2 beside FEU (212,170), as in the reference.
+- **D-050 — The jeepney drives the roads (owner: "out of place").** `map_jeep` is now a top-down jeepney (18×9) like the
+  rest of the map, rotated along the road. Each stop is the jeepney stop on the street beside its campus (España, Recto,
+  Jhocson for NU, Mendiola for San Beda and CEU, Pureza for PUP), and `ROUTE_NODES` follows the drawn roads (a unit
+  test samples every leg). The yellow route board appears only while riding. Jhocson St was added to the geometry.
+- **D-051 — No map credit on screen (owner).** "Map data © OpenStreetMap contributors" is removed from the map (and the
+  `map.credit` key); the attribution stays on the Credits screen (`credits.map`) and in CREDITS.md. This overrides
+  SPEC-homepage §4.6 / §10's on-map credit.
