@@ -10,6 +10,7 @@
  * LagoonVacant events (pilaChanged, atCounter); the frame update (walking and the pila, clamped to 100 ms).
  */
 import Phaser from 'phaser';
+import { sceneConfig } from '../../../ui/view';
 import { t } from '../../../core/i18n';
 import { services } from '../../../core/services';
 import { FADE_MS } from '../../../home/config';
@@ -17,7 +18,7 @@ import { Button } from '../../../ui/Button';
 import { openOverlay } from '../../../ui/overlay';
 import { panel } from '../../../ui/Panel';
 import { COLORS, TEXT, textStyle } from '../../../ui/theme';
-import { avatarPreview } from '../../../scenes/IdCardScene';
+import { avatarSprite } from '../../../ui/avatar';
 import { PAUSE } from '../../../scenes/PauseScene';
 import { EVENTS, STALL_KEYS_ORDER, VIEW, WALK_SPEED } from '../config';
 import { MENU } from '../data/menu';
@@ -61,7 +62,7 @@ export class LagoonMapScene extends Phaser.Scene {
   private hud!: Phaser.GameObjects.Container;
 
   constructor() {
-    super(LAGOON_MAP);
+    super(sceneConfig(LAGOON_MAP));
   }
 
   create(data: { gen?: GeneratedVacant }): void {
@@ -125,7 +126,9 @@ export class LagoonMapScene extends Phaser.Scene {
         0xd9d6cc,
       )
       .setInteractive();
-    ground.on('pointerup', (p: Phaser.Input.Pointer) => this.walkTo(GRAPH.nearest(p.x, p.y)));
+    ground.on('pointerup', (p: Phaser.Input.Pointer) =>
+      this.walkTo(GRAPH.nearest(p.worldX, p.worldY)),
+    );
 
     const P = VIEW.plaza;
     this.add.circle(P.x, P.y, P.r, 0xb5563d).setStrokeStyle(4, 0xf2eee4);
@@ -226,7 +229,7 @@ export class LagoonMapScene extends Phaser.Scene {
   private drawPlayer(): void {
     const profile = services().save.data.profile;
     const body = profile
-      ? avatarPreview(this, 0, -12, profile, 0.45)
+      ? avatarSprite(this, 0, -12, profile, 0.5)
       : this.add.rectangle(0, -10, 12, 20, COLORS.yellow).setStrokeStyle(1, COLORS.ink);
     const marker = this.add.triangle(0, -30, -4, 0, 4, 0, 0, 5, COLORS.red);
     this.player = this.add.container(this.walker.pos.x, this.walker.pos.y, [body, marker]);

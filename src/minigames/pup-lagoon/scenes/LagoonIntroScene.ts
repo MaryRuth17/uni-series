@@ -6,6 +6,7 @@
  * Listens to: pointer; Enter = Tara!, Esc = back.
  */
 import Phaser from 'phaser';
+import { sceneConfig } from '../../../ui/view';
 import { t } from '../../../core/i18n';
 import { services } from '../../../core/services';
 import { FADE_MS } from '../../../home/config';
@@ -26,7 +27,7 @@ export class LagoonIntroScene extends Phaser.Scene {
   private gen!: GeneratedVacant;
 
   constructor() {
-    super(LAGOON_INTRO);
+    super(sceneConfig(LAGOON_INTRO));
   }
 
   create(): void {

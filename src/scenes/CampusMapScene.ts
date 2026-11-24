@@ -10,6 +10,7 @@
  * stops, Enter opens / rides, Esc closes the card, Tab switches Mapa/Listahan), the frame update (clouds).
  */
 import Phaser from 'phaser';
+import { addViewCamera, RENDER_SCALE, sceneConfig } from '../ui/view';
 import { gameEvents } from '../core/GameEvents';
 import { t } from '../core/i18n';
 import type { MapView } from '../core/SaveManager';
@@ -34,7 +35,7 @@ import { Button } from '../ui/Button';
 import { openOverlay } from '../ui/overlay';
 import { panel } from '../ui/Panel';
 import { COLORS, SCENES, TEXT, textStyle } from '../ui/theme';
-import { avatarPreview } from './IdCardScene';
+import { avatarSprite } from '../ui/avatar';
 
 export interface CampusMapData {
   /** A message to show on arrival, e.g. "+₱25 sa alkansya!" after a vacant. */
@@ -69,7 +70,7 @@ export class CampusMapScene extends Phaser.Scene {
   private clouds: Phaser.GameObjects.Ellipse[] = [];
 
   constructor() {
-    super(SCENES.campusMap);
+    super(sceneConfig(SCENES.campusMap));
   }
 
   create(data: CampusMapData = {}): void {
@@ -96,13 +97,13 @@ export class CampusMapScene extends Phaser.Scene {
 
     const main = this.cameras.main;
     main.setBounds(0, 0, 640, 360);
-    this.uiCam = this.cameras.add(0, 0, 640, 360);
+    this.uiCam = addViewCamera(this);
     this.syncCameras();
 
     this.fadeIn();
     if (data.from === 'landing' && !this.reduced) {
-      main.setZoom(MAP_AMBIENT.unfoldFrom);
-      main.zoomTo(1, FADE_MS, 'Sine.easeOut');
+      main.setZoom(RENDER_SCALE * MAP_AMBIENT.unfoldFrom);
+      main.zoomTo(RENDER_SCALE, FADE_MS, 'Sine.easeOut');
     }
     if (data.toast) gameEvents.emit('toast', { text: data.toast });
   }
@@ -141,14 +142,14 @@ export class CampusMapScene extends Phaser.Scene {
     if (this.reduced || this.view !== 'map') return;
     const main = this.cameras.main;
     main.pan(x, y, MAP.zoomMs, 'Sine.easeInOut', true);
-    main.zoomTo(MAP.zoom, MAP.zoomMs, 'Sine.easeInOut', true);
+    main.zoomTo(RENDER_SCALE * MAP.zoom, MAP.zoomMs, 'Sine.easeInOut', true);
   }
 
   private zoomReset(): void {
     if (this.reduced) return;
     const main = this.cameras.main;
     main.pan(320, 180, MAP.zoomMs, 'Sine.easeInOut', true);
-    main.zoomTo(1, MAP.zoomMs, 'Sine.easeInOut', true);
+    main.zoomTo(RENDER_SCALE, MAP.zoomMs, 'Sine.easeInOut', true);
   }
 
   // ---- Drawing -----------------------------------------------------------------------------------
@@ -384,9 +385,10 @@ export class CampusMapScene extends Phaser.Scene {
       o.setDepth(40);
     };
     hud(
-      new Button(this, MAP.home.x, MAP.home.y, t('map.home'), () => this.goHome(), {
-        width: 30,
+      new Button(this, MAP.home.x, MAP.home.y, '', () => this.goHome(), {
+        width: 26,
         height: 22,
+        icon: 'icon_home',
       }),
     );
     this.toggle = new Button(
@@ -406,7 +408,7 @@ export class CampusMapScene extends Phaser.Scene {
         width: MAP.idChip.w,
         height: 22,
       });
-      chip.add(avatarPreview(this, -48, 0, save.profile, 0.35));
+      chip.add(avatarSprite(this, -48, -3, save.profile, 0.42));
       chip.label.setText(save.profile.name).setX(8);
       hud(chip);
     }
@@ -441,9 +443,9 @@ export class CampusMapScene extends Phaser.Scene {
         this,
         MAP.settings.x,
         MAP.settings.y,
-        '*',
+        '',
         () => openOverlay(this, SCENES.settings),
-        { width: 22, height: 22, fontSize: 16 },
+        { width: 24, height: 22, icon: 'icon_settings' },
       ),
     );
     hud(
@@ -451,16 +453,16 @@ export class CampusMapScene extends Phaser.Scene {
         this,
         MAP.stickerBook.x,
         MAP.stickerBook.y,
-        'S',
+        '',
         () => openOverlay(this, SCENES.stickerBook),
-        { width: 24, height: 24, fontSize: 16 },
+        { width: 24, height: 24, icon: 'icon_stickers' },
       ),
     );
     hud(
-      new Button(this, MAP.album.x, MAP.album.y, 'A', () => openOverlay(this, SCENES.album), {
+      new Button(this, MAP.album.x, MAP.album.y, '', () => openOverlay(this, SCENES.album), {
         width: 24,
         height: 24,
-        fontSize: 16,
+        icon: 'icon_album',
       }),
     );
     hud(this.add.text(320, 352, t('map.credit'), textStyle(8, '#7A6A55')).setOrigin(0.5));
@@ -516,7 +518,7 @@ export class CampusMapScene extends Phaser.Scene {
     bg.on('pointerdown', (p: Phaser.Input.Pointer) => this.dragStart(p));
     this.input.on('pointermove', (p: Phaser.Input.Pointer) => {
       if (!this.drag || !p.isDown || this.view !== 'list') return;
-      const dy = p.y - this.drag.y;
+      const dy = p.y / RENDER_SCALE - this.drag.y;
       if (Math.abs(dy) > 6) this.drag.moved = true;
       this.listScroll = this.drag.scroll - dy;
       this.layoutList();
@@ -538,7 +540,7 @@ export class CampusMapScene extends Phaser.Scene {
 
   private dragStart(p: Phaser.Input.Pointer): void {
     if (this.view !== 'list' || this.cardEntry) return;
-    this.drag = { y: p.y, scroll: this.listScroll, moved: false };
+    this.drag = { y: p.y / RENDER_SCALE, scroll: this.listScroll, moved: false };
   }
 
   private layoutList(): void {

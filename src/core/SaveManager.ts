@@ -22,7 +22,11 @@ export interface SettingsData {
   tutorialSeen: Record<string, boolean>;
 }
 
+export type Gender = 'girl' | 'boy';
+
 export interface Profile {
+  /** Girl or boy body, hair and outfits (DECISIONS D-041). */
+  gender: Gender;
   name: string;
   skin: number;
   hair: number;
@@ -78,7 +82,10 @@ export function migrate(raw: unknown, defaults: SaveData): SaveData | null {
   if (!isObject(raw) || raw.version !== SAVE_VERSION) return null;
   const settings = isObject(raw.settings) ? raw.settings : {};
   const home = isObject(raw.home) ? raw.home : {};
-  const profile = isObject(raw.profile) ? (raw.profile as unknown as Profile) : null;
+  // Profiles saved before the girl/boy choice load as 'girl', the ID card's default (D-041).
+  const profile = isObject(raw.profile)
+    ? ({ gender: 'girl', ...(raw.profile as object) } as Profile)
+    : null;
   return {
     ...defaults,
     createdAt: typeof raw.createdAt === 'string' ? raw.createdAt : defaults.createdAt,

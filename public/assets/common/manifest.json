@@ -1,0 +1,149 @@
+[
+  {
+    "key": "logo_uniseries",
+    "url": "assets/common/logo_uniseries.png",
+    "width": 281,
+    "height": 59,
+    "frame": null
+  },
+  {
+    "key": "ui_panel",
+    "url": "assets/common/ui_panel.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "ui_button",
+    "url": "assets/common/ui_button.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "ui_board",
+    "url": "assets/common/ui_board.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "icon_settings",
+    "url": "assets/common/icon_settings.png",
+    "width": 16,
+    "height": 16,
+    "frame": null
+  },
+  {
+    "key": "icon_credits",
+    "url": "assets/common/icon_credits.png",
+    "width": 16,
+    "height": 16,
+    "frame": null
+  },
+  {
+    "key": "icon_stickers",
+    "url": "assets/common/icon_stickers.png",
+    "width": 16,
+    "height": 16,
+    "frame": null
+  },
+  {
+    "key": "icon_album",
+    "url": "assets/common/icon_album.png",
+    "width": 16,
+    "height": 16,
+    "frame": null
+  },
+  {
+    "key": "icon_home",
+    "url": "assets/common/icon_home.png",
+    "width": 16,
+    "height": 16,
+    "frame": null
+  },
+  {
+    "key": "icon_map",
+    "url": "assets/common/icon_map.png",
+    "width": 16,
+    "height": 16,
+    "frame": null
+  },
+  {
+    "key": "icon_list",
+    "url": "assets/common/icon_list.png",
+    "width": 16,
+    "height": 16,
+    "frame": null
+  },
+  {
+    "key": "avatar_body_girl",
+    "url": "assets/common/avatar_body_girl.png",
+    "width": 288,
+    "height": 48,
+    "frame": [
+      48,
+      48
+    ]
+  },
+  {
+    "key": "avatar_hair_girl",
+    "url": "assets/common/avatar_hair_girl.png",
+    "width": 384,
+    "height": 48,
+    "frame": [
+      48,
+      48
+    ]
+  },
+  {
+    "key": "avatar_outfit_girl",
+    "url": "assets/common/avatar_outfit_girl.png",
+    "width": 192,
+    "height": 48,
+    "frame": [
+      48,
+      48
+    ]
+  },
+  {
+    "key": "avatar_body_boy",
+    "url": "assets/common/avatar_body_boy.png",
+    "width": 288,
+    "height": 48,
+    "frame": [
+      48,
+      48
+    ]
+  },
+  {
+    "key": "avatar_hair_boy",
+    "url": "assets/common/avatar_hair_boy.png",
+    "width": 384,
+    "height": 48,
+    "frame": [
+      48,
+      48
+    ]
+  },
+  {
+    "key": "avatar_outfit_boy",
+    "url": "assets/common/avatar_outfit_boy.png",
+    "width": 192,
+    "height": 48,
+    "frame": [
+      48,
+      48
+    ]
+  },
+  {
+    "key": "avatar_lace",
+    "url": "assets/common/avatar_lace.png",
+    "width": 288,
+    "height": 48,
+    "frame": [
+      48,
+      48
+    ]
+  }
+]

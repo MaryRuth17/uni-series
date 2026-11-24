@@ -1,9 +1,10 @@
 /**
- * Cream panel with a 1 px dark outline (SPEC §6), and the dimmed backdrop overlays sit on.
- * Placeholders until the art pass swaps in the nine-slice `panel`.
+ * Cream panel with a rounded, bevelled frame (SPEC §6), drawn with the `ui_panel` nine-slice, and the
+ * dimmed backdrop overlays sit on.
  */
 import type Phaser from 'phaser';
 import { COLORS } from './theme';
+import { VIEW_H, VIEW_W } from './view';
 
 export function panel(
   scene: Phaser.Scene,
@@ -11,15 +12,27 @@ export function panel(
   y: number,
   width: number,
   height: number,
-  fill: number = COLORS.cream,
-): Phaser.GameObjects.Rectangle {
-  return scene.add.rectangle(x, y, width, height, fill).setStrokeStyle(1, COLORS.ink);
+  tint: number = COLORS.cream,
+): Phaser.GameObjects.NineSlice {
+  const p = scene.add.nineslice(
+    x,
+    y,
+    'ui_panel',
+    undefined,
+    width,
+    Math.max(height, 12),
+    6,
+    6,
+    6,
+    6,
+  );
+  if (tint !== COLORS.cream) p.setTint(tint);
+  return p;
 }
 
 /** Full-screen dim that also swallows taps meant for the scene underneath. */
 export function backdrop(scene: Phaser.Scene, alpha = 0.6): Phaser.GameObjects.Rectangle {
-  const { width, height } = scene.scale;
   return scene.add
-    .rectangle(width / 2, height / 2, width, height, COLORS.dim, alpha)
+    .rectangle(VIEW_W / 2, VIEW_H / 2, VIEW_W, VIEW_H, COLORS.dim, alpha)
     .setInteractive();
 }

@@ -4,6 +4,7 @@
  * glyphs until the art pass adds a pixel ₱ (DECISIONS H-005).
  */
 import type Phaser from 'phaser';
+import { RENDER_SCALE } from './view';
 
 export const FONT = '"Pixelify Sans", monospace';
 
@@ -30,7 +31,7 @@ export function textStyle(
   color: string = TEXT.ink,
   extra: Phaser.Types.GameObjects.Text.TextStyle = {},
 ): Phaser.Types.GameObjects.Text.TextStyle {
-  return { fontFamily: FONT, fontSize: `${size}px`, color, ...extra };
+  return { fontFamily: FONT, fontSize: `${size}px`, color, resolution: RENDER_SCALE, ...extra };
 }
 
 /** Scene keys, so scenes never mistype each other's names. */

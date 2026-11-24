@@ -5,6 +5,7 @@
  * Listens to: pointer; Esc closes.
  */
 import Phaser from 'phaser';
+import { sceneConfig } from '../ui/view';
 import { t } from '../core/i18n';
 import { Button } from '../ui/Button';
 import { closeOverlay, type OverlayData } from '../ui/overlay';
@@ -15,7 +16,7 @@ export class CreditsScene extends Phaser.Scene {
   private from = SCENES.landing as string;
 
   constructor() {
-    super(SCENES.credits);
+    super(sceneConfig(SCENES.credits));
   }
 
   init(data: OverlayData): void {

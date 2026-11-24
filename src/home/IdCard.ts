@@ -9,7 +9,7 @@ export const NAME_MAX = 12;
 export type IdPart = keyof typeof ID_OPTIONS;
 
 export function emptyProfile(): Profile {
-  return { name: '', skin: 0, hair: 0, outfit: 0, lace: 0 };
+  return { gender: 'girl', name: '', skin: 0, hair: 0, outfit: 0, lace: 0 };
 }
 
 /** Trim, collapse spaces, drop control characters, and cut to 12 characters (not UTF-16 units). */
@@ -25,7 +25,10 @@ export function cycle(part: IdPart, value: number, dir: 1 | -1): number {
   return (((value + dir) % n) + n) % n;
 }
 
-export function validateProfile(p: Profile): { ok: true } | { ok: false; reason: 'name' | 'part' } {
+export function validateProfile(
+  p: Profile,
+): { ok: true } | { ok: false; reason: 'name' | 'part' | 'gender' } {
+  if (p.gender !== 'girl' && p.gender !== 'boy') return { ok: false, reason: 'gender' };
   if (cleanName(p.name).length === 0) return { ok: false, reason: 'name' };
   for (const part of Object.keys(ID_OPTIONS) as IdPart[]) {
     const v = p[part];

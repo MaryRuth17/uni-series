@@ -1,13 +1,14 @@
 /**
- * LandingScene ("Tara, laro!", SPEC-homepage §3) — H2 living landing (greybox shapes until H4 art)
+ * LandingScene ("Tara, laro!", SPEC-homepage §3) — H4 pixel art (DECISIONS D-040 to D-042)
  * Shows: the living U-Belt street (StreetView: sky and lights by time of day, drifting clouds, the LRT-2
  * train, walkers, passing jeepneys, carts, barker, tappable surprises), and on top of it the UNI SERIES
- * logo, subtitle, TARA, LARO!, Sticker Book / Settings / Credits icons, the Student ID chip and the
- * disclaimer footer. The first tap of the session dims-then-brightens ("Pindutin para magsimula"),
+ * logo, subtitle, the play button, Sticker Book / Settings / Credits icons, the English | Filipino toggle
+ * (usable even on the tap-to-start screen), the Student ID chip and the disclaimer footer. The first tap of the session dims-then-brightens ("Pindutin para magsimula"),
  * unlocks audio and drops the logo in. TARA, LARO! drives the parked jeepney away, then fades to the map.
  * Listens to: pointer, keyboard (Enter = TARA, LARO!), the frame update (moves the street).
  */
 import Phaser from 'phaser';
+import { sceneConfig } from '../ui/view';
 import { gameEvents } from '../core/GameEvents';
 import { t } from '../core/i18n';
 import { services } from '../core/services';
@@ -17,7 +18,8 @@ import { isDecember, phaseAt } from '../home/TimeOfDay';
 import { Button } from '../ui/Button';
 import { openOverlay } from '../ui/overlay';
 import { COLORS, SCENES, TEXT, textStyle } from '../ui/theme';
-import { avatarPreview } from './IdCardScene';
+import { avatarSprite } from '../ui/avatar';
+import type { Language } from '../core/SaveManager';
 
 const REGISTRY_STARTED = 'landing.started';
 const REGISTRY_WELCOMED = 'landing.welcomed';
@@ -28,7 +30,7 @@ export class LandingScene extends Phaser.Scene {
   private leaving = false;
 
   constructor() {
-    super(SCENES.landing);
+    super(sceneConfig(SCENES.landing));
   }
 
   create(): void {
@@ -54,18 +56,10 @@ export class LandingScene extends Phaser.Scene {
 
   private drawUi(reduced: boolean): void {
     const L = LANDING;
-    const logoBox = this.add
-      .rectangle(0, 0, L.logo.w, L.logo.h, PALETTE.jeepYellow)
-      .setStrokeStyle(2, COLORS.ink);
-    const logoText = this.add
-      .text(
-        0,
-        0,
-        t('landing.logo'),
-        textStyle(32, TEXT.red, { stroke: '#2B2233', strokeThickness: 4 }),
-      )
-      .setOrigin(0.5);
-    this.logo = this.add.container(L.logo.x, L.logo.y, [logoBox, logoText]).setDepth(DEPTH.ui);
+    // logo_uniseries: jeepney sign-painter lettering baked in scripts/art/ui.mjs.
+    this.logo = this.add
+      .container(L.logo.x, L.logo.y, [this.add.image(0, 0, 'logo_uniseries')])
+      .setDepth(DEPTH.ui);
     if (!reduced) {
       this.tweens.add({
         targets: this.logo,
@@ -94,18 +88,19 @@ export class LandingScene extends Phaser.Scene {
       fontSize: 16,
     }).setDepth(DEPTH.ui);
 
-    const icons: [string, string, () => void][] = [
-      ['landing.icon.stickers', 'S', () => openOverlay(this, SCENES.stickerBook)],
-      ['landing.icon.settings', '*', () => openOverlay(this, SCENES.settings)],
-      ['landing.icon.credits', 'i', () => openOverlay(this, SCENES.credits)],
+    const icons: [string, () => void][] = [
+      ['icon_stickers', () => openOverlay(this, SCENES.stickerBook)],
+      ['icon_settings', () => openOverlay(this, SCENES.settings)],
+      ['icon_credits', () => openOverlay(this, SCENES.credits)],
     ];
-    icons.forEach(([, glyph, onClick], i) => {
-      new Button(this, L.icons.xs[i], L.icons.y, glyph, onClick, {
+    icons.forEach(([icon, onClick], i) => {
+      new Button(this, L.icons.xs[i], L.icons.y, '', onClick, {
         width: L.icons.size,
         height: L.icons.size,
-        fontSize: 16,
+        icon,
       }).setDepth(DEPTH.ui);
     });
+    this.drawLanguageToggle();
 
     const profile = services().save.data.profile;
     if (profile) {
@@ -120,7 +115,7 @@ export class LandingScene extends Phaser.Scene {
           height: L.idChip.h,
         },
       );
-      chip.add(avatarPreview(this, -46, 0, profile, 0.4));
+      chip.add(avatarSprite(this, -46, -3, profile, 0.5));
       chip.label.setText(profile.name).setX(10);
       chip.setDepth(DEPTH.ui);
     }
@@ -140,6 +135,32 @@ export class LandingScene extends Phaser.Scene {
       .text(320, L.footer.y + 2, t('landing.disclaimer'), textStyle(8, TEXT.cream))
       .setOrigin(0.5, 0)
       .setDepth(DEPTH.ui);
+  }
+
+  /**
+   * English | Filipino (DECISIONS D-042): English by default. It sits above the tap-to-start dim so a
+   * first-time player can pick a language before starting. Switching redraws the landing in that language.
+   */
+  private drawLanguageToggle(): void {
+    const current = services().settings.get('language');
+    const make = (lang: Language, x: number): void => {
+      new Button(
+        this,
+        x,
+        LANDING.icons.y,
+        t(`settings.language.${lang}`),
+        () => {
+          if (services().settings.get('language') === lang) return;
+          services().settings.set('language', lang);
+          this.scene.restart();
+        },
+        { width: 44, height: 22 },
+      )
+        .setSelected(current === lang)
+        .setDepth(DEPTH.ui + 11);
+    };
+    make('en', 462);
+    make('fil', 508);
   }
 
   private showTapToStart(reduced: boolean): void {

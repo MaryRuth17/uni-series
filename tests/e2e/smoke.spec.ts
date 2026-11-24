@@ -1,7 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
 
 // SPEC §11 / SPEC-homepage §9 smoke tests, against the production build.
-// The canvas is 640×360 scaled to fit; game coordinates are converted to page clicks.
+// Game coordinates are the 640×360 grid (the canvas is 3× that, D-040), scaled to fit; game coordinates are converted to page clicks.
 
 async function activeScenes(page: Page): Promise<string[]> {
   return page.evaluate(() => {
@@ -48,7 +48,7 @@ test('first launch: tap to start, School ID, map, ride to PUP, Lagoon, pause, ba
   await page.goto('./');
   await waitForScene(page, 'Landing');
 
-  await tap(page, 320, 250); // "Pindutin para magsimula"
+  await tap(page, 320, 250); // Tap to start
   await page.waitForTimeout(700);
   // H2 surprises: parked jeepney, barker, cart, print shop, cat. They must never block or error.
   for (const [x, y] of [
@@ -61,22 +61,28 @@ test('first launch: tap to start, School ID, map, ride to PUP, Lagoon, pause, ba
     await tap(page, x, y);
   }
   await page.waitForTimeout(300);
-  await tap(page, 320, 146); // TARA, LARO!
+  await tap(page, 320, 146); // LET'S PLAY!
   await waitForScene(page, 'IdCard');
   await page.waitForTimeout(400);
+  await tap(page, 420, 123); // Boy
   await page.getByTestId('id-name').fill('Ana');
-  await tap(page, 380, 246); // Ayos na!
+  await tap(page, 426, 267); // Done!
   await waitForScene(page, 'CampusMap');
   expect(
     await page.evaluate(
       () => JSON.parse(localStorage.getItem('uni-series-save') ?? '{}').profile?.name,
     ),
   ).toBe('Ana');
+  expect(
+    await page.evaluate(
+      () => JSON.parse(localStorage.getItem('uni-series-save') ?? '{}').profile?.gender,
+    ),
+  ).toBe('boy');
 
   await page.waitForTimeout(500);
   await tap(page, 555, 244); // PUP pin
   await page.waitForTimeout(400);
-  await tap(page, 360, 331); // Sakay na!
+  await tap(page, 360, 331); // Ride!
   await waitForScene(page, 'LagoonIntroScene'); // the Vacant card
   await page.waitForTimeout(500);
   await page.keyboard.press('Enter'); // Tara!
@@ -101,7 +107,7 @@ test('first launch: tap to start, School ID, map, ride to PUP, Lagoon, pause, ba
 
   await page.keyboard.press('p'); // pause
   await waitForScene(page, 'Pause');
-  await tap(page, 320, 216); // Balik sa mapa
+  await tap(page, 320, 216); // Back to map
   await waitForScene(page, 'CampusMap');
 
   // A returning player skips the School ID.
