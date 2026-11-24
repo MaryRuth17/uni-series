@@ -122,7 +122,7 @@ const FLAT_ROOFS = ['#d6cfc2', '#c8c1b4', '#e0d8c8', '#bdb8b0'];
 const STREET = '#eadfc4';
 /** The calming wash (owner feedback on the busy map): share toward paper and grey. */
 const PAPER = '#efe5cf';
-const CALM = { city: 0.5, road: 0.15, desaturate: 0.45 };
+const CALM = { city: 0.42, road: 0.15, desaturate: 0.35 };
 const ALLEY = '#d9caa8';
 
 /** Local grid coordinates: each district has its own street grid angle (like the real city). */
@@ -234,7 +234,7 @@ function waterTank(p, x, y) {
 }
 
 /** Blue Manila street sign with white letters (like the real ones on every corner). */
-function streetSign(p, cx, cy, str, bg = '#245fb0') {
+function streetSign(p, cx, cy, str, bg = '#41679e') {
   const w = p.textWidth(str, '3x5') + 6;
   const x = Math.round(cx - w / 2);
   const y = Math.round(cy - 5);
@@ -590,11 +590,11 @@ function baseMap() {
         c.shape === 'diamond'
           ? dx / (c.w / 2) + dy / (c.h / 2) > 0.96
           : dx > c.w / 2 - 1 || dy > c.h / 2 - 1;
-      let col = hash(x, y, 14) < 0.25 ? '#98cc70' : '#8bc163';
+      let col = hash(x, y, 14) < 0.25 ? '#f3d792' : '#efcf84';
       if (c.shape === 'diamond' && dy < c.h / 4 && y < c.y && dx / (c.w / 2) + dy / (c.h / 2) < 0.7)
-        col = (Math.floor((x - c.x) / 3) & 1) === 0 ? '#79b357' : '#72ab50';
-      if (dx < 1.5 || dy < 1.5) col = '#e6d7b4';
-      if (edge) col = '#f3ead2';
+        col = (Math.floor((x - c.x) / 3) & 1) === 0 ? '#e9c674' : '#e4bf6c';
+      if (dx < 1.5 || dy < 1.5) col = '#faefd2';
+      if (edge) col = '#fbf3dc';
       p.px(x, y, col);
     }
   for (const [id, c] of Object.entries(GEO.campuses)) {
@@ -648,7 +648,7 @@ function baseMap() {
       for (let k = 0; k < 3; k++) waterTank(p, x + 2 + k * 5, y + 1);
       p.rect(x + 16, y + 4, 4, 3, shade(FLAT_ROOFS[0], -0.25));
       for (let k = 0; k < 8; k++)
-        if (hash(x, y, k, 61) < 0.2)
+        if (hash(x, y, k, 61) < 0.05)
           lights.px(
             x + Math.floor(hash(x, k, 62) * 20),
             y + Math.floor(hash(y, k, 63) * 10),
@@ -664,7 +664,7 @@ function baseMap() {
       for (let k = 0; k < 4; k++)
         p.px(x + k, y + 2, ['#ffffff', '#e98ab0', '#3b6fb6', '#f2c14e'][k]);
     }
-    if (hash(x, y, 73) < 0.08)
+    if (hash(x, y, 73) < 0)
       lights.px(
         x + 1 + Math.floor(hash(x, y, 74) * 3),
         y + 1 + Math.floor(hash(x, y, 75) * 4),
@@ -694,15 +694,15 @@ function baseMap() {
   for (let y = 0; y < H; y++)
     for (let x = 0; x < W; x++) {
       if (inCampus(x, y)) continue;
-      if (inCampus(x, y, 1.6)) p.px(x, y, '#7a5f40');
-      else if (inCampus(x - 1, y - 1, 2.6)) p.px(x, y, '#5a463040');
+      if (inCampus(x, y, 1.6)) p.px(x, y, '#b8925a');
+      else if (inCampus(x - 1, y - 1, 2.6)) p.px(x, y, '#5a463020');
     }
 
   // 8. Streetlights along avenues (night overlay) and lamps on bridges.
   for (const r of ROADS) {
     if (r.kind === 'street') continue;
     const len = polyLength(r.points);
-    for (let d = 5; d < len; d += 16) {
+    for (let d = 5; d < len; d += 24) {
       const q = polyAt(r.points, d);
       for (const sgn of [-1, 1]) {
         const lx = Math.round(q.x - q.uy * sgn * (r.hw + 1));
@@ -788,8 +788,8 @@ function baseMap() {
   ];
   for (const [str, x, y] of signs) streetSign(p, x, y, str);
   for (const [key, sx] of Object.entries(GEO.lrt.stations))
-    streetSign(p, sx, lrtAt(sx) - 13, key.toUpperCase(), '#6d3fae');
-  streetSign(p, 624, 172, 'LRT-2', '#6d3fae');
+    streetSign(p, sx, lrtAt(sx) - 13, key.toUpperCase(), '#7a5cb0');
+  streetSign(p, 624, 172, 'LRT-2', '#7a5cb0');
   areaLabel(p, 315, 99, 'SAMPALOC', '#9a8468');
   areaLabel(p, 40, 256, 'QUIAPO', '#9a8468');
   areaLabel(p, 470, 100, 'STA. MESA', '#9a8468');

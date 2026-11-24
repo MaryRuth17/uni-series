@@ -465,7 +465,7 @@ export class CampusMapScene extends Phaser.Scene {
         const tagX = left + signW - 4 - tagW / 2;
         soon.setX(tagX);
         this.add
-          .rectangle(tagX, baseY + 10, tagW, 9, COLORS.red)
+          .rectangle(tagX, baseY + 10, tagW, 9, 0x5a6478)
           .setStrokeStyle(1, COLORS.ink)
           .setDepth(DEPTH.stopUi + 0.15);
       }

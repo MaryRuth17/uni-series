@@ -292,3 +292,7 @@ Specs: [SPEC.md](SPEC.md) (§), [SPEC-homepage.md](SPEC-homepage.md) (H§), [SPE
   pins are slate blue, not grey. Each stop has one signboard: PUP in red on the yellow board with a pulsing gold ring
   (none with Reduced Motion); the others on a cream board with a red "SOON" tag (the tarpaulin is gone). UST moved to
   (177,98) along España so its pin clears the HUD.
+- **D-049 — Softer colour, UE moved (owner).** The city wash is now 42% toward paper and 35% desaturated (roads 15%):
+  some colour in the rooftops without competing with the stops. Campus grounds are soft gold, like the owner's
+  reference map, with a light frame. Street signs a softer blue, LRT signs a softer purple. "SOON" tags are slate;
+  red is kept for the playable PUP pin. UE moved north of the LRT-2 beside FEU (212,170), as in the reference.
