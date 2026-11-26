@@ -388,3 +388,33 @@ Specs: [SPEC.md](SPEC.md) (§), [SPEC-homepage.md](SPEC-homepage.md) (H§), [SPE
   says what to do next with a single main button. People are drawn only at whole-number scales (students at 2×, the
   player at 1×); the small chips on the landing and map show a 1× cropped head (`avatarHead`) instead of a shrunken
   character. Small art clean-ups: no stray sticker on the kiosk glass, no corner number on bills.
+
+### L3 — Buying, paying and the owner's rules (builder, 2026-11-26)
+
+- **D-052 — No saved progress (owner: "once the user exits the website the progress will be gone").** The save lives
+  in memory only (`memoryStorage()` in `SaveManager`); closing or reloading the page starts fresh (School ID, settings,
+  Lagoon progress). Old saves left in localStorage by earlier versions are removed at boot. The "Hindi ma-save" toast
+  can no longer appear. Overrides SPEC §9's localStorage save.
+- **L-033 — No pila (owner).** `PILA.enabled` is false: choosing a stall puts the player at its counter at once
+  (`joinPila` goes straight to the counter). The Pila logic stays for a possible future option.
+- **L-034 — The rules (owner).** You get a baon; buy food for every line of your listahan. Game over, and the run starts
+  again at vacant 1, if an order costs more than the money left ("over your baon"), if you finish (Kain na!) with lines
+  still open, or if the money left cannot buy anything still needed. A win (every line done) goes to the next vacant;
+  ipon and vacants cleared count for this session only. Pure rules in `logic/RunRules.ts` (tested). The Vacant card
+  and the top bar state the rule; How to play is rewritten around it (step 4: "Don't go over!").
+- **L-035 — Buying and paying work (L3).** On the stalls screen: tap a menu row to add the food to the tray (tusok food
+  asks for a sawsawan), tap tray food to put it back, Bayad opens the payment view (tap coins and bills onto the
+  counter; it shows the total, what is placed and the sukli, or what is still missing; Smart pay; Heto po!). The
+  vendor may have no change (walang panukli). Ihaw food waits for the grill. Moving to another stall needs an empty
+  tray. Results: `LagoonResultScene` (win page with stamps and leftover, or game over with the reason and the missing
+  lines). Keys: 1–8, ← / →, B Bayad, S Smart pay, Enter Heto po!, K Kain na!, Esc close.
+- **L-036 — Audio, more polished (owner).** `scripts/audio` now mixes on buses (keys with chorus, pluck, pad, bass, drums,
+  vinyl), with side-chain ducking from the kick, a shared reverb with per-bus sends, glue compression and a limiter.
+  Instruments improved: a three-partial electric piano with a velocity-bright tine (it was silent before: the note
+  ended on its first sample, now fixed), a softer nylon pluck with body, a warm pad, a round bass with a filter
+  envelope, a kick with a click, a snare with a body, metallic hats and a shaker. Both songs are arranged: intro,
+  groove with a melodic motif (call and response), breakdown, second groove up an octave, a drum fill into the loop.
+  New `amb_lagoon` (crowd, birds, leaves, clinks, a far-off jeepney horn) plays under the Lagoon music
+  (`AudioManager.setAmbience`). Thirteen sound effects: click, tab, add, remove, coin, bill, pay (register), sukli,
+  check, error, page, win jingle, gentle game-over tune. `audio_home` is preloaded; `audio_lagoon` (music and ambience,
+  about 3.5 MB) loads on arrival at PUP. Still WAV (no encoder dependency, see L-031).

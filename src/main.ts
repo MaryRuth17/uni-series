@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { t } from './core/i18n';
-import { initServices } from './core/services';
+import { initServices, services } from './core/services';
 import { gameConfig } from './game/config';
 
 const game = new Phaser.Game(gameConfig);
@@ -19,3 +19,5 @@ game.events.once(Phaser.Core.Events.READY, applyOrientation);
 
 // Read-only handle for the Playwright smoke test (tests/e2e) to check which scenes are running.
 (window as unknown as { __uniGame?: Phaser.Game }).__uniGame = game;
+// The in-memory save (D-052), for the same test.
+(window as unknown as { __uniSave?: unknown }).__uniSave = (): unknown => services().save.data;

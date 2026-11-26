@@ -97,6 +97,30 @@ export function migrate(raw: unknown, defaults: SaveData): SaveData | null {
   };
 }
 
+/**
+ * A storage that lives only as long as the page (owner change, DECISIONS D-052): the game keeps no
+ * progress once the website is closed or reloaded. It never fails, so the "Hindi ma-save" toast never shows.
+ */
+export function memoryStorage(): StorageLike {
+  const items = new Map<string, string>();
+  return {
+    getItem: (key) => items.get(key) ?? null,
+    setItem: (key, value) => {
+      items.set(key, value);
+    },
+  };
+}
+
+/** Remove a save left in localStorage by an older version of the game (best effort). */
+export function clearBrowserSave(): void {
+  try {
+    window.localStorage.removeItem(SAVE_KEY);
+    window.localStorage.removeItem(BACKUP_KEY);
+  } catch {
+    // Storage may be blocked; there is nothing to clear then.
+  }
+}
+
 /** window.localStorage if it can actually be written, otherwise null. */
 export function browserStorage(): StorageLike | null {
   try {

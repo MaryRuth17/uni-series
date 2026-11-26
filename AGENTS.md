@@ -21,9 +21,9 @@ Brief for every AI agent (Claude Code, Codex, others) working in this repo, usua
 | H2 — Living landing | Done: street spawner, LRT-2 train, surprises, time of day, December parols (greybox shapes) |
 | L2 — Lagoon greybox map and movement | Done: Vacant card, walkable map, menu boards, live pila, Pause |
 | H3 — Living map | Done: zoom toward stops, ambient life, time-of-day tint, unfold transition, list drag |
-| L3 — Buying and paying | Next |
+| L3 — Buying and paying | Done: no pila, all stalls open, tray, payment with coins and bills and sukli, the owner's win and lose rules, results (L-033–L-035) |
 | L4–L5 | Not started |
-| H4 + L6 — Art and audio (made by Claude, DECISIONS R-006) | H4 done (D-040–D-051). L6 part 1 done: PUP intro, How to play, storefront play screen with tabs (no map, all stalls open), notebook HUD, food and money art, lo-fi music (L-019–L-032). Sound effects not started |
+| H4 + L6 — Art and audio (made by Claude, DECISIONS R-006) | H4 done (D-040–D-051). L6 part 1 done: PUP intro, How to play, storefront play screen with tabs (no map, all stalls open), notebook HUD, food and money art, lo-fi music, ambience and sound effects (L-019–L-036) |
 | H5 + L7 + M6 — Polish; M7 — Release | Not started |
 | M2–M5 | Replaced by L1–L7 |
 
@@ -79,7 +79,8 @@ commit message like `M2: wok cooking states`. Then stop and report: what you bui
 
 ## Gotchas for this project
 
-- `localStorage` can throw (private mode, itch.io iframe): wrap every read/write in `try/catch`, fall back to in-memory defaults, show the "Hindi ma-save ang progress" toast.
+- No saved progress (owner, DECISIONS D-052): the save lives in memory only and is gone when the page closes. Never write
+  progress to localStorage.
 - Audio is locked until the first tap; the Landing "Pindutin para magsimula" (tap to start) unlocks it.
 - Pause when `document.visibilitychange` reports hidden; pausing = not calling the minigame logic's `update`. Lagoon has
   no clock (SPEC-pup-lagoon OC-2), but the pila and walking still advance through `update(dtMs)`.

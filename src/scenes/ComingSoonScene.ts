@@ -39,6 +39,7 @@ export class ComingSoonScene extends Phaser.Scene {
     this.events.once('shutdown', () => this.input.keyboard?.removeAllListeners());
     this.cameras.main.fadeIn(FADE_MS, 0x2b, 0x22, 0x33);
     services().audio.playMusic('music_home', this);
+    services().audio.setAmbience(null, this);
   }
 
   private back(): void {

@@ -4,7 +4,7 @@
 // How to play pictures.
 import { Pix, shade, sheet } from './pix.mjs';
 import { foodPix } from './lagoon-food.mjs';
-import { INK, LOOKS, canopy, person } from './lagoon-common.mjs';
+import { INK, LOOKS, person } from './lagoon-common.mjs';
 
 // ---- Money ----------------------------------------------------------------------------------------
 
@@ -249,26 +249,44 @@ function howPictures() {
     }
     pics.push(p);
   }
-  // 4. Eat with the barkada; leftover goes to the alkansya.
+  // 4. Don't go over: an empty wallet with a red X, and a list with a line still unticked (game over).
   {
     const p = new Pix(104, 72);
-    frameBg(p);
-    canopy(p, 30, 10, 26, 5, '#3f7d3a');
-    p.rect(28, 20, 4, 30, '#5a4632');
-    p.rect(6, 54, 62, 5, '#8b5a3c');
-    p.rect(10, 59, 3, 8, '#55505f');
-    p.rect(60, 59, 3, 8, '#55505f');
-    person(p, 16, 56, { ...LOOKS[1], sit: true });
-    person(p, 30, 56, { ...LOOKS[2], sit: true, arm: 2 });
-    person(p, 44, 56, { ...LOOKS[4], sit: true });
-    person(p, 58, 56, { ...LOOKS[0], sit: true, arm: 1 });
-    // Bamboo alkansya with a coin dropping in.
-    p.rect(80, 30, 16, 36, '#c9a26a');
-    for (let y = 36; y < 66; y += 9) p.hline(80, y, 16, '#8a6a3a');
-    p.vline(82, 30, 36, '#e0c088');
-    p.rect(85, 28, 6, 3, '#3e2a1a');
-    p.blit(coin(1, 12, '#e2b23c'), 82, 12);
-    p.outline(INK);
+    frameBg(p, '#f6d8d0');
+    // An open, empty brown wallet with a moth flying out.
+    p.rect(8, 30, 40, 26, '#8a5a3a');
+    p.rect(8, 30, 40, 6, '#a06a48');
+    p.rect(10, 38, 36, 14, '#5a3a22');
+    p.stroke(8, 30, 40, 26, '#3e2a1a');
+    p.px(30, 22, '#efe6cc');
+    p.px(32, 21, '#efe6cc');
+    p.px(31, 22, '#c9c0aa');
+    // The big red X over it.
+    for (let k = 0; k < 30; k++) {
+      p.rect(10 + k, 26 + k * 0.9, 3, 3, '#d22f2a');
+      p.rect(40 - k, 26 + k * 0.9, 3, 3, '#d22f2a');
+    }
+    // A listahan with one line unticked, circled in red.
+    const nb = notebook(44, 52, { spiral: 'top', lineGap: 10, margin: 8, top: 14 });
+    p.blit(nb, 56, 10);
+    for (let k = 0; k < 3; k++) {
+      p.stroke(64, 18 + k * 10, 5, 5, '#55505f');
+      if (k < 2) {
+        p.line(65, 20 + k * 10, 66, 22 + k * 10, '#2f8a4a');
+        p.line(66, 22 + k * 10, 69, 17 + k * 10, '#2f8a4a');
+      }
+      p.hline(72, 20 + k * 10, 18, '#55505f');
+    }
+    p.ellipse(77, 40, 17, 6, '#d22f2a');
+    p.ellipse(77, 40, 15, 4, '#fffcf2');
+    p.stroke(64, 38, 5, 5, '#55505f');
+    p.hline(72, 40, 18, '#55505f');
+    // "Start again" arrow.
+    for (let a2 = 0; a2 < 26; a2++) {
+      const ang = Math.PI * 0.2 + (a2 / 26) * Math.PI * 1.4;
+      p.px(Math.round(78 + Math.cos(ang) * 10), Math.round(62 + Math.sin(ang) * 6), '#3b6fb6');
+    }
+    p.rect(86, 58, 3, 3, '#3b6fb6');
     pics.push(p);
   }
   return sheet(pics);

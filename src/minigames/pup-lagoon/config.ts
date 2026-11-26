@@ -121,6 +121,8 @@ export const LISTAHAN = {
 };
 
 export const PILA = {
+  /** Owner change (DECISIONS L-033): no lines; going to a stall puts the player at its counter at once. */
+  enabled: false,
   secondsPerPerson: 3,
   cap: 4,
   longLineFactor: 2,
@@ -208,26 +210,41 @@ export const FRONT = {
   /** Stall tabs along the top. */
   tabsY: 24,
   tabsH: 16,
-  /** The storefront picture. */
+  /** The storefront picture (its bottom 20 px of sidewalk are cropped). */
   x: 0,
   y: 40,
   w: 512,
-  h: 220,
-  /** The menu: two columns, three rows. */
-  menuY: 264,
+  h: 200,
+  /** The menu: two columns, three rows; tap a row to add the food to the tray. */
+  menuY: 244,
   menuRowH: 24,
-  /** The bar with what to do next and the main button. */
-  barY: 348,
-  barH: 24,
-  /** The line in front of the counter, on the right (students at 2×, the player at 1×: both 48 px). */
-  lineX: 380,
-  lineGap: 32,
-  lineMax: 4,
+  /** The tray bar: food in the tray, total, money left, hint, Bayad and Kain na!. */
+  trayY: 316,
+  trayH: 44,
   steamMs: 450,
 };
 
+/** Sound effects (DECISIONS L-035), made by scripts/audio/build.mjs. */
+export const SFX = {
+  tap: 'sfx_click',
+  tab: 'sfx_tab',
+  add: 'sfx_add',
+  remove: 'sfx_remove',
+  coin: 'sfx_coin',
+  bill: 'sfx_bill',
+  pay: 'sfx_pay',
+  sukli: 'sfx_sukli',
+  check: 'sfx_check',
+  error: 'sfx_error',
+  page: 'sfx_page',
+  win: 'sfx_win',
+  lose: 'sfx_lose',
+} as const;
+
 /** Music (owner request, DECISIONS L-031): a cozy lo-fi loop made by scripts/audio/build.mjs. */
 export const LAGOON_MUSIC = 'music_lagoon';
+/** Crowd murmur, birds and leaves under the music (L-035). */
+export const LAGOON_AMBIENCE = 'amb_lagoon';
 
 /** Stall order for keys 1–8 (§10.3, §7 order). */
 export const STALL_KEYS_ORDER: readonly StallKey[] = [
