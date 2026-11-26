@@ -41,6 +41,8 @@ Brief for every AI agent (Claude Code, Codex, others) working in this repo, usua
 | Lint / format | `npm run lint` / `npm run format` |
 | Balance bot | `npm run sim` (added in L1) |
 
+**Shell commands:** prefix every shell command you run in the terminal (git, ls, grep, tests, npm scripts) with `rtk`, e.g. `rtk git status`, `rtk npm test`, `rtk ls src`. `rtk` filters command output to save tokens and passes the command through unchanged.
+
 ## Phaser 4, not Phaser 3
 
 Most Phaser code online (and in model training data) is Phaser 3. Before using an API you are unsure about, read the
