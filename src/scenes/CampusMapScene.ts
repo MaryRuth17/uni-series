@@ -5,7 +5,7 @@
  * 20–30 s, jeepneys, tricycles and cars on the avenues, a river ferry, drifting water hyacinth, sparkles on
  * the water, cloud shadows, birds), the 7 campus buildings with pins (PUP playable with its progress and
  * sticker mark and a pulsing gold ring, the rest a "SOON" tag on their signboard), the player's jeepney, the HUD, the campus card, the list view
- * and the jeepney ride into the minigame. Tapping a stop zooms the world camera 10% toward it; a second,
+ * and the jeepney ride into the minigame (opening a card pops, sfx_pin; riding honks, sfx_jeep_horn). Tapping a stop zooms the world camera 10% toward it; a second,
  * fixed camera draws the UI so the HUD never zooms. Arriving from the landing, the map unfolds (0.92 → 1).
  * Listens to: pointer (taps, hover glow, list drag), mouse wheel (list), keyboard (arrows move between
  * stops, Enter opens / rides, Esc closes the card, Tab switches Map/List), the frame update (movers, clouds).
@@ -18,6 +18,7 @@ import type { MapView } from '../core/SaveManager';
 import { services } from '../core/services';
 import {
   FADE_MS,
+  HOME_SFX,
   MAP,
   MAP_AMBIENT,
   MAP_LIGHTS,
@@ -771,6 +772,8 @@ export class CampusMapScene extends Phaser.Scene {
 
   private openCard(entry: RosterEntry): void {
     if (this.riding) return;
+    // Every way of opening a card (stop, list card, keyboard) makes the same soft pop (L-037).
+    services().audio.sfx(HOME_SFX.pin);
     this.cardEntry = entry;
     this.selected = entry.stop;
     this.moveHighlight();
@@ -816,6 +819,7 @@ export class CampusMapScene extends Phaser.Scene {
           fill: COLORS.yellow,
           textColor: TEXT.red,
           fontSize: 8,
+          sound: null, // ride() honks the jeepney horn instead
         }),
       );
     } else {
@@ -853,6 +857,7 @@ export class CampusMapScene extends Phaser.Scene {
   private ride(entry: RosterEntry): void {
     if (this.riding) return;
     this.riding = true;
+    services().audio.sfx(HOME_SFX.jeepHorn);
     this.closeCard();
     this.setView('map', false);
     const from = services().save.data.home.lastStop;

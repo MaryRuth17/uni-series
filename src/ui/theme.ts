@@ -16,6 +16,9 @@ export const COLORS = {
   yellow: 0xf2c14e,
   grey: 0x8a8494,
   dim: 0x000000,
+  /** "Done / needed / ok" green and its edge (Lagoon badges and the win headline, DESIGN.md). */
+  success: 0x3a9a6a,
+  successEdge: 0x2b5a3a,
 };
 
 export const TEXT = {

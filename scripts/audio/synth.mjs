@@ -178,6 +178,27 @@ export class Mix {
     }
   }
 
+  /**
+   * Soft hats: a short burst of band-limited noise (about 2.5 to 6.5 kHz), much gentler than the square-wave
+   * hats. Takes its own random source so swapping hat types never changes the rest of a song.
+   */
+  softHat(t, vel, random, open = false, bus = 'drums') {
+    const start = Math.round(t * SR);
+    const n = (open ? 0.18 : 0.05) * SR;
+    const hi = lpA(6500);
+    const lo = lpA(2500);
+    let a = 0;
+    let b = 0;
+    for (let k = 0; k < n; k++) {
+      const s = k / SR;
+      const noise = random() * 2 - 1;
+      a += hi * (noise - a);
+      b += lo * (a - b);
+      const env = Math.min(1, s / 0.002) * Math.exp(-s * (open ? 16 : 70));
+      this.add(bus, start + k, (a - b) * env * vel * 0.11);
+    }
+  }
+
   shaker(t, vel, random, bus = 'drums') {
     const start = Math.round(t * SR);
     let prev = 0;

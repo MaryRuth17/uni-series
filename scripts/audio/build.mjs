@@ -4,10 +4,14 @@
 // arpeggio), a groove with a melodic motif (call and response on a nylon guitar), a two-bar breakdown,
 // and a second groove with the motif up an octave and a drum fill that leads back to the top.
 //   music_home   — landing, campus map, Coming soon: C major, 84 BPM.
-//   music_lagoon — PUP intro, Vacant card, stalls, results: F major, 76 BPM.
-// Ambience — amb_lagoon: crowd murmur, birds, leaves, spoon clinks and a far-off jeepney horn.
+//   music_lagoon — PUP intro, Vacant card, stalls, results: F major, 76 BPM. Softer than the home loop
+//   (noise hats instead of square-wave hats, less vinyl crackle, a lower low-pass, a lower peak; L-037).
+// Ambience — amb_lagoon: a warm crowd murmur, a few birds, leaves, rare spoon clinks and a far-off jeepney
+//   horn, low-passed and quiet so it sits under the music (L-037).
 // Sound effects — taps, tabs, food in and out of the tray, coins, bills, the register, sukli, the pencil
-// check, errors, page flips, a win jingle and a gentle game-over tune.
+// check, errors, page flips, a win jingle and a gentle game-over tune; the landing surprises (jeepney horn,
+// sorbetes bell, printer, meow, LRT chime, barker) and the map pin. All are low-passed (most energy under
+// 3 kHz) so repeated taps never hiss (L-037).
 // Files: 16-bit mono WAV at 22.05 kHz. Two packs: audio_home (preloaded) and audio_lagoon (loaded when
 // arriving at PUP).
 import { mkdirSync, writeFileSync } from 'node:fs';
@@ -38,6 +42,9 @@ const SONGS = [
     ],
     scale: [67, 69, 72, 74, 76, 79, 81, 84],
     cutoff: 7200,
+    hats: 'metal',
+    vinyl: 0.9,
+    peak: 0.72,
   },
   {
     key: 'music_lagoon',
@@ -56,7 +63,10 @@ const SONGS = [
       [[52, 55, 58, 62], 48],
     ],
     scale: [65, 67, 69, 72, 74, 77, 79, 81],
-    cutoff: 6600,
+    cutoff: 4800,
+    hats: 'soft',
+    vinyl: 0.3,
+    peak: 0.6,
   },
 ];
 
@@ -84,6 +94,10 @@ function compose(song) {
   const bars = song.chords.length * 2;
   const mix = new Mix(bars * 4 * beat);
   const r = rng(song.seed);
+  // Soft hats draw their own noise, so the rest of the song stays note-for-note the same.
+  const hatNoise = rng(song.seed + 1000);
+  const hat = (t, vel, open = false) =>
+    song.hats === 'soft' ? mix.softHat(t, vel, hatNoise, open) : mix.hat(t, vel, open);
   const at = (bar, eighth) =>
     (bar * 4 + Math.floor(eighth / 2) + (eighth % 2 ? 0.5 + song.swing : 0)) * beat;
   const at16 = (bar, sixteenth) => (bar * 4 + sixteenth / 4) * beat;
@@ -142,8 +156,8 @@ function compose(song) {
     }
     if (!intro) {
       for (let e = 0; e < 8; e++) {
-        if ((bar % 4 === 3 || fill) && e === 7) mix.hat(at(bar, e), 0.55, true);
-        else mix.hat(at(bar, e), (e % 2 ? 0.42 : 0.68) * (0.8 + r() * 0.3) * (breakdown ? 0.7 : 1));
+        if ((bar % 4 === 3 || fill) && e === 7) hat(at(bar, e), 0.55, true);
+        else hat(at(bar, e), (e % 2 ? 0.42 : 0.68) * (0.8 + r() * 0.3) * (breakdown ? 0.7 : 1));
       }
     }
     if (bar >= 1)
@@ -175,12 +189,12 @@ function compose(song) {
       mix.pluck(at(bar, e) + hum(), midi, (e % 2 ? 0.55 : 0.75) * (bar >= 12 ? 1 : 0.92), r);
     }
   }
-  mix.vinyl(r, 0.9);
+  mix.vinyl(r, song.vinyl);
   return mix.master({
     levels: { keys: 0.95, pluck: 0.9, pad: 0.45, bass: 0.82, drums: 0.9, vinyl: 0.7 },
     sends: { keys: 0.28, pluck: 0.32, pad: 0.4, drums: 0.08, bass: 0.02, vinyl: 0 },
     cutoff: song.cutoff,
-    peak: 0.72,
+    peak: song.peak,
   });
 }
 
@@ -197,21 +211,27 @@ function ambience() {
     const phase = r() * TAU;
     let lp = 0;
     let lp2 = 0;
+    let w1 = 0;
+    let w2 = 0;
+    const warm = 1 - Math.exp((-TAU * 1100) / SR);
     for (let i = 0; i < mix.len; i++) {
       const s = i / SR;
       const noise = r() * 2 - 1;
       lp += (1 - Math.exp((-TAU * centre) / SR)) * (noise - lp);
       lp2 += (1 - Math.exp((-TAU * centre * 0.6) / SR)) * (lp - lp2);
-      const bp = lp - lp2;
+      // Two more low-pass stages round off the hiss above the voices (L-037).
+      w1 += warm * (lp - lp2 - w1);
+      w2 += warm * (w1 - w2);
+      const bp = w2;
       const talk =
         Math.max(0, Math.sin(TAU * rate * s + phase) * 0.6 + 0.4) *
         (0.6 + 0.4 * Math.sin(TAU * 0.11 * s + v));
-      mix.add('crowd', i, bp * talk * 0.18);
+      mix.add('crowd', i, bp * talk * 0.3);
     }
   }
   // Birds: little chirp phrases.
-  for (let t = 0.5; t < seconds - 1; t += 1.5 + r() * 3) {
-    const base = 2400 + r() * 1400;
+  for (let t = 0.5; t < seconds - 1; t += 3 + r() * 4) {
+    const base = 1900 + r() * 700;
     const count = 2 + Math.floor(r() * 4);
     for (let c = 0; c < count; c++) {
       const start = Math.round((t + c * (0.09 + r() * 0.05)) * SR);
@@ -222,27 +242,28 @@ function ambience() {
         const f = base * (1 + 0.35 * (s / dur)) + 120 * Math.sin(TAU * 40 * s);
         ph += (TAU * f) / SR;
         const env = Math.sin(Math.PI * (s / dur));
-        mix.add('birds', start + k, Math.sin(ph) * env * 0.05);
+        mix.add('birds', start + k, Math.sin(ph) * env * 0.018);
       }
     }
   }
-  // Leaves: slow soft noise swells.
+  // Leaves: slow swells of low-passed noise (a soft rustle, not hiss).
   let lp = 0;
+  const leafA = 1 - Math.exp((-TAU * 900) / SR);
   for (let i = 0; i < mix.len; i++) {
     const s = i / SR;
-    lp += 0.2 * (r() * 2 - 1 - lp);
+    lp += leafA * (r() * 2 - 1 - lp);
     const sw = Math.pow(Math.max(0, Math.sin(TAU * 0.07 * s) * Math.sin(TAU * 0.023 * s + 1)), 2);
-    mix.add('leaves', i, (r() * 2 - 1 - lp) * sw * 0.02);
+    mix.add('leaves', i, lp * sw * 0.05);
   }
   // Spoon and plate clinks.
-  for (let t = 1; t < seconds - 1; t += 2.5 + r() * 4) {
+  for (let t = 2; t < seconds - 1; t += 5 + r() * 5) {
     const start = Math.round(t * SR);
-    const fs = [2100 + r() * 400, 3400 + r() * 500, 5100];
+    const fs = [1500 + r() * 300, 2300 + r() * 300];
     for (let k = 0; k < 0.25 * SR; k++) {
       const s = k / SR;
       let v = 0;
-      fs.forEach((f, j) => (v += Math.sin(TAU * f * s) * Math.exp(-s * (18 + j * 10))));
-      mix.add('fx', start + k, v * 0.025);
+      fs.forEach((f, j) => (v += Math.sin(TAU * f * s) * Math.exp(-s * (22 + j * 12))));
+      mix.add('fx', start + k, v * 0.01);
     }
   }
   // A jeepney horn far away (two tones, muffled).
@@ -259,17 +280,21 @@ function ambience() {
   return mix.master({
     levels: { crowd: 1, birds: 1, leaves: 1, fx: 1 },
     sends: { crowd: 0.1, birds: 0.35, leaves: 0.1, fx: 0.3 },
-    cutoff: 8000,
-    peak: 0.5,
+    cutoff: 3000,
+    peak: 0.3,
   });
 }
 
 // ---- Sound effects -------------------------------------------------------------------------------------
 
-function sfx(seconds, draw, peak = 0.7) {
+/**
+ * One sound effect. The low-pass (`cutoff`) keeps taps warm: most energy stays under 3 kHz, so a sound that
+ * plays twenty times a round never hisses (L-037).
+ */
+function sfx(seconds, draw, { peak = 0.6, cutoff = 4200 } = {}) {
   const mix = new Mix(seconds, 0.6);
   draw(mix, rng(seconds * 1000));
-  return mix.master({ loop: false, cutoff: 9500, peak, sends: { fx: 0.12 } });
+  return mix.master({ loop: false, cutoff, peak, sends: { fx: 0.12 } });
 }
 
 const blip = (mix, t, f0, f1, dur, vol, shape = 'sine') => {
@@ -289,69 +314,128 @@ const metal = (mix, t, fs, decay, vol) => {
     const s = k / SR;
     let v = 0;
     fs.forEach((f, j) => (v += Math.sin(TAU * f * s) * Math.exp(-s * decay * (1 + j * 0.6))));
-    mix.add('fx', start + k, (v / fs.length) * Math.min(1, s / 0.001) * vol);
+    mix.add('fx', start + k, (v / fs.length) * Math.min(1, s / 0.002) * vol);
   }
 };
-const noiseBurst = (mix, r, t, dur, vol, cutoff = 4000, hp = false) => {
+/** A short burst of low-passed noise (paper, a drawer, a pencil). */
+const noiseBurst = (mix, r, t, dur, vol, cutoff = 2500) => {
   const start = Math.round(t * SR);
   let lp = 0;
+  let lp2 = 0;
   const a = 1 - Math.exp((-TAU * cutoff) / SR);
   for (let k = 0; k < dur * SR; k++) {
     const s = k / SR;
-    const n = r() * 2 - 1;
-    lp += a * (n - lp);
-    const v = hp ? n - lp : lp;
-    mix.add('fx', start + k, v * Math.sin(Math.PI * Math.min(1, s / dur)) * vol);
+    lp += a * (r() * 2 - 1 - lp);
+    lp2 += a * (lp - lp2);
+    mix.add('fx', start + k, lp2 * Math.sin(Math.PI * Math.min(1, s / dur)) * vol);
   }
 };
 const note = (mix, r, t, midi, vel, kind = 'ep') => {
   if (kind === 'ep') mix.ep(t, midi, vel, 0.5, 'fx');
   else mix.pluck(t, midi, vel, r, { bus: 'fx', len: 1.2 });
 };
+/**
+ * A tiny voice: harmonics of a gliding pitch, shaped by one moving formant (the vowel) and a fixed low one.
+ * `f0` and `formant` are functions of the time in the sound (0..dur).
+ */
+const voice = (mix, t, dur, f0, formant, vol) => {
+  const start = Math.round(t * SR);
+  let ph = 0;
+  for (let k = 0; k < dur * SR; k++) {
+    const s = k / SR;
+    const f = f0(s);
+    ph += (TAU * f) / SR;
+    const F = formant(s);
+    let v = 0;
+    for (let h = 1; h <= 10; h++) {
+      const fh = f * h;
+      if (fh > 3400) break;
+      const amp = Math.exp(-(((fh - F) / 380) ** 2)) + 0.45 * Math.exp(-(((fh - 650) / 260) ** 2));
+      v += (Math.sin(ph * h) * amp) / h ** 0.3;
+    }
+    const env = Math.min(1, s / 0.03) * Math.min(1, (dur - s) / 0.08);
+    mix.add('fx', start + k, v * env * vol);
+  }
+};
+/** A jeepney horn honk: two detuned saw-ish tones a major third apart, low-passed (a friendly beep). */
+const honk = (mix, t, dur, vol) => {
+  const start = Math.round(t * SR);
+  const fs = [415, 523];
+  const ph = [0, 0.4];
+  let lp = 0;
+  let lp2 = 0;
+  const a = 1 - Math.exp((-TAU * 1400) / SR);
+  for (let k = 0; k < dur * SR; k++) {
+    const s = k / SR;
+    let v = 0;
+    for (let i = 0; i < 2; i++) {
+      ph[i] = (ph[i] + (fs[i] * (1 + 0.004 * Math.sin(TAU * 6 * s))) / SR) % 1;
+      v += ph[i] * 2 - 1;
+    }
+    lp += a * (v / 2 - lp);
+    lp2 += a * (lp - lp2);
+    const env = Math.min(1, s / 0.012) * Math.min(1, (dur - s) / 0.03);
+    mix.add('fx', start + k, lp2 * env * vol);
+  }
+};
 
 const SFX = {
   sfx_click: () =>
     sfx(0.12, (m, r) => {
       blip(m, 0, 1400, 1100, 0.03, 0.5);
-      noiseBurst(m, r, 0, 0.015, 0.25, 5000, true);
+      noiseBurst(m, r, 0, 0.012, 0.2, 3000);
     }),
+  // A soft wooden tok, like tapping a menu board.
   sfx_tab: () =>
-    sfx(0.18, (m, r) => {
-      noiseBurst(m, r, 0, 0.07, 0.5, 6000, true);
-      blip(m, 0.01, 900, 1300, 0.05, 0.25);
+    sfx(0.16, (m, r) => {
+      blip(m, 0, 760, 600, 0.05, 0.6, 'tri');
+      noiseBurst(m, r, 0, 0.02, 0.2, 1800);
     }),
   sfx_add: () =>
     sfx(0.25, (m) => {
       blip(m, 0, 320, 760, 0.08, 0.7);
-      metal(m, 0.05, [2600, 3900], 40, 0.15);
+      metal(m, 0.05, [1760, 2640], 40, 0.12);
     }),
   sfx_remove: () => sfx(0.2, (m) => blip(m, 0, 700, 300, 0.09, 0.6)),
   sfx_coin: () =>
-    sfx(0.4, (m) => {
-      metal(m, 0, [2810, 4210, 5630, 7100], 22, 0.8);
-      metal(m, 0.06, [2950, 4400], 30, 0.25);
-    }),
+    sfx(
+      0.4,
+      (m) => {
+        metal(m, 0, [2350, 3520, 4400], 26, 0.7);
+        metal(m, 0.06, [2480, 3700], 34, 0.2);
+      },
+      { peak: 0.45, cutoff: 5000 },
+    ),
+  // Paper bill: two soft flicks.
   sfx_bill: () =>
-    sfx(0.3, (m, r) => {
-      for (let k = 0; k < 5; k++) noiseBurst(m, r, k * 0.035, 0.05, 0.35 - k * 0.05, 5200, true);
+    sfx(0.28, (m, r) => {
+      noiseBurst(m, r, 0, 0.05, 0.45, 2200);
+      noiseBurst(m, r, 0.06, 0.06, 0.3, 1800);
     }),
   sfx_pay: () =>
-    sfx(0.9, (m, r) => {
-      noiseBurst(m, r, 0, 0.05, 0.5, 900); // drawer thunk
-      blip(m, 0, 140, 90, 0.08, 0.5);
-      metal(m, 0.08, [1568, 2349, 3136], 6, 0.9); // ka-ching bell
-      metal(m, 0.22, [2093, 3136], 6, 0.6);
-    }),
+    sfx(
+      0.9,
+      (m, r) => {
+        noiseBurst(m, r, 0, 0.05, 0.5, 700); // drawer thunk
+        blip(m, 0, 140, 90, 0.08, 0.5);
+        metal(m, 0.08, [1568, 2349, 3136], 9, 0.6); // ka-ching bell
+        metal(m, 0.22, [2093, 3136], 9, 0.4);
+      },
+      { peak: 0.55 },
+    ),
   sfx_sukli: () =>
-    sfx(0.8, (m) => {
-      for (let k = 0; k < 5; k++)
-        metal(m, k * 0.07, [2700 + k * 180, 4100 + k * 150, 5600], 26, 0.55);
-    }),
+    sfx(
+      0.8,
+      (m) => {
+        for (let k = 0; k < 4; k++) metal(m, k * 0.08, [2300 + k * 140, 3450 + k * 120], 30, 0.5);
+      },
+      { peak: 0.45, cutoff: 5000 },
+    ),
+  // Pencil tick: two short soft strokes.
   sfx_check: () =>
-    sfx(0.3, (m, r) => {
-      noiseBurst(m, r, 0, 0.05, 0.35, 3000, true);
-      noiseBurst(m, r, 0.07, 0.09, 0.45, 3500, true);
-      blip(m, 0.07, 1800, 2400, 0.08, 0.12);
+    sfx(0.28, (m, r) => {
+      noiseBurst(m, r, 0, 0.04, 0.35, 2000);
+      noiseBurst(m, r, 0.06, 0.07, 0.45, 2400);
     }),
   sfx_error: () =>
     sfx(0.5, (m) => {
@@ -359,14 +443,15 @@ const SFX = {
       blip(m, 0.17, 262, 220, 0.2, 0.45, 'tri');
     }),
   sfx_page: () =>
-    sfx(0.35, (m, r) => {
-      const start = 0;
+    sfx(0.32, (m, r) => {
       let lp = 0;
-      for (let k = 0; k < 0.28 * SR; k++) {
+      let lp2 = 0;
+      for (let k = 0; k < 0.26 * SR; k++) {
         const s = k / SR;
-        const c = 800 + 5000 * (s / 0.28);
-        lp += (1 - Math.exp((-TAU * c) / SR)) * (r() * 2 - 1 - lp);
-        m.add('fx', start + k, lp * Math.sin(Math.PI * (s / 0.28)) * 0.5);
+        const a = 1 - Math.exp((-TAU * (500 + 1600 * (s / 0.26))) / SR);
+        lp += a * (r() * 2 - 1 - lp);
+        lp2 += a * (lp - lp2);
+        m.add('fx', k, lp2 * Math.sin(Math.PI * (s / 0.26)) * 0.5);
       }
     }),
   // Win: a bright arpeggio on keys and guitar with a sparkle on top.
@@ -378,11 +463,9 @@ const SFX = {
           note(m, r, i * 0.11, n, 0.7, 'ep');
           note(m, r, i * 0.11 + 0.01, n + 12, 0.55, 'pluck');
         });
-        [79, 84].forEach((n, i) =>
-          metal(m, 0.6 + i * 0.12, [midiHz(n), midiHz(n) * 2.01], 5, 0.25),
-        );
+        [79, 84].forEach((n, i) => metal(m, 0.6 + i * 0.12, [midiHz(n), midiHz(n) * 2.01], 5, 0.2));
       },
-      0.75,
+      { peak: 0.7, cutoff: 5000 },
     ),
   // Game over: a gentle falling "aww" on keys, a soft low note to end.
   sfx_lose: () =>
@@ -393,8 +476,93 @@ const SFX = {
         note(m, r, 1.0, 50, 0.6, 'ep');
         note(m, r, 1.0, 55, 0.45, 'ep');
       },
-      0.7,
+      { peak: 0.65 },
     ),
+
+  // ---- Landing surprises (SPEC-homepage §3.5) and the map -------------------------------------------
+  // Jeepney horn: "beep-beep!"
+  sfx_jeep_horn: () =>
+    sfx(
+      0.55,
+      (m) => {
+        honk(m, 0, 0.14, 0.6);
+        honk(m, 0.2, 0.22, 0.6);
+      },
+      { peak: 0.55, cutoff: 3000 },
+    ),
+  // Sorbetes cart hand bell: "kling-kling".
+  sfx_sorbetes_bell: () =>
+    sfx(
+      0.9,
+      (m) => {
+        for (let k = 0; k < 3; k++) metal(m, k * 0.13, [1320, 2240, 3010], 11, 0.55 - k * 0.1);
+      },
+      { peak: 0.5, cutoff: 4000 },
+    ),
+  // Photocopier: three soft motor pulses and a paper slide.
+  sfx_printer: () =>
+    sfx(
+      0.75,
+      (m, r) => {
+        for (let k = 0; k < 3; k++) {
+          noiseBurst(m, r, k * 0.13, 0.08, 0.5, 600);
+          blip(m, k * 0.13, 120, 100, 0.08, 0.35, 'tri');
+        }
+        noiseBurst(m, r, 0.42, 0.22, 0.3, 1400);
+      },
+      { peak: 0.5, cutoff: 2500 },
+    ),
+  // Cat: "mi-aow", a little voice whose vowel opens and closes.
+  sfx_meow: () =>
+    sfx(
+      0.6,
+      (m) =>
+        voice(
+          m,
+          0,
+          0.5,
+          (s) => 520 + 240 * Math.sin(Math.PI * Math.min(1, s / 0.42)) - 60 * (s / 0.5),
+          (s) => 2200 - 1400 * Math.sin(Math.PI * Math.min(1, s / 0.45)),
+          0.35,
+        ),
+      { peak: 0.5, cutoff: 3200 },
+    ),
+  // LRT-2 door chime: three soft descending notes.
+  sfx_lrt_chime: () =>
+    sfx(1.4, (m, r) => [76, 72, 67].forEach((n, i) => note(m, r, i * 0.22, n, 0.55, 'ep')), {
+      peak: 0.55,
+      cutoff: 3500,
+    }),
+  // The barker calls out: a cheerful "ho-ey!" (two vowels, the pitch rising).
+  sfx_barker: () =>
+    sfx(
+      0.6,
+      (m) => {
+        voice(
+          m,
+          0,
+          0.2,
+          (s) => 170 + 30 * (s / 0.2),
+          () => 700,
+          0.4,
+        );
+        voice(
+          m,
+          0.22,
+          0.3,
+          (s) => 230 + 40 * Math.sin(Math.PI * (s / 0.3)),
+          (s) => 900 + 900 * (s / 0.3),
+          0.4,
+        );
+      },
+      { peak: 0.5, cutoff: 3000 },
+    ),
+  // Map stop: a soft wooden pop.
+  sfx_pin: () =>
+    sfx(0.18, (m, r) => {
+      blip(m, 0, 520, 780, 0.06, 0.6, 'tri');
+      noiseBurst(m, r, 0, 0.015, 0.15, 1500);
+    }),
 };
 
 // ---- Write -------------------------------------------------------------------------------------------

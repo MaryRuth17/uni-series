@@ -1,6 +1,6 @@
 /**
- * A tap-only button (SPEC §6): three states (normal, hover, pressed moves down 1 px), click sound,
- * optional disabled look and icon. Drawn with the nine-slice art: `ui_board` (the yellow jeepney route
+ * A tap-only button (SPEC §6): three states (normal, hover, pressed moves down 1 px), a tap sound
+ * (sfx_click unless `sound` says otherwise), optional disabled look and icon. Drawn with the nine-slice art: `ui_board` (the yellow jeepney route
  * board, for main actions) or `ui_button` (cream, tinted for other colours).
  */
 import Phaser from 'phaser';
@@ -16,6 +16,11 @@ export interface ButtonOptions {
   fontSize?: number;
   /** Texture key of a 16×16 icon shown instead of (or beside) the label. */
   icon?: string;
+  /**
+   * Sound on tap: defaults to sfx_click. Pass another key for a themed sound, or null when the handler
+   * plays its own, so two sounds never stack (L-037).
+   */
+  sound?: string | null;
 }
 
 const SLICE = 6;
@@ -26,6 +31,7 @@ export class Button extends Phaser.GameObjects.Container {
   private readonly baseTint: number;
   private enabled = true;
   private onClick: () => void;
+  private readonly sound: string | null;
 
   constructor(
     scene: Phaser.Scene,
@@ -37,6 +43,7 @@ export class Button extends Phaser.GameObjects.Container {
   ) {
     super(scene, x, y);
     this.onClick = onClick;
+    this.sound = opts.sound === undefined ? 'sfx_click' : opts.sound;
     const fill = opts.fill ?? COLORS.cream;
     const board = fill === COLORS.yellow;
     const h = Math.max(opts.height, SLICE * 2);
@@ -79,7 +86,7 @@ export class Button extends Phaser.GameObjects.Container {
     this.on('pointerup', () => {
       this.label.setY(-1);
       if (!this.enabled) return;
-      services().audio.sfx('sfx_click');
+      if (this.sound) services().audio.sfx(this.sound);
       this.onClick();
     });
     scene.add.existing(this);

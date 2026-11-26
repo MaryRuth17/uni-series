@@ -70,6 +70,41 @@
         "type": "audio",
         "key": "sfx_lose",
         "url": "assets/audio/sfx_lose.wav"
+      },
+      {
+        "type": "audio",
+        "key": "sfx_jeep_horn",
+        "url": "assets/audio/sfx_jeep_horn.wav"
+      },
+      {
+        "type": "audio",
+        "key": "sfx_sorbetes_bell",
+        "url": "assets/audio/sfx_sorbetes_bell.wav"
+      },
+      {
+        "type": "audio",
+        "key": "sfx_printer",
+        "url": "assets/audio/sfx_printer.wav"
+      },
+      {
+        "type": "audio",
+        "key": "sfx_meow",
+        "url": "assets/audio/sfx_meow.wav"
+      },
+      {
+        "type": "audio",
+        "key": "sfx_lrt_chime",
+        "url": "assets/audio/sfx_lrt_chime.wav"
+      },
+      {
+        "type": "audio",
+        "key": "sfx_barker",
+        "url": "assets/audio/sfx_barker.wav"
+      },
+      {
+        "type": "audio",
+        "key": "sfx_pin",
+        "url": "assets/audio/sfx_pin.wav"
       }
     ]
   }

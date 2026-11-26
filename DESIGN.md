@@ -424,6 +424,23 @@ changed (language, reset, profile). Esc closes. A confirm box inside an overlay 
 `gameEvents.emit('toast', { text, ms? })`. Box: `ink` at 0.92 alpha with a 1 px `cream` stroke, 18 high, text 8 px
 `cream`, centred at (320, 330). One at a time; 2000 ms default, then a 200 ms fade.
 
+### Food card (Lagoon stalls, L-038)
+
+A `panel()` card, 156×88, three per row (`FRONT.cards`): the food picture at 2× on the left; name (8 px `ink`, wrapped),
+a `ui_tag` price tag (`red`), busog (`grey`) on the right; a full-width `success` strip at the bottom names the listahan
+line it ticks. Hover tints the card to 0.9; sold out fades it to 0.45 and it cannot be tapped. Tap anywhere to add.
+
+### Guide ring and bubble (L-039)
+
+The next tap gets a 2 px `gold` outline that pulses (alpha 1 to 0.3, 500 ms, off with Reduced Motion). The speech
+bubble is a `panel()` the width of the stall area, over the banner (or over the tray bar while paying), with 8 px
+`ink` text and a yellow Next button when it needs one.
+
+### Button sounds
+
+`Button` plays `sfx_click` on release. Pass `sound: 'sfx_…'` for a themed sound, or `sound: null` when the handler
+plays its own, so one tap never makes two sounds (L-037).
+
 ### Other pieces
 
 - **School ID name field**: the only HTML element in the game: 110x16, 10 px Pixelify Sans, `#FFFFFF` fill, 1 px `#2B2233`
@@ -483,7 +500,7 @@ changed (language, reset, profile). Esc closes. A confirm box inside an overlay 
 3. **44x44 touch targets** for the HUD and small buttons (H-001, H5).
 4. **Master palette.** Colours are split across `theme.ts`, `home/config.ts` `PALETTE`, scene-local literals and the art
    scripts; there is no single named list, and the SPEC palette is mostly unused.
-5. **Semantic colours.** Success green `#3A9A6A` is used but not named in `theme.ts`; a warning colour is not defined
+5. **Semantic colours.** Success green `#3A9A6A` is now `COLORS.success` (edge `COLORS.successEdge`) in `theme.ts`; a warning colour is not defined
    (SPEC lists `#F08A3E`, unused). The `grey` secondary text and the `red` on `yellow` play label are below 4.5:1.
 6. **Typography details.** Line height, paragraph spacing and letter spacing are Phaser defaults; no text-size or
    high-contrast option.

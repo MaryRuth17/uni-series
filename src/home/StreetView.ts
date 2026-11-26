@@ -10,7 +10,7 @@ import { t } from '../core/i18n';
 import { Random } from '../core/Random';
 import { services } from '../core/services';
 import { COLORS, TEXT, textStyle } from '../ui/theme';
-import { DEPTH, PALETTE, ROUTES, STREET } from './config';
+import { DEPTH, HOME_SFX, PALETTE, ROUTES, STREET } from './config';
 import { type SpawnEvent, type SpawnKind, StreetSpawner } from './StreetSpawner';
 import { type SurpriseKey, Surprises } from './Surprises';
 import type { Phase } from './TimeOfDay';
@@ -416,7 +416,7 @@ export class StreetView {
     const audio = services().audio;
     switch (key) {
       case 'jeep':
-        audio.sfx('sfx_jeep_horn');
+        audio.sfx(HOME_SFX.jeepHorn);
         this.bubble(STREET.barkerX + 6, 286, t(this.rng.pick(BARKER_LINES)));
         this.bubble(this.parkedJeep.x - 20, 318, t('landing.beep'));
         if (!this.reduced)
@@ -429,10 +429,11 @@ export class StreetView {
           });
         break;
       case 'barker':
+        audio.sfx(HOME_SFX.barker);
         this.bubble(STREET.barkerX + 6, 286, t(this.rng.pick(BARKER_LINES)));
         break;
       case 'cart': {
-        audio.sfx('sfx_sorbetes_bell');
+        audio.sfx(HOME_SFX.sorbetesBell);
         const treat = s.add
           .container(STREET.cartX, 284, [
             s.add.triangle(0, 4, -4, 0, 4, 0, 0, 10, 0xd9a066),
@@ -449,7 +450,7 @@ export class StreetView {
         break;
       }
       case 'print':
-        audio.sfx('sfx_printer');
+        audio.sfx(HOME_SFX.printer);
         for (let i = 0; i < 3; i++) {
           const paper = s.add
             .rectangle(170, 268, 6, 8, 0xffffff)
@@ -468,7 +469,7 @@ export class StreetView {
         }
         break;
       case 'cat': {
-        audio.sfx('sfx_meow');
+        audio.sfx(HOME_SFX.meow);
         const at =
           this.phase === 'gabi'
             ? { x: STREET.streetlightX + 12, y: 300 }
@@ -491,7 +492,7 @@ export class StreetView {
         break;
       }
       case 'train':
-        audio.sfx('sfx_lrt_chime');
+        audio.sfx(HOME_SFX.lrtChime);
         s.tweens.add({
           targets: this.trainSprite,
           alpha: 0.4,

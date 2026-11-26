@@ -15,7 +15,7 @@ import { services } from '../../../core/services';
 import { FADE_MS } from '../../../home/config';
 import { Button } from '../../../ui/Button';
 import { COLORS, SCENES, TEXT, textStyle } from '../../../ui/theme';
-import { LAGOON_AMBIENCE, LAGOON_MUSIC, OPENING } from '../config';
+import { LAGOON_AMBIENCE, LAGOON_MUSIC, OPENING, SFX } from '../config';
 import { LAGOON_INTRO } from './LagoonIntroScene';
 
 export const LAGOON_OPENING = 'LagoonOpening';
@@ -169,6 +169,7 @@ export class LagoonOpeningScene extends Phaser.Scene {
   /** The "How to play" card: four steps with pictures. */
   private showHow(): void {
     this.stage = 'how';
+    services().audio.sfx(SFX.page);
     const c = this.add.container(320, 186).setDepth(UI_DEPTH + 5);
     c.add(this.add.rectangle(0, -16, 640, 400, COLORS.ink, 0.45).setInteractive());
     // A notebook page with four steps, each a taped-in picture, a number badge, a title and a note.

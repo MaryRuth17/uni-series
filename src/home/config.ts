@@ -76,6 +76,17 @@ export const RIDE = {
 
 export const FADE_MS = 400;
 
+/** Sound keys for the landing surprises (§3.5) and the map (baked by scripts/audio, L-037). */
+export const HOME_SFX = {
+  jeepHorn: 'sfx_jeep_horn',
+  sorbetesBell: 'sfx_sorbetes_bell',
+  printer: 'sfx_printer',
+  meow: 'sfx_meow',
+  lrtChime: 'sfx_lrt_chime',
+  barker: 'sfx_barker',
+  pin: 'sfx_pin',
+} as const;
+
 /** Draw order per landing layer (SPEC-homepage §7). */
 export const DEPTH = {
   sky: 0,

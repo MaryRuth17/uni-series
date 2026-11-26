@@ -14,6 +14,7 @@ import audioLagoon from '../../../public/assets/audio/audio_lagoon.json';
 import { MENU } from '../../../src/minigames/pup-lagoon/data/menu';
 import { STALLS } from '../../../src/minigames/pup-lagoon/data/stalls';
 import { SFX } from '../../../src/minigames/pup-lagoon/config';
+import { HOME_SFX } from '../../../src/home/config';
 import storefronts from '../../../src/minigames/pup-lagoon/data/storefronts.json';
 
 interface ManifestEntry {
@@ -189,9 +190,24 @@ describe('music, ambience and sound effects (L-031, L-035)', () => {
     expect(home).toContain('sfx_click');
     expect(lagoon).toEqual(['music_lagoon', 'amb_lagoon']);
     for (const key of Object.values(SFX)) expect(home, key).toContain(key);
+    for (const key of Object.values(HOME_SFX)) expect(home, key).toContain(key);
     for (const f of [...audioHome.audio_home.files, ...audioLagoon.audio_lagoon.files]) {
       expect(f.type).toBe('audio');
       expect(f.url.startsWith('assets/audio/')).toBe(true);
     }
+  });
+
+  it('bakes every sfx_ key the code asks for (a missing key plays nothing, L-037)', () => {
+    const sources = import.meta.glob('../../../src/**/*.ts', {
+      query: '?raw',
+      import: 'default',
+      eager: true,
+    });
+    const baked = new Set(audioHome.audio_home.files.map((f) => f.key));
+    const asked = new Set<string>();
+    for (const text of Object.values(sources) as string[])
+      for (const match of text.matchAll(/'(sfx_[a-z0-9_]+)'/g)) asked.add(match[1]);
+    expect(asked.size).toBeGreaterThan(10);
+    for (const key of asked) expect(baked.has(key), key).toBe(true);
   });
 });
