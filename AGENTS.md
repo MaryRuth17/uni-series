@@ -9,7 +9,8 @@ Brief for every AI agent (Claude Code, Codex, others) working in this repo, usua
 3. `SPEC-pup-lagoon.md`: the PUP minigame **Lagoon Merienda** (L1–L7). Wins over SPEC.md §4. **Its section 0 (owner
    changes: endless, no days, no clock, stamps instead of stars) wins over the rest of that file.**
 4. `DECISIONS.md`: choices already made and open questions (`Q-…`). Add every new decision there.
-5. The milestone or task you were given (build order: the note at the top of SPEC §10). Do only that.
+5. `DESIGN.md`: how the game looks (colours, fonts, buttons, panels, layout, scaling) and the design do's and don'ts. The source of truth for any UI or art work; update it when the look changes.
+6. The milestone or task you were given (build order: the note at the top of SPEC §10). Do only that.
 
 ## Status
 
