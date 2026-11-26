@@ -21,16 +21,19 @@ export const TIER_STARTS: readonly { tier: Tier; from: number }[] = [
   { tier: 4, from: 21 },
 ];
 
-/** Stalls that open at each tier (OC-4, §7). The water station opens with the Tumbler. */
+/**
+ * Stalls that open at each tier. Owner change (DECISIONS L-030): there are no levels, so every food stall is
+ * open from the first vacant. The water station still opens with the Tumbler (an Ipon Shop item).
+ */
 export const STALLS_OPEN_FROM: Readonly<Record<Exclude<StallKey, 'water'>, Tier>> = {
   karinderya: 1,
   tusok: 1,
   palamig: 1,
   ihaw: 1,
-  merienda: 2,
-  lugawan: 2,
-  halohalo: 3,
-  silog: 3,
+  merienda: 1,
+  lugawan: 1,
+  halohalo: 1,
+  silog: 1,
 };
 
 /** Vacant n uses SLOT_ORDER[n % 3], so the tutorial (n = 1) is tanghali, then hapon, umaga, … (OC-4). */
@@ -202,19 +205,29 @@ export const VIEW = {
 
 /** The storefront screen (owner change, DECISIONS L-026): a 512×220 front, the menu, the button bar. */
 export const FRONT = {
+  /** Stall tabs along the top. */
+  tabsY: 24,
+  tabsH: 16,
+  /** The storefront picture. */
   x: 0,
-  y: 24,
+  y: 40,
   w: 512,
   h: 220,
-  menuY: 250,
-  menuRowH: 27,
-  barY: 344,
-  /** The line of students in front of the stall: first place, spacing, how many are drawn. */
-  lineX: 300,
-  lineGap: 24,
-  lineMax: 8,
+  /** The menu: two columns, three rows. */
+  menuY: 264,
+  menuRowH: 24,
+  /** The bar with what to do next and the main button. */
+  barY: 348,
+  barH: 24,
+  /** The line in front of the counter, on the right (students at 2×, the player at 1×: both 48 px). */
+  lineX: 380,
+  lineGap: 32,
+  lineMax: 4,
   steamMs: 450,
 };
+
+/** Music (owner request, DECISIONS L-031): a cozy lo-fi loop made by scripts/audio/build.mjs. */
+export const LAGOON_MUSIC = 'music_lagoon';
 
 /** Stall order for keys 1–8 (§10.3, §7 order). */
 export const STALL_KEYS_ORDER: readonly StallKey[] = [

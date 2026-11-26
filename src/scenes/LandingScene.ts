@@ -18,7 +18,7 @@ import { isDecember, phaseAt } from '../home/TimeOfDay';
 import { Button } from '../ui/Button';
 import { openOverlay } from '../ui/overlay';
 import { COLORS, SCENES, TEXT, textStyle } from '../ui/theme';
-import { avatarSprite } from '../ui/avatar';
+import { avatarHead } from '../ui/avatar';
 import type { Language } from '../core/SaveManager';
 
 const REGISTRY_STARTED = 'landing.started';
@@ -45,6 +45,8 @@ export class LandingScene extends Phaser.Scene {
     this.input.keyboard?.on('keydown-ENTER', () => this.play());
     this.events.once('shutdown', () => this.input.keyboard?.removeAllListeners());
     this.cameras.main.fadeIn(FADE_MS, 0x2b, 0x22, 0x33);
+    // Plays once audio is unlocked by the first tap (Tap to start).
+    services().audio.playMusic('music_home', this);
 
     if (!this.registry.get(REGISTRY_STARTED)) this.showTapToStart(reduced);
     else this.welcome();
@@ -115,7 +117,7 @@ export class LandingScene extends Phaser.Scene {
           height: L.idChip.h,
         },
       );
-      chip.add(avatarSprite(this, -46, -3, profile, 0.5));
+      chip.add(avatarHead(this, -46, 0, profile));
       chip.label.setText(profile.name).setX(10);
       chip.setDepth(DEPTH.ui);
     }

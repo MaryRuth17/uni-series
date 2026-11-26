@@ -307,16 +307,6 @@ function calendar(p, x, y) {
   p.px(x + 11, y + 21, '#d94b3d');
   p.rect(x + 10, y - 2, 2, 3, '#55505f');
 }
-
-function smallSign(p, x, y, w, h, bg, fg) {
-  // A small printed sign; its words are drawn as text lines (no real wording).
-  p.rect(x + 1, y + 1, w, h, '#00000030');
-  p.rect(x, y, w, h, bg);
-  p.stroke(x, y, w, h, fg);
-  for (let k = 0; k < Math.floor((h - 4) / 4); k++)
-    p.hline(x + 3, y + 3 + k * 4, w - 6 - (k % 2) * 4, fg);
-}
-
 /** Strips of snack packs hanging from the overhang (generic colours, no brands): a sari-sari staple. */
 function snackStrips(p, x0, x1, y) {
   const colors = ['#d94b3d', '#f2c14e', '#3b6fb6', '#3a9a6a', '#f08a3c', '#e98ab0', '#8a5ab8'];
@@ -383,7 +373,6 @@ function kioskBase(p, key, layout) {
   grime(p, 0, 40, FRONT_W, 110, '#d2ccc0', 260, key.length);
   wallClock(p, 86, 52);
   calendar(p, 104 + s.w + 2, 44);
-  smallSign(p, 196, 40, 34, 9, '#fff4dc', '#d94b3d');
   plasticBags(p, 6, 46);
   vendor(p, layout.vendor[0], layout.vendor[1], LOOKS[1]);
   // Glass case: red frame, fluorescent tube, an upper shelf of extra trays, the main shelf.

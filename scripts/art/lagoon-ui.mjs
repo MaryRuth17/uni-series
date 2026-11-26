@@ -59,7 +59,6 @@ function bill(value, base, w = 36, h = 18) {
   const big = new Pix(18, 7);
   big.text(0, 0, String(value), '#fff8e6', '5x7');
   p.blit(big, 5, 5);
-  p.text(w - 4 - p.textWidth(String(value), '3x5'), h - 7, String(value), shade(base, 0.45), '3x5');
   p.outline(INK);
   return p;
 }

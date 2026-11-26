@@ -63,7 +63,8 @@ describe('Solver: rules', () => {
   });
 
   it('returns null when nothing can complete the list within maxCost', () => {
-    const r = solve([tag('L1', 'sabaw')], candidatesFor(1), 0);
+    // The cheapest sabaw (lugaw) costs ₱25.
+    const r = solve([tag('L1', 'sabaw')], candidatesFor(1), 0, 20);
     expect(r.minCost).toBeNull();
     const capped = solve([tag('L1', 'kanin')], candidatesFor(1), 0, 40);
     expect(capped.minCost).toBeNull();

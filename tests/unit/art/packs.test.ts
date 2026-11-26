@@ -9,6 +9,7 @@ import mapManifest from '../../../public/assets/map/manifest.json';
 import mapPack from '../../../public/assets/map/pack.json';
 import lagoonManifest from '../../../public/assets/lagoon/manifest.json';
 import lagoonPack from '../../../public/assets/lagoon/pack.json';
+import audioPack from '../../../public/assets/audio/pack.json';
 import { MENU } from '../../../src/minigames/pup-lagoon/data/menu';
 import { STALLS } from '../../../src/minigames/pup-lagoon/data/stalls';
 import storefronts from '../../../src/minigames/pup-lagoon/data/storefronts.json';
@@ -175,5 +176,16 @@ describe('Lagoon art (L6)', () => {
     expect(frames('ui_bowl')).toBe(2);
     expect(frames('ui_slot')).toBe(3);
     expect(byKey.get('lagoon_how')?.frame).toEqual([104, 72]);
+  });
+});
+
+describe('music (L-031)', () => {
+  it('ships the home and Lagoon loops with relative URLs', () => {
+    const keys = audioPack.audio.files.map((f) => f.key);
+    expect(keys).toEqual(['music_home', 'music_lagoon']);
+    for (const f of audioPack.audio.files) {
+      expect(f.type).toBe('audio');
+      expect(f.url.startsWith('assets/audio/')).toBe(true);
+    }
   });
 });

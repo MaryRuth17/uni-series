@@ -13,7 +13,7 @@ import { services } from '../../../core/services';
 import { FADE_MS } from '../../../home/config';
 import { Button } from '../../../ui/Button';
 import { COLORS, SCENES, TEXT, textStyle } from '../../../ui/theme';
-import { TIER_STARTS } from '../config';
+import { LAGOON_MUSIC, TIER_STARTS } from '../config';
 import { lineText, loadProgress } from '../lagoonSave';
 import { openStalls, tierFor } from '../logic/Catalog';
 import { generateVacant, type GeneratedVacant } from '../logic/ListahanGen';
@@ -133,6 +133,7 @@ export class LagoonIntroScene extends Phaser.Scene {
     this.input.keyboard?.on('keydown-ESC', () => this.back());
     this.events.once('shutdown', () => this.input.keyboard?.removeAllListeners());
     this.cameras.main.fadeIn(FADE_MS, 0x2b, 0x22, 0x33);
+    services().audio.playMusic(LAGOON_MUSIC, this);
   }
 
   /** Stalls that open on this vacant (the first vacant of a tier). */

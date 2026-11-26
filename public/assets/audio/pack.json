@@ -1,0 +1,16 @@
+{
+  "audio": {
+    "files": [
+      {
+        "type": "audio",
+        "key": "music_home",
+        "url": "assets/audio/music_home.wav"
+      },
+      {
+        "type": "audio",
+        "key": "music_lagoon",
+        "url": "assets/audio/music_lagoon.wav"
+      }
+    ]
+  }
+}

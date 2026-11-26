@@ -4,6 +4,7 @@
  * Listens to: pointer; Enter or Esc goes back to the campus map.
  */
 import Phaser from 'phaser';
+import { services } from '../core/services';
 import { sceneConfig } from '../ui/view';
 import { t } from '../core/i18n';
 import { FADE_MS } from '../home/config';
@@ -37,6 +38,7 @@ export class ComingSoonScene extends Phaser.Scene {
     this.input.keyboard?.on('keydown-ESC', () => this.back());
     this.events.once('shutdown', () => this.input.keyboard?.removeAllListeners());
     this.cameras.main.fadeIn(FADE_MS, 0x2b, 0x22, 0x33);
+    services().audio.playMusic('music_home', this);
   }
 
   private back(): void {

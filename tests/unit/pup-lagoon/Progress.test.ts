@@ -98,15 +98,8 @@ describe('Progress (OC-6, OC-7, OC-11)', () => {
     expect(favouriteFood([])).toBeNull();
   });
 
-  it('announces stalls that open on the next vacant', () => {
-    expect(applyOutcome(newProgress(1), outcome(5)).report.newStalls.sort()).toEqual([
-      'lugawan',
-      'merienda',
-    ]);
-    expect(applyOutcome(newProgress(1), outcome(12)).report.newStalls.sort()).toEqual([
-      'halohalo',
-      'silog',
-    ]);
-    expect(applyOutcome(newProgress(1), outcome(7)).report.newStalls).toEqual([]);
+  it('never announces new stalls: every stall is open from the start (L-030)', () => {
+    for (const n of [5, 7, 12, 20])
+      expect(applyOutcome(newProgress(1), outcome(n)).report.newStalls).toEqual([]);
   });
 });
