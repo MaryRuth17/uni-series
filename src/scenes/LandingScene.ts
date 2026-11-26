@@ -18,7 +18,7 @@ import { isDecember, phaseAt } from '../home/TimeOfDay';
 import { Button } from '../ui/Button';
 import { openOverlay } from '../ui/overlay';
 import { COLORS, SCENES, TEXT, textStyle } from '../ui/theme';
-import { avatarHead } from '../ui/avatar';
+import { avatarPortrait, PORTRAIT_SIZE } from '../ui/avatar';
 import type { Language } from '../core/SaveManager';
 
 const REGISTRY_STARTED = 'landing.started';
@@ -118,8 +118,10 @@ export class LandingScene extends Phaser.Scene {
           height: L.idChip.h,
         },
       );
-      chip.add(avatarHead(this, -46, 0, profile));
-      chip.label.setText(profile.name).setX(10);
+      // Framed portrait at the left end, the name centred in the rest of the tag.
+      const px = -L.idChip.w / 2 + 2 + PORTRAIT_SIZE.w / 2;
+      chip.add(avatarPortrait(this, px, 0, profile));
+      chip.label.setText(profile.name).setX((px + PORTRAIT_SIZE.w / 2 + L.idChip.w / 2) / 2);
       chip.setDepth(DEPTH.ui);
     }
 
@@ -215,7 +217,8 @@ export class LandingScene extends Phaser.Scene {
       );
     };
     if (reduced) go();
-    else
+    else {
+      this.street.startParkedJeep();
       this.tweens.add({
         targets: this.street.parkedJeep,
         x: 720,
@@ -223,5 +226,6 @@ export class LandingScene extends Phaser.Scene {
         ease: 'Sine.easeIn',
         onComplete: go,
       });
+    }
   }
 }

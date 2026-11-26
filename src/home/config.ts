@@ -41,7 +41,7 @@ export const LANDING = {
   subtitle: { x: 320, y: 112 },
   play: { x: 320, y: 146, w: 176, h: 36 },
   icons: { xs: [548, 580, 612], y: 20, size: 28 },
-  idChip: { x: 70, y: 20, w: 120, h: 28 },
+  idChip: { x: 70, y: 21, w: 120, h: 36 },
   welcomeMs: 2000,
   logoBobPx: 2,
   logoBobMs: 3000,
@@ -51,7 +51,7 @@ export const LANDING = {
 export const MAP = {
   home: { x: 20, y: 20 },
   toggle: { x: 64, y: 20, w: 56, h: 24 },
-  idChip: { x: 160, y: 20, w: 120, h: 24 },
+  idChip: { x: 180, y: 21, w: 120, h: 36 },
   ipon: { x: 480, y: 20 },
   stickers: { x: 560, y: 20 },
   settings: { x: 612, y: 20 },

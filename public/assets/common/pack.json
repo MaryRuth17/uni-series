@@ -53,6 +53,11 @@
       },
       {
         "type": "image",
+        "key": "icon_close",
+        "url": "assets/common/icon_close.png"
+      },
+      {
+        "type": "image",
         "key": "icon_list",
         "url": "assets/common/icon_list.png"
       },

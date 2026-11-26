@@ -36,7 +36,7 @@ import { Button } from '../ui/Button';
 import { openOverlay } from '../ui/overlay';
 import { panel } from '../ui/Panel';
 import { COLORS, SCENES, TEXT, textStyle } from '../ui/theme';
-import { avatarHead } from '../ui/avatar';
+import { avatarPortrait, PORTRAIT_SIZE } from '../ui/avatar';
 
 export interface CampusMapData {
   /** A message to show on arrival, e.g. "+₱25 sa alkansya!" after a vacant. */
@@ -579,10 +579,18 @@ export class CampusMapScene extends Phaser.Scene {
     hud(this.toggle);
     if (save.profile) {
       // The School ID chip only shows who is playing; the character is made on the landing (H4).
-      const chip = this.add.container(180, MAP.idChip.y, [
-        panel(this, 0, 0, MAP.idChip.w, 22),
-        avatarHead(this, -48, 0, save.profile),
-        this.add.text(8, -1, save.profile.name, textStyle(8)).setOrigin(0.5),
+      const px = -MAP.idChip.w / 2 + 2 + PORTRAIT_SIZE.w / 2;
+      const chip = this.add.container(MAP.idChip.x, MAP.idChip.y, [
+        panel(this, 0, 0, MAP.idChip.w, MAP.idChip.h),
+        avatarPortrait(this, px, 0, save.profile),
+        this.add
+          .text(
+            (px + PORTRAIT_SIZE.w / 2 + MAP.idChip.w / 2) / 2,
+            -1,
+            save.profile.name,
+            textStyle(8),
+          )
+          .setOrigin(0.5),
       ]);
       hud(chip);
     }

@@ -298,11 +298,11 @@ the existing ones are (below).
 
 | Area                         | Position                                                                                                              |
 | ---------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| Landing top row              | y 20: ID chip x 70 (120x28), EN / FIL toggle x 462 and 508 (44x22 each), icons x 548, 580, 612 (28x28 each)           |
+| Landing top row              | y 20: ID name tag x 70, y 21 (120x36), EN / FIL toggle x 462 and 508 (44x22 each), icons x 548, 580, 612 (28x28 each) |
 | Landing title block          | Logo at (320, 63) (`logo_uniseries`, 281x59); subtitle (320, 112); play board (320, 146), 176x36                      |
 | Landing footer strip         | y 348 to 360, 640x12, `ink` at 0.75 alpha; version text left (x 4), disclaimer centred; both 8 px `cream`            |
 | Landing street layers (y)    | sky 0-186, far city 120-186, LRT-2 track 170-186, shop row 186-300, sidewalk 300-318, street 318-348 (footer to 360)  |
-| Campus map HUD               | Top row y 20: home x 20, Mapa/Listahan toggle x 64 (56x24), ID chip x 160 (120x24), ipon x 480, stickers x 560, settings x 612. Bottom row y 334: sticker book x 28, album x 612 |
+| Campus map HUD               | Top row y 20: home x 20, Mapa/Listahan toggle x 64 (56x24), ID name tag x 180, y 21 (120x36), ipon x 480, stickers x 560, settings x 612. Bottom row y 334: sticker book x 28, album x 612 |
 | Campus card / list           | Card 360x150 (thumb 96); list rows 560x64, gap 8, from y 44 to 326                                                    |
 | Overlays                     | Centred at (320, 180): Pause 200x150, Settings 300x260, Credits 400x260, Coming soon 320x140 (centre y 170), reset confirm 220x90, School ID card 328x214 |
 | Lagoon stalls screen         | Top bar 24 high; stall tabs y 24, 16 high; storefront 512x200 at (0, 40); menu from y 244, rows 24; tray bar y 316, 44 high; right column x 514 to 638: listahan 124x176, busog 120x38, wallet 120x102 |
@@ -348,11 +348,14 @@ There are no CSS or Phaser drop shadows on UI. Depth is drawn into the art or ma
   corners"; the art is the truth. The HTML name field uses `border-radius: 2px`. Toast and tab rectangles are square.
 - **Nine-slice.** `ui_panel`, `ui_button`, `ui_board`: 24x24 source, 6 px border on every side. Minimum size is 12x12
   (panel) and 12 high (button).
-- **Icons.** 16x16 with an `ink` outline: settings, credits, stickers, album, home, map, list (`icon_*`, `ui.mjs`).
+- **Icons.** 16x16 with an `ink` outline: settings, credits, stickers, album, home, map, list, close (`icon_*`, `ui.mjs`).
+  `icon_close` is a red tile with a white X, for card headers on the `ink` bar; its hit area is 28x28.
 - **Logo.** `logo_uniseries` (281x59) is an image, never live text: "UNI SERIES" in 5x7 pixel letters scaled 5x, arched,
   red face with a chrome highlight band, yellow then `ink` outline, drop shadow (`ui.mjs logo()`).
 - **Characters.** Avatar frames are 48x48, layered: body (skin), outfit, ID lace, hair (`avatar_*`). Street walkers are
-  16x24 (6 variants). `avatarHead` shows a 1x 24x24 crop for chips, never a shrunken sprite.
+  16x24 (6 variants). `avatarPortrait` shows a 1x 34x32 crop (frame x 8-41, y 0-31, which holds every hair pixel of
+  all 16 styles) in a School ID photo frame (`#BFD8E8`, `#8FB3C9` band, 1 px `ink` frame, 36x34 outside) at the left of
+  the name tags, never a shrunken sprite.
 - **Sizes of common art** (manifests): coins 12x12 (1) to 18x18 (20), bills 36x18, food e.g. 24x24, map pin 22x30 frames,
   parked jeepney 80x40 frames, LRT train 220x24 frames, storefront 512x220, Lagoon intro panorama 960x360.
 
@@ -398,8 +401,8 @@ container with a centred label and an optional 16x16 icon.
 Label: `textStyle(fontSize ?? 8, textColor ?? ink, { align: 'center' })`, origin centre. Height is at least 12.
 Sizes in use: Pause menu 140x22; Close 80x20 (Settings, Credits, Sticker Book, Album), 64x24 (map card), 64x20 (Lagoon),
 60x22 (School ID); Back 96x24; Skip 48x20 (map) and 56 wide (Lagoon intro); reset confirm 88x20; landing play board 176x36 and
-Lagoon "Heto po!" board 120x22, both with a 16 px `red` label; icon buttons 28x28; EN/FIL toggle 44x22; ID chips 120x28
-(landing) and 120x24 (map); Settings volume "-" 18x16. Observed heights run from 16 to 24 (36 for the landing board). `TODO: not defined yet`: a rule for max
+Lagoon "Heto po!" board 120x22, both with a 16 px `red` label; icon buttons 28x28; EN/FIL toggle 44x22; ID name tags 120x36
+(landing and map; portrait at the left, name centred in the rest); Settings volume "-" 18x16. Observed heights run from 16 to 24 (36 for the landing board). `TODO: not defined yet`: a rule for max
 label length per width beyond the 12 px border budget above.
 
 ### Panel and backdrop (`src/ui/Panel.ts`)
@@ -416,7 +419,8 @@ label length per width beyond the 12 px border budget above.
 Backdrop (0.6) + centred panel + `heading` title at the top + content + a Close or Back button at the bottom.
 `openOverlay(scene, key, data)` pauses the current scene, launches the overlay with `{ from }` and brings it to the
 top. `closeOverlay(overlay, from, restartFrom)` resumes the scene underneath, or restarts it when text or progress
-changed (language, reset, profile). Esc closes. A confirm box inside an overlay uses a second dim at 0.5 and a
+changed (language, reset, profile). Esc closes. The School ID card also has a red X (`icon_close`) at the right
+of its header bar; X and Esc close it without saving, the first-time card too. A confirm box inside an overlay uses a second dim at 0.5 and a
 220x90 panel.
 
 ### Toast (`src/scenes/ToastScene.ts`)
