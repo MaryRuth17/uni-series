@@ -47,6 +47,7 @@ export class LandingScene extends Phaser.Scene {
     this.cameras.main.fadeIn(FADE_MS, 0x2b, 0x22, 0x33);
     // Plays once audio is unlocked by the first tap (Tap to start).
     services().audio.playMusic('music_home', this);
+    services().audio.setAmbience(null, this);
 
     if (!this.registry.get(REGISTRY_STARTED)) this.showTapToStart(reduced);
     else this.welcome();

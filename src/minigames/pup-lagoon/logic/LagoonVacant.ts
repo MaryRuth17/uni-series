@@ -1,12 +1,13 @@
 /**
  * One vacant of Lagoon Merienda: the round the scene, the tests and `npm run sim` all drive
  * (SPEC-pup-lagoon §4, §13 "LagoonDay", renamed by OC-1). No clock (OC-2): update(dtMs) only moves the
- * pila, the grill wait and the sold-out moment.
+ * grill wait and the sold-out moment (and the pila, which is off since L-033: joinPila goes straight to
+ * the counter).
  *
  * Commands return { ok, reason? }. Events queue up; the scene reads them with drainEvents().
  * Money is conserved: wallet + spent always equals the starting wallet (baon + pasabay money).
  */
-import { BUO, HEARTS, SUKI, VISIT } from '../config';
+import { BUO, HEARTS, PILA, SUKI, VISIT } from '../config';
 import { Random } from '../../../core/Random';
 import { menuItem } from '../data/menu';
 import { STALLS } from '../data/stalls';
@@ -124,7 +125,7 @@ export class LagoonVacant {
     this.open = new Set(gen.open);
     for (const s of STALLS) {
       this.boxes.set(s.key, new CashBox(gen.cashBoxes[s.key]));
-      if (s.key !== 'water' && this.open.has(s.key)) {
+      if (PILA.enabled && s.key !== 'water' && this.open.has(s.key)) {
         this.pilas.set(
           s.key,
           Pila.create(s, gen.def.slot, gen.hot, gen.longLineStall === s.key, this.rng),
@@ -234,8 +235,13 @@ export class LagoonVacant {
   joinPila(stall: StallKey): Result {
     if (this.finished) return { ok: false, reason: 'finished' };
     if (this.queueStall || this.counter) return { ok: false, reason: 'busy' };
+    if (stall === 'water' || !this.open.has(stall)) return { ok: false, reason: 'closed' };
     const pila = this.pilas.get(stall);
-    if (!pila) return { ok: false, reason: 'closed' };
+    if (!pila) {
+      // No lines (L-033): straight to the counter.
+      this.arriveAtCounter(stall);
+      return { ok: true };
+    }
     this.queueStall = stall;
     if (pila.join() === 'counter') this.arriveAtCounter(stall);
     this.events.push({ type: 'pilaChanged', stall });

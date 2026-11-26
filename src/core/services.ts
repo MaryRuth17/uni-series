@@ -6,7 +6,7 @@ import type Phaser from 'phaser';
 import { AudioManager } from './AudioManager';
 import { gameEvents } from './GameEvents';
 import { setLanguage } from './i18n';
-import { browserStorage, SaveManager } from './SaveManager';
+import { clearBrowserSave, memoryStorage, SaveManager } from './SaveManager';
 import { Settings } from './Settings';
 
 export interface Services {
@@ -21,7 +21,9 @@ export function initServices(game: Phaser.Game): Services {
   const reducedMotion =
     typeof window.matchMedia === 'function' &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const save = new SaveManager(browserStorage(), {
+  // Session only (D-052): progress lives in memory and is gone when the website is closed.
+  clearBrowserSave();
+  const save = new SaveManager(memoryStorage(), {
     reducedMotion,
     onFail: (reason) => gameEvents.emit('save:failed', { reason }),
   });

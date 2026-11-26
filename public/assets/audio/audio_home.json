@@ -1,0 +1,76 @@
+{
+  "audio_home": {
+    "files": [
+      {
+        "type": "audio",
+        "key": "music_home",
+        "url": "assets/audio/music_home.wav"
+      },
+      {
+        "type": "audio",
+        "key": "sfx_click",
+        "url": "assets/audio/sfx_click.wav"
+      },
+      {
+        "type": "audio",
+        "key": "sfx_tab",
+        "url": "assets/audio/sfx_tab.wav"
+      },
+      {
+        "type": "audio",
+        "key": "sfx_add",
+        "url": "assets/audio/sfx_add.wav"
+      },
+      {
+        "type": "audio",
+        "key": "sfx_remove",
+        "url": "assets/audio/sfx_remove.wav"
+      },
+      {
+        "type": "audio",
+        "key": "sfx_coin",
+        "url": "assets/audio/sfx_coin.wav"
+      },
+      {
+        "type": "audio",
+        "key": "sfx_bill",
+        "url": "assets/audio/sfx_bill.wav"
+      },
+      {
+        "type": "audio",
+        "key": "sfx_pay",
+        "url": "assets/audio/sfx_pay.wav"
+      },
+      {
+        "type": "audio",
+        "key": "sfx_sukli",
+        "url": "assets/audio/sfx_sukli.wav"
+      },
+      {
+        "type": "audio",
+        "key": "sfx_check",
+        "url": "assets/audio/sfx_check.wav"
+      },
+      {
+        "type": "audio",
+        "key": "sfx_error",
+        "url": "assets/audio/sfx_error.wav"
+      },
+      {
+        "type": "audio",
+        "key": "sfx_page",
+        "url": "assets/audio/sfx_page.wav"
+      },
+      {
+        "type": "audio",
+        "key": "sfx_win",
+        "url": "assets/audio/sfx_win.wav"
+      },
+      {
+        "type": "audio",
+        "key": "sfx_lose",
+        "url": "assets/audio/sfx_lose.wav"
+      }
+    ]
+  }
+}

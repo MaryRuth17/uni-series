@@ -9,9 +9,11 @@ import mapManifest from '../../../public/assets/map/manifest.json';
 import mapPack from '../../../public/assets/map/pack.json';
 import lagoonManifest from '../../../public/assets/lagoon/manifest.json';
 import lagoonPack from '../../../public/assets/lagoon/pack.json';
-import audioPack from '../../../public/assets/audio/pack.json';
+import audioHome from '../../../public/assets/audio/audio_home.json';
+import audioLagoon from '../../../public/assets/audio/audio_lagoon.json';
 import { MENU } from '../../../src/minigames/pup-lagoon/data/menu';
 import { STALLS } from '../../../src/minigames/pup-lagoon/data/stalls';
+import { SFX } from '../../../src/minigames/pup-lagoon/config';
 import storefronts from '../../../src/minigames/pup-lagoon/data/storefronts.json';
 
 interface ManifestEntry {
@@ -179,11 +181,15 @@ describe('Lagoon art (L6)', () => {
   });
 });
 
-describe('music (L-031)', () => {
-  it('ships the home and Lagoon loops with relative URLs', () => {
-    const keys = audioPack.audio.files.map((f) => f.key);
-    expect(keys).toEqual(['music_home', 'music_lagoon']);
-    for (const f of audioPack.audio.files) {
+describe('music, ambience and sound effects (L-031, L-035)', () => {
+  it('ships the loops and every sound effect the game plays, with relative URLs', () => {
+    const home = audioHome.audio_home.files.map((f) => f.key);
+    const lagoon = audioLagoon.audio_lagoon.files.map((f) => f.key);
+    expect(home).toContain('music_home');
+    expect(home).toContain('sfx_click');
+    expect(lagoon).toEqual(['music_lagoon', 'amb_lagoon']);
+    for (const key of Object.values(SFX)) expect(home, key).toContain(key);
+    for (const f of [...audioHome.audio_home.files, ...audioLagoon.audio_lagoon.files]) {
       expect(f.type).toBe('audio');
       expect(f.url.startsWith('assets/audio/')).toBe(true);
     }

@@ -13,7 +13,7 @@ import { services } from '../../../core/services';
 import { FADE_MS } from '../../../home/config';
 import { Button } from '../../../ui/Button';
 import { COLORS, SCENES, TEXT, textStyle } from '../../../ui/theme';
-import { LAGOON_MUSIC, TIER_STARTS } from '../config';
+import { LAGOON_AMBIENCE, LAGOON_MUSIC, TIER_STARTS } from '../config';
 import { lineText, loadProgress } from '../lagoonSave';
 import { openStalls, tierFor } from '../logic/Catalog';
 import { generateVacant, type GeneratedVacant } from '../logic/ListahanGen';
@@ -63,7 +63,8 @@ export class LagoonIntroScene extends Phaser.Scene {
       )
       .setOrigin(0, 0.5);
 
-    const notes: string[] = [];
+    // The owner's rule first (L-034): stay within the baon, buy the whole listahan.
+    const notes: string[] = [t('pupLagoon.card.rule', { baon: def.baon })];
     if (def.special === 'tutorial') notes.push(t('pupLagoon.ui.tutorial'));
     if (def.special === 'pdp') notes.push(t('pupLagoon.ui.petsa'));
     if (def.special === 'kinsenas' || def.special === 'katapusan')
@@ -134,6 +135,7 @@ export class LagoonIntroScene extends Phaser.Scene {
     this.events.once('shutdown', () => this.input.keyboard?.removeAllListeners());
     this.cameras.main.fadeIn(FADE_MS, 0x2b, 0x22, 0x33);
     services().audio.playMusic(LAGOON_MUSIC, this);
+    services().audio.setAmbience(LAGOON_AMBIENCE, this);
   }
 
   /** Stalls that open on this vacant (the first vacant of a tier). */

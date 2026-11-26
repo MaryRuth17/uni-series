@@ -15,7 +15,7 @@ import { services } from '../../../core/services';
 import { FADE_MS } from '../../../home/config';
 import { Button } from '../../../ui/Button';
 import { COLORS, SCENES, TEXT, textStyle } from '../../../ui/theme';
-import { LAGOON_MUSIC, OPENING } from '../config';
+import { LAGOON_AMBIENCE, LAGOON_MUSIC, OPENING } from '../config';
 import { LAGOON_INTRO } from './LagoonIntroScene';
 
 export const LAGOON_OPENING = 'LagoonOpening';
@@ -29,6 +29,12 @@ export class LagoonOpeningScene extends Phaser.Scene {
 
   constructor() {
     super(sceneConfig(LAGOON_OPENING));
+  }
+
+  /** The Lagoon music and ambience load on arrival (about 3.5 MB), so the first screen opens faster. */
+  preload(): void {
+    if (!this.cache.audio.exists(LAGOON_MUSIC))
+      this.load.pack('audio_lagoon', 'assets/audio/audio_lagoon.json', 'audio_lagoon');
   }
 
   create(): void {
@@ -129,6 +135,7 @@ export class LagoonOpeningScene extends Phaser.Scene {
     this.events.once('shutdown', () => kb?.removeAllListeners());
     for (const cam of [main, this.uiCam]) cam.fadeIn(FADE_MS, 0x2b, 0x22, 0x33);
     services().audio.playMusic(LAGOON_MUSIC, this);
+    services().audio.setAmbience(LAGOON_AMBIENCE, this);
   }
 
   private makeAnims(): void {

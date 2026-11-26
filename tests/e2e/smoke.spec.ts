@@ -70,16 +70,19 @@ test('first launch: tap to start, School ID, map, ride to PUP, Lagoon, pause, ba
   await page.getByTestId('id-name').fill('Ana');
   await tap(page, 426, 267); // Done!
   await waitForScene(page, 'CampusMap');
-  expect(
-    await page.evaluate(
-      () => JSON.parse(localStorage.getItem('uni-series-save') ?? '{}').profile?.name,
-    ),
-  ).toBe('Ana');
-  expect(
-    await page.evaluate(
-      () => JSON.parse(localStorage.getItem('uni-series-save') ?? '{}').profile?.gender,
-    ),
-  ).toBe('boy');
+  // Session only (D-052): the profile is in memory, and nothing is written to localStorage.
+  const profile = (): Promise<{ name?: string; gender?: string } | null> =>
+    page.evaluate(
+      () =>
+        (
+          window as unknown as {
+            __uniSave: () => { profile: { name: string; gender: string } | null };
+          }
+        ).__uniSave().profile,
+    );
+  expect((await profile())?.name).toBe('Ana');
+  expect((await profile())?.gender).toBe('boy');
+  expect(await page.evaluate(() => localStorage.getItem('uni-series-save'))).toBeNull();
 
   await page.waitForTimeout(500);
   await tap(page, 555, 244); // PUP pin
@@ -97,35 +100,57 @@ test('first launch: tap to start, School ID, map, ride to PUP, Lagoon, pause, ba
   await waitForScene(page, 'LagoonStalls');
   await page.waitForTimeout(500);
 
-  // L6: the karinderya storefront (key 1), flip to the next stall and back, Pumila (Enter) joins the line.
-  await page.keyboard.press('1'); // the karinderya storefront
-  await page.keyboard.press('ArrowRight'); // Next: the tusok cart (FEWA)
-  await page.keyboard.press('ArrowLeft'); // back to the karinderya
-  await page.keyboard.press('Enter');
-  const location = (): Promise<string | null> =>
+  // L3: no pila, every stall open. At the karinderya counter, add the first meal (tap its menu row),
+  // pay with Smart pay, and check the money moved and the listahan ticked.
+  const state = (): Promise<{
+    stall: string | null;
+    spent: number;
+    tray: number;
+    wallet: number;
+  }> =>
     page.evaluate(() => {
       const game = (window as unknown as { __uniGame: { scene: { getScene(k: string): unknown } } })
         .__uniGame;
       const scene = game.scene.getScene('LagoonStalls') as {
-        vacant: { location: { stall: string } | null };
+        vacant: {
+          location: { stall: string } | null;
+          spent: number;
+          currentOrder: unknown[];
+          wallet: { total: number };
+        };
       };
-      return scene.vacant.location?.stall ?? null;
+      const v = scene.vacant;
+      return {
+        stall: v.location?.stall ?? null,
+        spent: v.spent,
+        tray: v.currentOrder.length,
+        wallet: v.wallet.total,
+      };
     });
-  await expect.poll(location, { timeout: 15_000 }).toBe('karinderya');
-  await page.keyboard.press('Escape'); // leave the line
-  await expect.poll(location).toBeNull();
-
-  await page.keyboard.press('p'); // pause
-  await waitForScene(page, 'Pause');
-  await tap(page, 320, 216); // Back to map
+  await page.keyboard.press('ArrowRight'); // the tusok cart (FEWA)
+  await page.keyboard.press('ArrowLeft'); // back to the karinderya
+  await expect.poll(async () => (await state()).stall).toBe('karinderya');
+  await tap(page, 129, 255); // the first menu row: a rice meal
+  await expect.poll(async () => (await state()).tray).toBe(1);
+  await page.keyboard.press('b'); // Bayad
+  await page.waitForTimeout(300);
+  await page.keyboard.press('s'); // Smart pay
+  await page.keyboard.press('Enter'); // Heto po!
+  await expect.poll(async () => (await state()).spent).toBeGreaterThan(0);
+  // The tutorial baon cannot also buy the tusok line after a ₱70 meal: game over (owner rule), then start over.
+  await waitForScene(page, 'LagoonResult');
+  await page.waitForTimeout(500);
+  await page.keyboard.press('Enter'); // Start over
+  await waitForScene(page, 'LagoonIntroScene');
+  await page.keyboard.press('Escape'); // back to the campus map
   await waitForScene(page, 'CampusMap');
 
-  // A returning player skips the School ID.
+  // Nothing is kept once the website is closed (D-052): after a reload the School ID is made again.
   await page.reload();
   await waitForScene(page, 'Landing');
   await tap(page, 320, 250);
   await page.waitForTimeout(700);
   await tap(page, 320, 146);
-  await waitForScene(page, 'CampusMap');
+  await waitForScene(page, 'IdCard');
   expect(errors).toEqual([]);
 });

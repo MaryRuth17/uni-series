@@ -146,6 +146,7 @@ export class CampusMapScene extends Phaser.Scene {
 
     this.fadeIn();
     services().audio.playMusic('music_home', this);
+    services().audio.setAmbience(null, this);
     if (data.from === 'landing' && !this.reduced) {
       main.setZoom(RENDER_SCALE * MAP_AMBIENT.unfoldFrom);
       main.zoomTo(RENDER_SCALE, FADE_MS, 'Sine.easeOut');
