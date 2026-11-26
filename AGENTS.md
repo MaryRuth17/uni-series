@@ -87,3 +87,15 @@ commit message like `M2: wok cooking states`. Then stop and report: what you bui
 - Reference photos live only in the owner's main checkout `docs/reference/` (gitignored; see its README). Never ship or trace them.
 - Clamp the frame delta for logic: `sim.update(Math.min(delta, 100))`.
 - Load Pixelify Sans with `document.fonts.load()` in the Preloader before any scene draws text.
+
+<!-- codegraph:start -->
+## Code navigation (codegraph)
+
+1. **Use codegraph first.** This project is TypeScript/JavaScript and codegraph indexes all of it. For any code question (structure, call flow, "what uses X", where something is defined), call the codegraph MCP tool `mcp__codegraph__codegraph_explore` with `projectPath: "C:/Users/Mary/Documents/Godot/uni-series"` as the FIRST step, before grepping or opening files. CLI equivalents, run in the project folder: `codegraph explore <query>`, `codegraph query <name>`, `codegraph callers <symbol>`, `codegraph callees <symbol>`, `codegraph impact <symbol>`, `codegraph files`; `codegraph status` shows what is indexed.
+2. **What is indexed:** 118 files, 2,114 symbols:
+   - TypeScript: 100 files (`src/` 68, `tests/` 28, `scripts/sim.ts`, and `vite.config.ts`, `vitest.config.ts`, `playwright.config.ts`).
+   - JavaScript: 17 files (`scripts/art/*.mjs`, `scripts/audio/*.mjs`, `scripts/sim.mjs`, `eslint.config.js`).
+   - YAML: 1 file (`.github/workflows/deploy.yml`, 0 symbols).
+   - Not indexed: JSON (`src/i18n/*.json`, `package.json`, `tsconfig.json`), Markdown specs, `index.html`, and `public/assets/`. Read those directly.
+3. **Keeping it fresh.** The index updates automatically as files change. If results look stale after edits, run `codegraph sync` in the project folder.
+<!-- codegraph:end -->
