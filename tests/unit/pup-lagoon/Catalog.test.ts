@@ -34,10 +34,9 @@ describe('Catalog', () => {
     expect([1, 5, 6, 12, 13, 20, 21, 500].map(tierFor)).toEqual([1, 1, 2, 2, 3, 3, 4, 4]);
   });
 
-  it('opens stalls by tier and the water station with the Tumbler', () => {
-    expect(openStalls(1, []).sort()).toEqual(['ihaw', 'karinderya', 'palamig', 'tusok']);
-    expect(openStalls(2, [])).toContain('lugawan');
-    expect(openStalls(3, [])).toHaveLength(8);
+  it('opens every food stall from the first vacant, and the water station with the Tumbler (L-030)', () => {
+    for (const tier of [1, 2, 3, 4] as const) expect(openStalls(tier, [])).toHaveLength(8);
+    expect(openStalls(1, [])).not.toContain('water');
     expect(openStalls(1, ['tumbler'])).toContain('water');
   });
 

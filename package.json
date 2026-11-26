@@ -18,7 +18,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "sim": "node scripts/sim.mjs",
-    "art": "node scripts/art/build.mjs"
+    "art": "node scripts/art/build.mjs",
+    "audio": "node scripts/audio/build.mjs"
   },
   "dependencies": {
     "phaser": "^4.2.1"

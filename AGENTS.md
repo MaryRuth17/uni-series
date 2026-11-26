@@ -23,7 +23,7 @@ Brief for every AI agent (Claude Code, Codex, others) working in this repo, usua
 | H3 — Living map | Done: zoom toward stops, ambient life, time-of-day tint, unfold transition, list drag |
 | L3 — Buying and paying | Next |
 | L4–L5 | Not started |
-| H4 + L6 — Art and audio (made by Claude, DECISIONS R-006) | H4 done (D-040–D-051). L6 part 1 done: PUP intro (Anonas St front) + How to play, storefront play screen (no map), food art (L-019–L-028). HUD art and audio not started |
+| H4 + L6 — Art and audio (made by Claude, DECISIONS R-006) | H4 done (D-040–D-051). L6 part 1 done: PUP intro, How to play, storefront play screen with tabs (no map, all stalls open), notebook HUD, food and money art, lo-fi music (L-019–L-032). Sound effects not started |
 | H5 + L7 + M6 — Polish; M7 — Release | Not started |
 | M2–M5 | Replaced by L1–L7 |
 

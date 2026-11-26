@@ -370,3 +370,21 @@ Specs: [SPEC.md](SPEC.md) (§), [SPEC-homepage.md](SPEC-homepage.md) (H§), [SPE
   tags. The Vacant card is a notebook page over a dimmed PUP front, with the baon as coins and bills and the busog
   target as bowls; How to play is a notebook page with four taped-in pictures and numbered steps; the stalls HUD is a
   cork board with the listahan page (ticked lines struck through), the busog bowls and the wallet's coins and bills.
+- **L-030 — Every stall is open from the first vacant (owner: "there will be no levels").** `STALLS_OPEN_FROM` is 1 for
+  all eight food stalls, so the Vacant card never announces new stalls. The water station still needs the Tumbler
+  (an Ipon Shop item) and only shows as a tab once it is owned. Tiers still shape baon, busog targets and events.
+  `npm run sim`: 40,000 vacants, 0 failures.
+- **L-031 — Cozy lo-fi music (owner).** `scripts/audio/` composes and renders two seamless loops with no
+  dependencies (`npm run audio`): `music_home` (landing, campus map, Coming soon: C major, 84 BPM, 46 s) and
+  `music_lagoon` (PUP intro, Vacant card, stalls: F major, 76 BPM, 51 s). Each has an electric piano, a plucked
+  guitar (Karplus-Strong) melody, a warm bass, swung soft drums, vinyl crackle and a small reverb. They ship as 16 kHz
+  mono 16-bit WAV (about 1.5 MB each) because there is no OGG/M4A encoder without a new dependency (SPEC §6 asks for
+  .ogg + .m4a; revisit if the owner approves an encoder). Played through `AudioManager.playMusic` with the Settings
+  music volume; audio starts after the first tap.
+- **L-032 — A clearer stalls screen (owner: "still confusing", "characters glitch").** Tabs with every stall's short
+  name along the top (the current one raised; a green dot where the player is lined up), arrows on the storefront's
+  sides, the line of students on the right so it never covers the stall's name, the player tagged "You", a menu
+  with price and busog and a green badge naming the listahan lines a food would tick, and one bar at the bottom that
+  says what to do next with a single main button. People are drawn only at whole-number scales (students at 2×, the
+  player at 1×); the small chips on the landing and map show a 1× cropped head (`avatarHead`) instead of a shrunken
+  character. Small art clean-ups: no stray sticker on the kiosk glass, no corner number on bills.

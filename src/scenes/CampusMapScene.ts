@@ -35,7 +35,7 @@ import { Button } from '../ui/Button';
 import { openOverlay } from '../ui/overlay';
 import { panel } from '../ui/Panel';
 import { COLORS, SCENES, TEXT, textStyle } from '../ui/theme';
-import { avatarSprite } from '../ui/avatar';
+import { avatarHead } from '../ui/avatar';
 
 export interface CampusMapData {
   /** A message to show on arrival, e.g. "+₱25 sa alkansya!" after a vacant. */
@@ -145,6 +145,7 @@ export class CampusMapScene extends Phaser.Scene {
     this.syncCameras();
 
     this.fadeIn();
+    services().audio.playMusic('music_home', this);
     if (data.from === 'landing' && !this.reduced) {
       main.setZoom(RENDER_SCALE * MAP_AMBIENT.unfoldFrom);
       main.zoomTo(RENDER_SCALE, FADE_MS, 'Sine.easeOut');
@@ -578,7 +579,7 @@ export class CampusMapScene extends Phaser.Scene {
       // The School ID chip only shows who is playing; the character is made on the landing (H4).
       const chip = this.add.container(180, MAP.idChip.y, [
         panel(this, 0, 0, MAP.idChip.w, 22),
-        avatarSprite(this, -48, -3, save.profile, 0.42),
+        avatarHead(this, -48, 0, save.profile),
         this.add.text(8, -1, save.profile.name, textStyle(8)).setOrigin(0.5),
       ]);
       hud(chip);

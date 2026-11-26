@@ -41,6 +41,7 @@ export class PreloaderScene extends Phaser.Scene {
     this.load.pack('common', 'assets/common/pack.json', 'common');
     this.load.pack('map', 'assets/map/pack.json', 'map');
     this.load.pack('lagoon', 'assets/lagoon/pack.json', 'lagoon');
+    this.load.pack('audio', 'assets/audio/pack.json', 'audio');
   }
 
   create(): void {

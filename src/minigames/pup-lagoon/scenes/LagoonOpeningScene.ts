@@ -15,7 +15,7 @@ import { services } from '../../../core/services';
 import { FADE_MS } from '../../../home/config';
 import { Button } from '../../../ui/Button';
 import { COLORS, SCENES, TEXT, textStyle } from '../../../ui/theme';
-import { OPENING } from '../config';
+import { LAGOON_MUSIC, OPENING } from '../config';
 import { LAGOON_INTRO } from './LagoonIntroScene';
 
 export const LAGOON_OPENING = 'LagoonOpening';
@@ -128,6 +128,7 @@ export class LagoonOpeningScene extends Phaser.Scene {
     kb?.on('keydown-ESC', () => this.leave(SCENES.campusMap));
     this.events.once('shutdown', () => kb?.removeAllListeners());
     for (const cam of [main, this.uiCam]) cam.fadeIn(FADE_MS, 0x2b, 0x22, 0x33);
+    services().audio.playMusic(LAGOON_MUSIC, this);
   }
 
   private makeAnims(): void {

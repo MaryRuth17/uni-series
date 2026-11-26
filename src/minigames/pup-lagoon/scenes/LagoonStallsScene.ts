@@ -1,11 +1,13 @@
 /**
- * LagoonStallsScene — buying merienda at the Lagoon, one storefront at a time (owner change, DECISIONS L-026)
- * Shows: the current stall's front (front_<stall> art) with its name, promo sign and live price tags, steam
- * from the pots and the grill, the line of students in front of it (the player too, once lined up), the menu
- * (food, name, price, cravings, busog), Prev / Next through the stalls, Pumila / Leave line (Refill at the
- * water station), the top bar (vacant, slot, event, pause) and the HUD column (listahan, busog, wallet).
- * There is no walkable map: Pumila joins the line at once. Buying at the counter arrives in L3.
- * Listens to: pointer; keyboard (1–8 stalls, ← / → prev / next, Enter = Pumila, Esc = leave the line,
+ * LagoonStallsScene — buying merienda at the Lagoon, one storefront at a time (owner changes, DECISIONS L-026, L-030)
+ * Shows: tabs with every stall's name along the top (the current one raised); the current stall's front
+ * (front_<stall> art) with its name, promo sign, live price tags and steam, and arrows to the next and
+ * previous stall; the line of students in front of the counter (the player marked "You" once lined up);
+ * the menu (food, name, price, busog, and a green Listahan badge on food that ticks a line still open);
+ * a bar with what to do next and one main button (Pumila / Leave line / Refill); the top bar (vacant, slot,
+ * event, pause) and the cork-board HUD (listahan, busog, wallet). People are drawn only at whole-number
+ * scales so their pixels stay crisp. Buying at the counter arrives in L3.
+ * Listens to: pointer; keyboard (1–8 stalls, ← / → previous / next, Enter = Pumila, Esc = leave the line,
  * P = pause); LagoonVacant events (pilaChanged, atCounter, ticked); the frame update (the pila, ≤ 100 ms).
  */
 import Phaser from 'phaser';
@@ -19,15 +21,15 @@ import { panel } from '../../../ui/Panel';
 import { COLORS, TEXT, textStyle } from '../../../ui/theme';
 import { avatarSprite } from '../../../ui/avatar';
 import { PAUSE } from '../../../scenes/PauseScene';
-import { FRONT, STALL_KEYS_ORDER, VIEW } from '../config';
+import { FRONT, LAGOON_MUSIC, STALL_KEYS_ORDER, VIEW } from '../config';
 import { MENU } from '../data/menu';
 import storefronts from '../data/storefronts.json';
 import { lineText, loadProgress } from '../lagoonSave';
-import { purchaseEffect } from '../logic/Catalog';
+import { purchaseEffect, type PurchaseEffect } from '../logic/Catalog';
 import { LagoonVacant } from '../logic/LagoonVacant';
 import type { GeneratedVacant } from '../logic/ListahanGen';
 import { moneyTotal } from '../logic/Money';
-import type { StallKey } from '../logic/types';
+import type { ListahanLine, StallKey } from '../logic/types';
 import { bowlRow, walletGrid } from '../objects/lagoonUi';
 import { LAGOON_INTRO, LAGOON_STALLS } from './LagoonIntroScene';
 
@@ -39,12 +41,13 @@ interface FrontLayout {
   steam: number[][];
 }
 const LAYOUT = storefronts as unknown as Record<StallKey, FrontLayout>;
-/** Prev / Next order: the stalls in their 1–8 order, then the water station. */
-const ORDER: readonly StallKey[] = [...STALL_KEYS_ORDER, 'water'];
 
 export class LagoonStallsScene extends Phaser.Scene {
   private vacant!: LagoonVacant;
   private stall: StallKey = 'karinderya';
+  /** The stalls the player can visit: every food stall, and the water station once the Tumbler is owned. */
+  private order: StallKey[] = [];
+  private tabs!: Phaser.GameObjects.Container;
   private front!: Phaser.GameObjects.Container;
   private line!: Phaser.GameObjects.Container;
   private bar!: Phaser.GameObjects.Container;
@@ -69,10 +72,12 @@ export class LagoonStallsScene extends Phaser.Scene {
     });
     this.reduced = services().save.data.settings.reducedMotion;
     this.steam = null;
-    // Start at the first open stall.
-    this.stall = ORDER.find((s) => this.vacant.gen.open.includes(s)) ?? 'karinderya';
+    const all: StallKey[] = [...STALL_KEYS_ORDER, 'water'];
+    this.order = all.filter((s) => this.vacant.gen.open.includes(s));
+    this.stall = this.order[0] ?? 'karinderya';
 
     this.add.rectangle(VIEW.mapRight / 2, 192, VIEW.mapRight, 336, 0xefe9dc);
+    this.tabs = this.add.container(0, 0).setDepth(12);
     this.front = this.add.container(0, 0);
     this.line = this.add.container(0, 0).setDepth(10);
     this.bar = this.add.container(0, 0).setDepth(20);
@@ -81,6 +86,7 @@ export class LagoonStallsScene extends Phaser.Scene {
     this.drawHud();
     this.showStall(this.stall);
     this.bindKeys();
+    services().audio.playMusic(LAGOON_MUSIC, this);
     this.cameras.main.fadeIn(FADE_MS, 0x2b, 0x22, 0x33);
   }
 
@@ -91,16 +97,56 @@ export class LagoonStallsScene extends Phaser.Scene {
       if (e.type === 'pilaChanged' || e.type === 'atCounter') {
         this.drawLine();
         this.drawBar();
+        this.drawTabs();
       }
-      if (e.type === 'ticked') this.drawHud();
+      if (e.type === 'ticked') {
+        this.drawHud();
+        this.showStall(this.stall);
+      }
     }
   }
-
-  // ---- The storefront ----------------------------------------------------------------------------
 
   private get busy(): boolean {
     return this.vacant.location !== null;
   }
+
+  // ---- Tabs ----------------------------------------------------------------------------------------
+
+  /** One tab per stall with its short name; the current stall's tab is raised and cream. */
+  private drawTabs(): void {
+    this.tabs.removeAll(true);
+    const n = this.order.length;
+    const w = VIEW.mapRight / n;
+    const y = FRONT.tabsY;
+    const here = this.vacant.location?.stall ?? null;
+    this.order.forEach((stall, i) => {
+      const on = stall === this.stall;
+      const x = i * w;
+      const bg = this.add
+        .rectangle(x + w / 2, y + FRONT.tabsH / 2, w - 2, FRONT.tabsH, on ? 0xfff4dc : 0xcfc6b0)
+        .setStrokeStyle(1, on ? COLORS.red : 0x8a8494);
+      this.tabs.add(bg);
+      if (on)
+        this.tabs.add(this.add.rectangle(x + w / 2, y + FRONT.tabsH - 1, w - 4, 2, COLORS.red));
+      this.tabs.add(
+        this.add
+          .text(
+            x + w / 2,
+            y + FRONT.tabsH / 2,
+            t(`pupLagoon.tab.${stall}`),
+            textStyle(8, on ? TEXT.red : busyColor(this.busy && !on)),
+          )
+          .setOrigin(0.5),
+      );
+      // A dot on the stall where the player is lined up.
+      if (here === stall) this.tabs.add(this.add.circle(x + w - 7, y + 5, 3, 0x3a9a6a));
+      if (!this.busy && !on) {
+        bg.setInteractive({ useHandCursor: true }).on('pointerup', () => this.showStall(stall));
+      }
+    });
+  }
+
+  // ---- The storefront ----------------------------------------------------------------------------
 
   private showStall(stall: StallKey): void {
     this.stall = stall;
@@ -110,17 +156,15 @@ export class LagoonStallsScene extends Phaser.Scene {
     const F = FRONT;
     const L = LAYOUT[stall];
     const g = this.vacant.gen;
-    const isOpen = g.open.includes(stall);
     const add = <T extends Phaser.GameObjects.GameObject>(o: T): T => {
       this.front.add(o);
       return o;
     };
-    const art = add(this.add.image(F.x, F.y, `front_${stall}`).setOrigin(0));
-    if (!isOpen) art.setTint(0x8a8494);
+    add(this.add.image(F.x, F.y, `front_${stall}`).setOrigin(0));
 
     // The stall's name: on the red front (kiosks) or on the black board (stall row).
-    const name = stall === 'water' ? t('pupLagoon.stall.water') : t(`pupLagoon.stall.${stall}`);
-    const maxW = L.style === 'row' ? 184 : 440;
+    const name = t(`pupLagoon.stall.${stall}`);
+    const maxW = L.style === 'row' ? 184 : 300;
     let label = this.add.text(L.name.x, F.y + L.name.y, name, textStyle(16, L.name.color));
     if (label.width > maxW) {
       label.destroy();
@@ -140,17 +184,6 @@ export class LagoonStallsScene extends Phaser.Scene {
           .setOrigin(0.5),
       );
     }
-    if (stall === 'tusok')
-      add(
-        this.add
-          .text(
-            300,
-            F.y + 178,
-            t('pupLagoon.front.fewa'),
-            textStyle(8, TEXT.cream, { backgroundColor: '#D94B3D', padding: { x: 4, y: 2 } }),
-          )
-          .setOrigin(0.5),
-      );
 
     // Price tags under the food on display (they follow promos and sell-outs).
     const items = MENU.filter((m) => m.stall === stall && m.orderable !== false);
@@ -158,7 +191,7 @@ export class LagoonStallsScene extends Phaser.Scene {
       const [x, y] = L.items[i] ?? [0, 0];
       const e = purchaseEffect(m.key, undefined, g.promo);
       const sold = this.vacant.isSoldOut(m.key);
-      const label = this.add
+      const tag = this.add
         .text(
           x + 2,
           F.y + y + 34,
@@ -166,68 +199,80 @@ export class LagoonStallsScene extends Phaser.Scene {
           textStyle(8, sold ? TEXT.grey : TEXT.red),
         )
         .setOrigin(0.5);
-      add(
-        this.add.nineslice(x, F.y + y + 34, 'ui_tag', undefined, label.width + 12, 13, 5, 3, 3, 3),
-      );
-      add(label);
+      add(this.add.nineslice(x, F.y + y + 34, 'ui_tag', undefined, tag.width + 12, 13, 5, 3, 3, 3));
+      add(tag);
     });
-    if (!isOpen) {
-      const msg =
-        stall === 'water' ? t('pupLagoon.board.needsTumbler') : t('pupLagoon.front.closed');
-      add(
-        this.add
-          .text(
-            F.x + F.w / 2,
-            F.y + F.h / 2,
-            msg,
-            textStyle(16, TEXT.cream, {
-              align: 'center',
-              wordWrap: { width: 320 },
-              backgroundColor: '#2B2233',
-              padding: { x: 8, y: 6 },
-            }),
-          )
-          .setOrigin(0.5),
-      );
+
+    // Arrows to the previous and next stall, on the storefront's sides.
+    if (this.order.length > 1) {
+      for (const dir of [-1, 1] as const) {
+        const arrow = new Button(
+          this,
+          dir < 0 ? 14 : VIEW.mapRight - 14,
+          F.y + F.h / 2,
+          dir < 0 ? '<' : '>',
+          () => this.flip(dir),
+          { width: 20, height: 32, fontSize: 16 },
+        );
+        arrow.setEnabled(!this.busy);
+        add(arrow);
+      }
     }
 
-    // The menu: food, name, price, cravings and busog.
+    // The menu: food, name, price; busog and a green Listahan badge when it ticks an open line.
+    add(this.add.rectangle(VIEW.mapRight / 2, F.menuY - 2, VIEW.mapRight, 1, 0xc9c0aa));
     items.forEach((m, i) => {
       const e = purchaseEffect(m.key, undefined, g.promo);
       const sold = this.vacant.isSoldOut(m.key);
-      // Two columns, three rows: name and price on top, cravings and busog below.
-      const x = 8 + (i % 2) * 252;
-      const y = FRONT.menuY + Math.floor(i / 2) * FRONT.menuRowH;
+      const x = 6 + (i % 2) * 254;
+      const y = F.menuY + Math.floor(i / 2) * F.menuRowH;
       const color = sold ? TEXT.grey : TEXT.ink;
-      add(this.add.image(x + 12, y + 12, `food_${m.key}`).setAlpha(sold ? 0.4 : 1));
+      add(this.add.image(x + 12, y + 11, `food_${m.key}`).setAlpha(sold ? 0.4 : 1));
       add(this.add.text(x + 28, y + 1, t(m.nameKey), textStyle(8, color)));
       add(
         this.add
           .text(
-            x + 244,
+            x + 246,
             y + 1,
             sold ? t('pupLagoon.board.soldOut') : `₱${e.price}`,
             textStyle(8, sold ? TEXT.grey : TEXT.red),
           )
           .setOrigin(1, 0),
       );
-      const tags = [...e.tags, ...(e.free?.tags ?? [])]
-        .map((tag) => t(`pupLagoon.tag.${tag}`))
-        .join(', ');
       add(
         this.add.text(
           x + 28,
           y + 12,
-          `${tags} · ${t('pupLagoon.board.busog', { n: e.busog * e.copies })}`,
+          t('pupLagoon.board.busog', { n: e.busog * e.copies }),
           textStyle(8, TEXT.grey),
         ),
       );
+      const lines = sold ? [] : this.openLinesTicked(m.key, e);
+      if (lines.length) {
+        // Name the listahan lines this food ticks, e.g. "May kanin + Inumin".
+        const badge = this.add
+          .text(
+            x + 104,
+            y + 12,
+            lines.map((l) => lineText(l)).join(' + '),
+            textStyle(8, TEXT.cream),
+          )
+          .setOrigin(0, 0);
+        add(
+          this.add
+            .rectangle(x + 90, y + 11, badge.width + 20, 11, 0x3a9a6a)
+            .setOrigin(0, 0)
+            .setStrokeStyle(1, 0x2b5a3a),
+        );
+        add(this.add.image(x + 97, y + 16, 'ui_check', 1));
+        add(badge);
+      }
     });
 
     // Steam and smoke rising from pots, woks and the grill.
-    if (isOpen && !this.reduced && L.steam.length) {
+    if (!this.reduced && L.steam.length) {
       this.steam = this.time.addEvent({
-        delay: FRONT.steamMs,
+        delay: F.steamMs,
         loop: true,
         callback: () => {
           const [x, y] = L.steam[Phaser.Math.Between(0, L.steam.length - 1)];
@@ -245,15 +290,30 @@ export class LagoonStallsScene extends Phaser.Scene {
         },
       });
     }
+    this.drawTabs();
     this.drawLine();
     this.drawBar();
   }
 
-  /** The line of students in front of the stall, with the player in their place. */
+  /** The listahan lines, still open, that buying this item would tick. */
+  private openLinesTicked(item: string, e: PurchaseEffect): ListahanLine[] {
+    const tags = new Set([...e.tags, ...(e.free?.tags ?? [])]);
+    return this.vacant.gen.lines.filter(
+      (l) =>
+        !this.vacant.listahan.isLineDone(l.id) &&
+        ((l.kind === 'item' && l.item === item) ||
+          (l.kind === 'tag' && !!l.tag && tags.has(l.tag))),
+    );
+  }
+
+  /**
+   * The line of students in front of the counter, on the right so it never covers the stall's name.
+   * Students are drawn at 2× and the player at 1× (both 48 px tall): whole-number scales only.
+   */
   private drawLine(): void {
     this.line.removeAll(true);
     const stall = this.stall;
-    if (!this.vacant.gen.open.includes(stall) || stall === 'water') return;
+    if (stall === 'water') return;
     const total = this.vacant.pilaLength(stall);
     const here = this.vacant.location?.stall === stall;
     const place = here ? this.vacant.playerPlace() : null;
@@ -262,23 +322,28 @@ export class LagoonStallsScene extends Phaser.Scene {
     const shown = Math.min(total, FRONT.lineMax);
     for (let i = 0; i < shown; i++) {
       const x = FRONT.lineX + i * FRONT.lineGap;
-      if ((place !== null && i === place) || (atCounter && i === 0)) {
+      const isPlayer = (place !== null && i === place) || (atCounter && i === 0);
+      if (isPlayer) {
         const profile = services().save.data.profile;
-        if (profile) this.line.add(avatarSprite(this, x, feet - 16, profile, 0.62));
-        this.line.add(this.add.triangle(x, feet - 38, -4, 0, 4, 0, 0, 5, COLORS.red));
+        if (profile) this.line.add(avatarSprite(this, x, feet - 24, profile, 1));
+        const you = this.add
+          .text(x, feet - 52, t('pupLagoon.line.you'), textStyle(8, TEXT.cream))
+          .setOrigin(0.5);
+        this.line.add(this.add.rectangle(x, feet - 52, you.width + 8, 11, COLORS.red));
+        this.line.add(you);
         continue;
       }
       const v = ((i + stall.length) % 6) + 1;
       this.line.add(
-        this.add.sprite(x, feet, `walker_${v}`, 0).setOrigin(0.5, 1).setScale(1.25).setFlipX(true),
+        this.add.sprite(x, feet, `walker_${v}`, 0).setOrigin(0.5, 1).setScale(2).setFlipX(true),
       );
     }
     if (total > shown)
       this.line.add(
         this.add
           .text(
-            FRONT.lineX + shown * FRONT.lineGap,
-            feet - 14,
+            FRONT.lineX + shown * FRONT.lineGap - 6,
+            feet - 20,
             `+${total - shown}`,
             textStyle(8, TEXT.ink, { backgroundColor: '#FFF4DC', padding: { x: 2, y: 1 } }),
           )
@@ -286,7 +351,7 @@ export class LagoonStallsScene extends Phaser.Scene {
       );
   }
 
-  /** Prev / Next, where this stall is in the list, and Pumila / Leave line / Refill. */
+  /** What to do next, in words, and the one main button. */
   private drawBar(): void {
     this.bar.removeAll(true);
     const y = FRONT.barY;
@@ -294,73 +359,47 @@ export class LagoonStallsScene extends Phaser.Scene {
       this.bar.add(o);
       return o;
     };
-    add(this.add.rectangle(VIEW.mapRight / 2, y, VIEW.mapRight, 32, 0xe2dccd));
-    const busy = this.busy;
-    add(
-      new Button(this, 44, y, t('pupLagoon.front.prev'), () => this.flip(-1), {
-        width: 76,
-        height: 20,
-      }),
-    ).setEnabled(!busy);
-    add(
-      new Button(this, VIEW.mapRight - 44, y, t('pupLagoon.front.next'), () => this.flip(1), {
-        width: 76,
-        height: 20,
-      }),
-    ).setEnabled(!busy);
+    add(this.add.rectangle(VIEW.mapRight / 2, y, VIEW.mapRight, FRONT.barH, 0x3a3346));
     const loc = this.vacant.location;
-    const open = this.vacant.gen.open.includes(this.stall);
-    let status = `${ORDER.indexOf(this.stall) + 1}/${ORDER.length}`;
-    if (open && this.stall !== 'water')
-      status += ` · ${t('pupLagoon.board.pila', { n: this.vacant.pilaLength(this.stall) })}`;
-    if (loc?.at === 'pila')
-      status = t('pupLagoon.pila.waiting', { n: this.vacant.playerPlace() ?? 0 });
-    if (loc?.at === 'counter')
-      status = `${t('pupLagoon.counter.title')} ${t('pupLagoon.counter.soon')}`;
+    let hint: string;
+    let button: { label: string; act: () => void; main: boolean } | null;
+    if (loc?.at === 'pila') {
+      hint = t('pupLagoon.front.waiting', { n: this.vacant.playerPlace() ?? 0 });
+      button = { label: t('pupLagoon.pila.leave'), act: () => this.leaveLine(), main: false };
+    } else if (loc?.at === 'counter') {
+      hint = `${t('pupLagoon.counter.title')} ${t('pupLagoon.counter.soon')}`;
+      button = { label: t('pupLagoon.pila.leave'), act: () => this.leaveLine(), main: false };
+    } else if (this.stall === 'water') {
+      hint = t('pupLagoon.front.refillHint');
+      button = { label: t('pupLagoon.front.refill'), act: () => this.refill(), main: true };
+    } else {
+      hint = t('pupLagoon.front.hint', { n: this.vacant.pilaLength(this.stall) });
+      button = { label: t('pupLagoon.ui.queue'), act: () => this.queue(), main: true };
+    }
     add(
       this.add
-        .text(170, y, status, textStyle(8, loc ? TEXT.red : TEXT.ink, { wordWrap: { width: 150 } }))
-        .setOrigin(0.5),
+        .text(10, y, hint, textStyle(8, TEXT.cream, { wordWrap: { width: 370 } }))
+        .setOrigin(0, 0.5),
     );
-    if (loc) {
+    if (button) {
       add(
-        new Button(this, 340, y, t('pupLagoon.pila.leave'), () => this.leaveLine(), {
-          width: 92,
-          height: 20,
-        }),
-      );
-    } else if (open && this.stall === 'water') {
-      add(
-        new Button(this, 340, y, t('pupLagoon.front.refill'), () => this.refill(), {
-          width: 92,
-          height: 20,
-          fill: COLORS.yellow,
-          textColor: TEXT.red,
-        }),
-      );
-    } else if (open) {
-      add(
-        new Button(this, 340, y, t('pupLagoon.ui.queue'), () => this.queue(), {
-          width: 92,
-          height: 20,
-          fill: COLORS.yellow,
-          textColor: TEXT.red,
+        new Button(this, VIEW.mapRight - 62, y, button.label, button.act, {
+          width: 110,
+          height: 18,
+          ...(button.main ? { fill: COLORS.yellow, textColor: TEXT.red } : {}),
         }),
       );
     }
   }
 
   private flip(dir: 1 | -1): void {
-    if (this.busy) return;
-    const i = ORDER.indexOf(this.stall);
-    this.showStall(ORDER[(i + dir + ORDER.length) % ORDER.length]);
+    if (this.busy || this.order.length < 2) return;
+    const i = this.order.indexOf(this.stall);
+    this.showStall(this.order[(i + dir + this.order.length) % this.order.length]);
   }
 
   private queue(): void {
-    if (this.vacant.joinPila(this.stall).ok) {
-      this.drawLine();
-      this.drawBar();
-    }
+    if (this.vacant.joinPila(this.stall).ok) this.showStall(this.stall);
   }
 
   private refill(): void {
@@ -373,8 +412,7 @@ export class LagoonStallsScene extends Phaser.Scene {
     if (!loc) return true;
     const r = loc.at === 'counter' ? this.vacant.leaveCounter() : this.vacant.leavePila();
     if (!r.ok) return false;
-    this.drawLine();
-    this.drawBar();
+    this.showStall(this.stall);
     return true;
   }
 
@@ -500,7 +538,7 @@ export class LagoonStallsScene extends Phaser.Scene {
       kb.on(
         `keydown-${['ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN', 'EIGHT'][i]}`,
         () => {
-          if (!this.busy) this.showStall(stall);
+          if (!this.busy && this.order.includes(stall)) this.showStall(stall);
         },
       ),
     );
@@ -509,7 +547,7 @@ export class LagoonStallsScene extends Phaser.Scene {
     kb.on('keydown-ENTER', () => {
       if (this.busy) return;
       if (this.stall === 'water') this.refill();
-      else if (this.vacant.gen.open.includes(this.stall)) this.queue();
+      else this.queue();
     });
     kb.on('keydown-ESC', () => this.leaveLine());
     kb.on('keydown-P', () => this.pause());
@@ -519,4 +557,9 @@ export class LagoonStallsScene extends Phaser.Scene {
   private pause(): void {
     openOverlay(this, PAUSE);
   }
+}
+
+/** Tab text colour: dimmed while the player is busy in a line (tabs are locked then). */
+function busyColor(dim: boolean): string {
+  return dim ? TEXT.grey : TEXT.ink;
 }
