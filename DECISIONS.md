@@ -418,3 +418,13 @@ Specs: [SPEC.md](SPEC.md) (§), [SPEC-homepage.md](SPEC-homepage.md) (H§), [SPE
   (`AudioManager.setAmbience`). Thirteen sound effects: click, tab, add, remove, coin, bill, pay (register), sukli,
   check, error, page, win jingle, gentle game-over tune. `audio_home` is preloaded; `audio_lagoon` (music and ambience,
   about 3.5 MB) loads on arrival at PUP. Still WAV (no encoder dependency, see L-031).
+
+### Docs — DESIGN.md (builder, 2026-11-26)
+
+- **D-053 — `DESIGN.md` is the source of truth for the game's look.** It follows the DESIGN.md format (YAML tokens plus
+  Overview, Colors, Typography, Layout, Elevation, Shapes, Motion, Voice, Components, Do's and Don'ts) and records only what the
+  code and baked assets already do, with the source file beside each value. Anything undefined is written as
+  `TODO: not defined yet` (13 items, listed at the end of the file) instead of invented. Where an older spec line differs
+  from the code (panel corners, pressed button, character sizes, palette), the code wins and the difference is listed in
+  the file. `AGENTS.md` points to it in the read-first list. Change the look, change `DESIGN.md` in the same PR. No game
+  code or assets were changed. *(SPEC §6, SPEC-homepage §2, D-040, D-043)*
