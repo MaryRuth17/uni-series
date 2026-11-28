@@ -152,6 +152,13 @@
     "frame": null
   },
   {
+    "key": "front_tinapay",
+    "url": "assets/lagoon/front_tinapay.png",
+    "width": 512,
+    "height": 220,
+    "frame": null
+  },
+  {
     "key": "front_lugawan",
     "url": "assets/lagoon/front_lugawan.png",
     "width": 512,
@@ -168,6 +175,13 @@
   {
     "key": "front_silog",
     "url": "assets/lagoon/front_silog.png",
+    "width": 512,
+    "height": 220,
+    "frame": null
+  },
+  {
+    "key": "front_ricebox",
+    "url": "assets/lagoon/front_ricebox.png",
     "width": 512,
     "height": 220,
     "frame": null
@@ -252,13 +266,6 @@
   {
     "key": "food_kwekkwek",
     "url": "assets/lagoon/food_kwekkwek.png",
-    "width": 24,
-    "height": 24,
-    "frame": null
-  },
-  {
-    "key": "food_fewa",
-    "url": "assets/lagoon/food_fewa.png",
     "width": 24,
     "height": 24,
     "frame": null
@@ -390,6 +397,48 @@
     "frame": null
   },
   {
+    "key": "food_fewa",
+    "url": "assets/lagoon/food_fewa.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_cheese_bread",
+    "url": "assets/lagoon/food_cheese_bread.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_ensaymada",
+    "url": "assets/lagoon/food_ensaymada.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_egg_sandwich",
+    "url": "assets/lagoon/food_egg_sandwich.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_ham_cheese",
+    "url": "assets/lagoon/food_ham_cheese.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_tuna_sandwich",
+    "url": "assets/lagoon/food_tuna_sandwich.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
     "key": "food_lugaw",
     "url": "assets/lagoon/food_lugaw.png",
     "width": 24,
@@ -483,6 +532,48 @@
   {
     "key": "food_sisig_rice",
     "url": "assets/lagoon/food_sisig_rice.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_siomai_rice",
+    "url": "assets/lagoon/food_siomai_rice.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_shanghai_rice",
+    "url": "assets/lagoon/food_shanghai_rice.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_spicy_siomai_rice",
+    "url": "assets/lagoon/food_spicy_siomai_rice.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_chaofan_siomai",
+    "url": "assets/lagoon/food_chaofan_siomai.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_burger_steak",
+    "url": "assets/lagoon/food_burger_steak.png",
+    "width": 24,
+    "height": 24,
+    "frame": null
+  },
+  {
+    "key": "food_chicken_fillet",
+    "url": "assets/lagoon/food_chicken_fillet.png",
     "width": 24,
     "height": 24,
     "frame": null

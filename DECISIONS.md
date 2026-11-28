@@ -428,3 +428,46 @@ Specs: [SPEC.md](SPEC.md) (§), [SPEC-homepage.md](SPEC-homepage.md) (H§), [SPE
   from the code (panel corners, pressed button, character sizes, palette), the code wins and the difference is listed in
   the file. `AGENTS.md` points to it in the read-first list. Change the look, change `DESIGN.md` in the same PR. No game
   code or assets were changed. *(SPEC §6, SPEC-homepage §2, D-040, D-043)*
+
+### L6 (part 2) — Sound on every tap, softer PUP audio, calmer stalls, a guided round (builder, 2026-11-27)
+
+- **L-037 — Every tap makes one sound; the PUP audio is softer (owner: "the jeep must make a sound", "harsh").**
+  Tested in the browser on the live site: the landing surprises asked for `sfx_jeep_horn`, `sfx_sorbetes_bell`,
+  `sfx_printer`, `sfx_meow` and `sfx_lrt_chime`, but none were baked, so they were silent; the barker and the map stops
+  had no sound. `scripts/audio` now bakes those plus `sfx_barker` and `sfx_pin` (keys in `HOME_SFX`,
+  `src/home/config.ts`); opening a campus card pops, riding honks. `Button` takes `sound` (default `sfx_click`, `null`
+  when the handler plays its own) so sounds never stack. Measured in the browser inside PUP (music + ambience): the
+  2–6 kHz band is 7.2 dB lower and 1.3 dB quieter overall; 93% of that band came from the ambience, which is now
+  low-passed and quieter. `music_lagoon` uses soft noise hats instead of square-wave hats, less vinyl crackle and a
+  lower low-pass; `music_home` is byte-identical. The hissy effects (tab, bill, check, page) now keep most of their
+  energy under 3 kHz. A test fails if code asks for an `sfx_` key that is not baked.
+- **L-038 — The stall screen follows the owner's photo of a Lagoon stall.** One calm banner (wall, the vendor in a small
+  window, the name board, the printed promo sign, the counter's edge in the stall's colour) over a menu of cards: each
+  food appears once (picture at 2×, name, price tag, busog, a green strip naming the listahan line it ticks); tap a card to
+  add it. The old storefront picture with a second menu below, the `<` `>` arrows and the steam are gone (tabs and
+  keys still switch stalls). One help line; the tray bar shows one slot per item the tray holds, the total over the
+  money left. Layout numbers are in `FRONT` and `STALL_COUNTER` (`pup-lagoon/config.ts`). Checked in English and
+  Filipino for all nine stalls.
+- **L-039 — A guided round.** `logic/Guide.ts` (pure, tested) follows the generator's proven route
+  (`GeneratedVacant.route.complete`), so following it always wins: it rings what to tap next in gold and explains it in
+  a speech bubble (go to the stall, tap the food, pick the sawsawan, Bayad, place money, Heto po!, the sukli, Kain na!).
+  It asks to put back food that is not on the plan, and gives general tips once the player goes their own way. It is
+  on for the first vacant; the new Guide button in the top bar turns it on or off any time. Tests: it wins 75 vacants
+  (seeds 1–3, vacants 1–25).
+
+### L6 UI fixes (part 1) — jeep departure, School ID close, name-tag portraits (builder, 2026-11-27)
+
+- **D-054 — The parked jeepney faces the way it leaves.** The landing jeepney art faces left, but TARA, LARO! drives it
+  off to the right, so it slid out backwards with still wheels. It is now parked mirrored (facing right; route board and
+  the cat's spot mirrored with it) and its wheel animation (`jeep_1_drive`) starts when it pulls out
+  (`StreetView.startParkedJeep`). The cat is part of the jeepney container, so it rides away instead of floating.
+  Checked in the browser: the wheel frames alternate 0/1 while x goes 200 → 720.
+- **D-055 — The School ID card can always be closed.** A baked red `icon_close` X sits at the right of the card's header
+  bar (16x16 art, 28x28 hit area). X and Esc close the card without saving anything, the first-time card too (before, a
+  first-time player opening it from LET'S PLAY could not back out); the player lands back on the landing with no
+  profile. The Close button stays in edit mode. Smoke test added.
+- **D-056 — Name tags show a framed portrait with a wider crop.** The landing and map name tags are 120x36 (were 120x28
+  and 120x24). `avatarPortrait` (replaces `avatarHead`) crops the 48x48 avatar frame to x 8-41, y 0-31 at 1x in a School
+  ID photo frame. The old 24x24 crop cut hair off five girl styles and one boy style (up to 71 of 340 hair pixels); the
+  new one keeps every hair pixel of all 16 styles (measured on the baked PNGs). The map tag's x moved into `MAP.idChip`
+  (180, where it was drawn).

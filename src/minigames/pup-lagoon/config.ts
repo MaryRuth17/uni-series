@@ -31,9 +31,11 @@ export const STALLS_OPEN_FROM: Readonly<Record<Exclude<StallKey, 'water'>, Tier>
   palamig: 1,
   ihaw: 1,
   merienda: 1,
+  tinapay: 1,
   lugawan: 1,
   halohalo: 1,
   silog: 1,
+  ricebox: 1,
 };
 
 /** Vacant n uses SLOT_ORDER[n % 3], so the tutorial (n = 1) is tanghali, then hapon, umaga, … (OC-4). */
@@ -210,18 +212,42 @@ export const FRONT = {
   /** Stall tabs along the top. */
   tabsY: 24,
   tabsH: 16,
-  /** The storefront picture (its bottom 20 px of sidewalk are cropped). */
-  x: 0,
-  y: 40,
-  w: 512,
-  h: 200,
-  /** The menu: two columns, three rows; tap a row to add the food to the tray. */
-  menuY: 244,
-  menuRowH: 24,
-  /** The tray bar: food in the tray, total, money left, hint, Bayad and Kain na!. */
+  /**
+   * The stall banner (L-038, after the owner's photo of a Lagoon stall): a calm wall, the vendor in a small
+   * window cropped from the front_<stall> art, the name board, the printed promo sign and the counter.
+   */
+  banner: {
+    y: 40,
+    h: 64,
+    counterH: 8,
+    vendor: { x: 14, w: 56, h: 50 },
+    sign: { x: 404, w: 96 },
+    /** Calm wall behind the banner, sampled from the storefront art. */
+    wall: 0xf4f1ea,
+  },
+  /** The menu: every food once, as a card (picture, name, price, busog); tap a card to add it. */
+  cards: { y: 110, left: 13, cols: 3, w: 156, h: 88, gapX: 10, gapY: 8 },
+  /** One line of help between the menu and the tray. */
+  info: { y: 298, h: 16, fill: 0xe6dcc6 },
+  /** The tray bar: tray slots (VISIT.maxItems), total, money left, Bayad and Kain na!. */
   trayY: 316,
   trayH: 44,
-  steamMs: 450,
+  slot: 26,
+};
+
+/** Counter colour per stall, sampled from its front_<stall> art (kiosk red, cart green, water blue). */
+export const STALL_COUNTER: Readonly<Record<StallKey, number>> = {
+  karinderya: 0xd22f2a,
+  halohalo: 0xd22f2a,
+  silog: 0xd22f2a,
+  ricebox: 0xd22f2a,
+  tusok: 0x6fa65a,
+  palamig: 0x6fa65a,
+  ihaw: 0x6fa65a,
+  merienda: 0x6fa65a,
+  tinapay: 0x6fa65a,
+  lugawan: 0x6fa65a,
+  water: 0x3b6fb6,
 };
 
 /** Sound effects (DECISIONS L-035), made by scripts/audio/build.mjs. */
@@ -246,16 +272,18 @@ export const LAGOON_MUSIC = 'music_lagoon';
 /** Crowd murmur, birds and leaves under the music (L-035). */
 export const LAGOON_AMBIENCE = 'amb_lagoon';
 
-/** Stall order for keys 1–8 (§10.3, §7 order). */
+/** Stall order for keys 1–0 (§10.3, §7 order). */
 export const STALL_KEYS_ORDER: readonly StallKey[] = [
   'karinderya',
   'tusok',
   'palamig',
   'ihaw',
   'merienda',
+  'tinapay',
   'lugawan',
   'halohalo',
   'silog',
+  'ricebox',
 ];
 
 /** The arrival intro (LagoonOpeningScene): pan across the PUP panorama, then How to play. */

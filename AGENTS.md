@@ -24,7 +24,7 @@ Brief for every AI agent (Claude Code, Codex, others) working in this repo, usua
 | H3 — Living map | Done: zoom toward stops, ambient life, time-of-day tint, unfold transition, list drag |
 | L3 — Buying and paying | Done: no pila, all stalls open, tray, payment with coins and bills and sukli, the owner's win and lose rules, results (L-033–L-035) |
 | L4–L5 | Not started |
-| H4 + L6 — Art and audio (made by Claude, DECISIONS R-006) | H4 done (D-040–D-051). L6 part 1 done: PUP intro, How to play, storefront play screen with tabs (no map, all stalls open), notebook HUD, food and money art, lo-fi music, ambience and sound effects (L-019–L-036) |
+| H4 + L6 — Art and audio (made by Claude, DECISIONS R-006) | H4 done (D-040–D-051). L6 part 1 done: PUP intro, How to play, storefront play screen with tabs (no map, all stalls open), notebook HUD, food and money art, lo-fi music, ambience and sound effects (L-019–L-036). L6 part 2: a sound on every tap, softer PUP audio, card-based stalls, a guided round (L-037–L-039) |
 | H5 + L7 + M6 — Polish; M7 — Release | Not started |
 | M2–M5 | Replaced by L1–L7 |
 
@@ -40,6 +40,8 @@ Brief for every AI agent (Claude Code, Codex, others) working in this repo, usua
 | Smoke tests (Playwright, builds first) | `npm run test:e2e` (first time: `npx playwright install`; one browser: `-- --project=chromium`) |
 | Lint / format | `npm run lint` / `npm run format` |
 | Balance bot | `npm run sim` (added in L1) |
+
+**Shell commands:** prefix every shell command you run in the terminal (git, ls, grep, tests, npm scripts) with `rtk`, e.g. `rtk git status`, `rtk npm test`, `rtk ls src`. `rtk` filters command output to save tokens and passes the command through unchanged.
 
 ## Phaser 4, not Phaser 3
 

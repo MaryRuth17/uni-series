@@ -441,7 +441,7 @@ original pixel art. *(Made by Claude: DECISIONS.md R-006.)*
 | `tricycle`, `cat`, `dog` | spritesheet | 40×32, 16×12, 20×12 | Idle loops |
 | `tarp_board_passers` | image | 96×32 | Generic congratulations banner |
 | `btn_signboard` | nine-slice | 24×24 source | Yellow route-board button |
-| `icon_settings`, `icon_credits`, `icon_stickers`, `icon_album`, `icon_home`, `icon_map`, `icon_list` | image | 24×24 | |
+| `icon_settings`, `icon_credits`, `icon_stickers`, `icon_album`, `icon_home`, `icon_map`, `icon_list`, `icon_close` | image | 24×24 | `icon_close`: School ID header X (DECISIONS D-055) |
 
 **Map**
 

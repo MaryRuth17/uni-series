@@ -5,10 +5,10 @@
   "description": "Cozy 2D browser minigames set at Philippine university landmarks. Minigame #1: PUP Lagoon.",
   "type": "module",
   "engines": {
-    "node": ">=24"
+    "node": ">=22"
   },
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host 0.0.0.0 --port 3000",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "test": "vitest run",

@@ -58,9 +58,14 @@ export const STALLS: readonly StallDef[] = [
     x: 220,
     y: 96,
   }),
+  stall('tinapay', 'nena', 'D', 'maraming', 'short', ['umaga', 'hapon'], ['tanghali'], {
+    x: 260,
+    y: 96,
+  }),
   stall('lugawan', 'dodong', 'D', 'kaunti', 'medium', ['umaga'], [], { x: 300, y: 96 }),
   stall('halohalo', 'mimi', 'E', 'maraming', 'short', ['hapon'], ['umaga'], { x: 48, y: 267 }),
   stall('silog', 'ronnie', 'E', 'kaunti', 'medium', ['tanghali'], [], { x: 48, y: 201 }),
+  stall('ricebox', 'ben', 'E', 'kaunti', 'medium', ['tanghali'], [], { x: 48, y: 234 }),
   stall('water', '', 'C', 'wala', 'none', [], [], { x: 485, y: 300 }),
 ];
 

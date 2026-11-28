@@ -10,7 +10,7 @@ import { t } from '../core/i18n';
 import { Random } from '../core/Random';
 import { services } from '../core/services';
 import { COLORS, TEXT, textStyle } from '../ui/theme';
-import { DEPTH, PALETTE, ROUTES, STREET } from './config';
+import { DEPTH, HOME_SFX, PALETTE, ROUTES, STREET } from './config';
 import { type SpawnEvent, type SpawnKind, StreetSpawner } from './StreetSpawner';
 import { type SurpriseKey, Surprises } from './Surprises';
 import type { Phase } from './TimeOfDay';
@@ -52,6 +52,7 @@ export class StreetView {
   private trainShadow!: Phaser.GameObjects.Rectangle;
   /** The jeepney parked at the stop; LandingScene drives it away on the play button. */
   parkedJeep!: Phaser.GameObjects.Container;
+  private parkedJeepSprite!: Phaser.GameObjects.Sprite;
   private routeSign!: Phaser.GameObjects.Text;
   private routeIndex = 0;
 
@@ -107,6 +108,11 @@ export class StreetView {
       this.trainShadow.x = this.train.obj.x;
       this.trainShadow.setAlpha(0.12 + this.rng.next() * 0.08);
     }
+  }
+
+  /** The parked jeepney pulls out: its wheels start turning (LandingScene tweens it off to the right). */
+  startParkedJeep(): void {
+    this.parkedJeepSprite.play('jeep_1_drive');
   }
 
   // ---- Animations -------------------------------------------------------------------------------
@@ -267,17 +273,23 @@ export class StreetView {
     const s = this.scene;
     s.add.image(0, 318, 'street').setOrigin(0).setDepth(DEPTH.street).setTint(this.tint);
 
-    // Parked jeepney at the stop with a route board that cycles, and a cat on its roof by day.
-    const jeep = s.add.sprite(0, 0, 'jeep_1', 0).setOrigin(0.5, 1).setTint(this.tint);
-    const board = s.add.image(4, -44, 'jeep_board');
-    this.routeSign = s.add.text(4, -45, ROUTES[0], textStyle(8, TEXT.red)).setOrigin(0.5);
+    // Parked jeepney at the stop with a route board that cycles, and a cat on its roof by day. The art
+    // faces left; the parked one is mirrored to face right, the way it drives off on TARA, LARO!
+    this.parkedJeepSprite = s.add
+      .sprite(0, 0, 'jeep_1', 0)
+      .setOrigin(0.5, 1)
+      .setFlipX(true)
+      .setTint(this.tint);
+    const board = s.add.image(-4, -44, 'jeep_board');
+    this.routeSign = s.add.text(-4, -45, ROUTES[0], textStyle(8, TEXT.red)).setOrigin(0.5);
     this.parkedJeep = s.add
-      .container(STREET.parkedJeepX, 350, [jeep, board, this.routeSign])
+      .container(STREET.parkedJeepX, 350, [this.parkedJeepSprite, board, this.routeSign])
       .setDepth(DEPTH.street + 1);
     this.parkedJeep.setSize(80, 40).setInteractive({ useHandCursor: true });
     this.parkedJeep.input?.hitArea.setTo(0, -20, 80, 40);
     this.parkedJeep.on('pointerup', () => this.surprise('jeep'));
-    if (this.phase !== 'gabi') this.cat(STREET.parkedJeepX + 30, 309, false);
+    // The cat rides along (it is part of the jeep container) so it never floats after the jeep leaves.
+    if (this.phase !== 'gabi') this.parkedJeep.add(this.cat(-30, -41, false));
 
     // Tricycle parked at the corner, driver napping.
     s.add
@@ -308,13 +320,14 @@ export class StreetView {
     }
   }
 
-  private cat(x: number, y: number, asleep: boolean): void {
+  private cat(x: number, y: number, asleep: boolean): Phaser.GameObjects.Image {
     const cat = this.scene.add
       .image(x, y, 'cat', asleep ? 1 : 0)
       .setOrigin(0.5, 1)
       .setDepth(DEPTH.street + 2)
       .setTint(this.tint);
     cat.setInteractive({ useHandCursor: true }).on('pointerup', () => this.surprise('cat'));
+    return cat;
   }
 
   private steam(x: number, y: number, depth: number): void {
@@ -416,9 +429,9 @@ export class StreetView {
     const audio = services().audio;
     switch (key) {
       case 'jeep':
-        audio.sfx('sfx_jeep_horn');
+        audio.sfx(HOME_SFX.jeepHorn);
         this.bubble(STREET.barkerX + 6, 286, t(this.rng.pick(BARKER_LINES)));
-        this.bubble(this.parkedJeep.x - 20, 318, t('landing.beep'));
+        this.bubble(this.parkedJeep.x + 20, 318, t('landing.beep'));
         if (!this.reduced)
           s.tweens.add({
             targets: this.parkedJeep,
@@ -429,10 +442,11 @@ export class StreetView {
           });
         break;
       case 'barker':
+        audio.sfx(HOME_SFX.barker);
         this.bubble(STREET.barkerX + 6, 286, t(this.rng.pick(BARKER_LINES)));
         break;
       case 'cart': {
-        audio.sfx('sfx_sorbetes_bell');
+        audio.sfx(HOME_SFX.sorbetesBell);
         const treat = s.add
           .container(STREET.cartX, 284, [
             s.add.triangle(0, 4, -4, 0, 4, 0, 0, 10, 0xd9a066),
@@ -449,7 +463,7 @@ export class StreetView {
         break;
       }
       case 'print':
-        audio.sfx('sfx_printer');
+        audio.sfx(HOME_SFX.printer);
         for (let i = 0; i < 3; i++) {
           const paper = s.add
             .rectangle(170, 268, 6, 8, 0xffffff)
@@ -468,11 +482,11 @@ export class StreetView {
         }
         break;
       case 'cat': {
-        audio.sfx('sfx_meow');
+        audio.sfx(HOME_SFX.meow);
         const at =
           this.phase === 'gabi'
             ? { x: STREET.streetlightX + 12, y: 300 }
-            : { x: STREET.parkedJeepX + 30, y: 292 };
+            : { x: STREET.parkedJeepX - 30, y: 292 };
         this.bubble(at.x, at.y - 6, t('landing.meow'));
         const heart = s.add
           .container(at.x + 14, at.y, [
@@ -491,7 +505,7 @@ export class StreetView {
         break;
       }
       case 'train':
-        audio.sfx('sfx_lrt_chime');
+        audio.sfx(HOME_SFX.lrtChime);
         s.tweens.add({
           targets: this.trainSprite,
           alpha: 0.4,

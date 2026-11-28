@@ -30,13 +30,22 @@ export const STALL_ITEMS = {
     'liempo_meal',
     'tonkatsu_meal',
   ],
-  tusok: ['fishball', 'kikiam', 'squidball', 'tokneneng', 'kwekkwek', 'fewa'],
+  tusok: ['fishball', 'kikiam', 'squidball', 'tokneneng', 'kwekkwek'],
   palamig: ['gulaman', 'melon', 'buko', 'softdrinks', 'water_bottle', 'iced_coffee'],
   ihaw: ['betamax', 'isaw', 'hotdog_stick', 'bbq', 'mais', 'bbq_rice'],
   merienda: ['pandesal', 'turon', 'kamotecue', 'puto', 'bananacue', 'siopao'],
+  tinapay: ['fewa', 'cheese_bread', 'ensaymada', 'egg_sandwich', 'ham_cheese', 'tuna_sandwich'],
   lugawan: ['lugaw', 'tokwa', 'lugaw_egg', 'goto', 'mami'],
   halohalo: ['icecandy', 'iskrambol', 'lecheflan', 'maiscon', 'halohalo'],
   silog: ['hotsilog', 'longsilog', 'tapsilog', 'sisig_rice'],
+  ricebox: [
+    'siomai_rice',
+    'shanghai_rice',
+    'spicy_siomai_rice',
+    'chaofan_siomai',
+    'burger_steak',
+    'chicken_fillet',
+  ],
   water: ['tumbler_water'],
 };
 
@@ -571,14 +580,37 @@ const PROPS = {
   tusok: (p) => {
     wok(p, 216, 100, 46);
     sawsawan(p, 452, 124);
-    // FEWA poster: black board with big letters and the food (photo detail).
+    cupStack(p, 66, 116);
+  },
+  tinapay: (p) => {
+    // Glass bread display box, warm bread basket, and the iconic FEWA poster.
+    p.rect(60, 102, 74, 46, '#c98a4a');
+    p.rect(64, 106, 66, 38, '#eef6f8');
+    p.hline(64, 125, 66, '#c9d1d9');
+    for (let k = 0; k < 4; k++) p.ellipse(74 + k * 15, 118, 5, 4, '#e0a868');
+    for (let k = 0; k < 4; k++) p.ellipse(74 + k * 15, 138, 5, 4, '#f7d046');
+    // FEWA poster moved from tusok to the bread/sandwich stall.
     p.rect(440, 66, 64, 54, '#1f1b26');
     p.stroke(442, 68, 60, 50, '#f2c14e');
     const big = new Pix(24, 7);
     big.text(0, 0, 'FEWA', '#f2c14e', '5x7');
     blitScaled(p, big, 448, 72, 2);
     food(p, 'fewa', 472, 102, 1);
-    cupStack(p, 66, 116);
+    cupStack(p, 470, 122, 26);
+  },
+  ricebox: (p) => {
+    toyoJug(p, 16, 112);
+    // Chili garlic jar + cup stack + stacked siomai steamer.
+    p.rect(48, 126, 18, 22, '#e8f2f6');
+    p.rect(50, 132, 14, 14, '#d94b3d');
+    p.rect(47, 123, 20, 4, '#d22f2a');
+    cupStack(p, 74, 118);
+    // Paper rice boxes stacked beside the steamer.
+    for (let k = 0; k < 3; k++) {
+      p.rect(96, 138 - k * 8, 34, 7, '#f4f1ea');
+      p.hline(96, 138 - k * 8, 34, '#d94b3d');
+    }
+    steamer(p, 144, 110);
   },
 };
 

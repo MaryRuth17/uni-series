@@ -36,9 +36,11 @@ export type StallKey =
   | 'palamig'
   | 'ihaw'
   | 'merienda'
+  | 'tinapay'
   | 'lugawan'
   | 'halohalo'
   | 'silog'
+  | 'ricebox'
   | 'water';
 export type FriendKey = 'migs' | 'bea' | 'jomar';
 export const FRIENDS: readonly FriendKey[] = ['migs', 'bea', 'jomar'];

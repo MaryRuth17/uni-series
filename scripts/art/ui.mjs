@@ -183,6 +183,19 @@ const ICONS = {
     p.line(3, 11, 12, 5, '#d94b3d');
     p.outline(INK);
   },
+  /** Close X for card headers (IdCard): a red tile with a white X, so it reads on the ink header bar. */
+  icon_close: (p) => {
+    p.rect(2, 2, 12, 12, '#d94b3d');
+    p.hline(2, 2, 12, '#e86a5a');
+    p.hline(2, 13, 12, '#a8352a');
+    for (let i = 0; i < 6; i++) {
+      p.rect(5 + i, 5 + i, 1, 1, '#ffffff');
+      p.rect(6 + i, 5 + i, 1, 1, '#ffffff');
+      p.rect(10 - i, 5 + i, 1, 1, '#ffffff');
+      p.rect(11 - i, 5 + i, 1, 1, '#ffffff');
+    }
+    p.outline(INK);
+  },
   icon_list: (p) => {
     for (const y of [3, 7, 11]) {
       p.rect(2, y, 2, 2, '#d94b3d');

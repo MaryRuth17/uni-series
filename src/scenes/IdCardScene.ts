@@ -4,7 +4,8 @@
  * photo frame (layered avatar art), a Girl | Boy choice (DECISIONS D-041), a name field (a real HTML input
  * so phones open the keyboard, H-002), skin / hair / outfit / lace pickers and Done. Opened on the first
  * play tap (then goes on to the map) or from the ID chip (edit).
- * Listens to: pointer; Enter in the name field saves; Esc closes when editing an existing ID.
+ * Listens to: pointer; Enter in the name field saves; Esc or the header X closes without saving (also on
+ * the first-time card, which then returns to the landing with no profile).
  */
 import Phaser from 'phaser';
 import { sceneConfig } from '../ui/view';
@@ -33,6 +34,8 @@ const CARD = { x: 320, y: 180, w: 328, h: 214 };
 const PHOTO = { x: -104, y: 10 };
 /** Left edge of the right-hand column, relative to the card centre. */
 const COL = -48;
+/** Hit area of the header close X. */
+const CLOSE_HIT = 28;
 
 export class IdCardScene extends Phaser.Scene {
   private data_!: OverlayData & { next?: 'map' };
@@ -65,6 +68,7 @@ export class IdCardScene extends Phaser.Scene {
     c.add(this.add.rectangle(0, top + 12, CARD.w - 6, 18, COLORS.ink));
     c.add(this.add.rectangle(0, top + 21, CARD.w - 6, 2, COLORS.red));
     c.add(this.add.text(0, top + 12, t('id.card'), textStyle(8, TEXT.cream)).setOrigin(0.5));
+    this.addCloseX(CARD.w / 2 - 14, top + 12);
     c.add(this.add.text(left + 12, top + 28, t('id.title'), textStyle(8, TEXT.red)));
 
     // Photo frame with the character.
@@ -132,6 +136,22 @@ export class IdCardScene extends Phaser.Scene {
     });
   }
 
+  /** The red X in the header bar: a 16×16 icon with a 28×28 hit area (DESIGN.md tap targets). */
+  private addCloseX(x: number, y: number): void {
+    const icon = this.add.image(x, y, 'icon_close');
+    const hit = this.add
+      .zone(x, y, CLOSE_HIT, CLOSE_HIT)
+      .setInteractive({ useHandCursor: true })
+      .setName('id-close');
+    hit.on('pointerover', () => icon.setScale(1.1));
+    hit.on('pointerout', () => icon.setScale(1));
+    hit.on('pointerup', () => {
+      services().audio.sfx('sfx_click');
+      this.cancel();
+    });
+    this.card.add([icon, hit]);
+  }
+
   /** The HTML name field: styled first, then measured, so Phaser centres it correctly. */
   private createNameInput(cx: number, cy: number): void {
     const input = document.createElement('input');
@@ -146,6 +166,7 @@ export class IdCardScene extends Phaser.Scene {
       width: '110px',
       height: '16px',
       fontFamily: FONT,
+      fontWeight: '600',
       fontSize: '10px',
       padding: '0 4px',
       border: '1px solid #2B2233',
@@ -213,8 +234,8 @@ export class IdCardScene extends Phaser.Scene {
     closeOverlay(this, this.data_.from, true);
   }
 
+  /** Close without saving the draft. */
   private cancel(): void {
-    if (!services().save.data.profile) return;
     closeOverlay(this, this.data_.from);
   }
 }

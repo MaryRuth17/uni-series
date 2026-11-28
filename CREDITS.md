@@ -8,7 +8,7 @@ screen shows the same list (SPEC §13).
 | Asset | Author | Source | License |
 |---|---|---|---|
 | Phaser 4 (game engine) | Richard Davey, Phaser Studio Inc. | https://phaser.io | MIT (notice below) |
-| Pixelify Sans (UI font) | The Pixelify Sans Project Authors | https://github.com/eifetx/Pixelify-Sans (file from https://github.com/google/fonts/tree/main/ofl/pixelifysans) | SIL Open Font License 1.1 (`public/assets/fonts/OFL.txt`) |
+| Nunito (UI font) | Vernon Adams, Cyreal & Jacques Le Bailly | https://github.com/google/fonts/tree/main/ofl/nunito | SIL Open Font License 1.1 (`public/assets/fonts/OFL.txt`) |
 | Campus map layout | Based on OpenStreetMap data | https://www.openstreetmap.org/copyright | "Map data © OpenStreetMap contributors" (ODbL), shown in Credits |
 | Art and music | Made with Claude (AI) for this project | this repo | Same as the game (DECISIONS R-006) |
 

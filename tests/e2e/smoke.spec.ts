@@ -41,6 +41,27 @@ test('boots to the Landing screen with no console errors', async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
+test('the first-time School ID closes with its X and saves nothing', async ({ page }) => {
+  const errors = collectErrors(page);
+  await page.goto('./');
+  await waitForScene(page, 'Landing');
+  await tap(page, 320, 250); // Tap to start
+  await page.waitForTimeout(700);
+  await tap(page, 320, 146); // LET'S PLAY!
+  await waitForScene(page, 'IdCard');
+  await page.waitForTimeout(400);
+  await page.getByTestId('id-name').fill('Ana');
+  await tap(page, 470, 85); // the red X in the card header
+  await expect.poll(() => activeScenes(page)).not.toContain('IdCard');
+  expect(await activeScenes(page)).toContain('Landing');
+  expect(
+    await page.evaluate(
+      () => (window as unknown as { __uniSave: () => { profile: unknown } }).__uniSave().profile,
+    ),
+  ).toBeNull();
+  expect(errors).toEqual([]);
+});
+
 test('first launch: tap to start, School ID, map, ride to PUP, Lagoon, pause, back', async ({
   page,
 }) => {
