@@ -40,7 +40,6 @@ export class LagoonOpeningScene extends Phaser.Scene {
   create(): void {
     this.stage = 'pan';
     const reduced = services().save.data.settings.reducedMotion;
-    const seen = services().save.data.settings.tutorialSeen[HOW_SEEN] === true;
 
     this.add.image(0, 0, 'lagoon_intro').setOrigin(0);
     // The gate's banner: a greeting, not the school's official sign (SPEC §13).
@@ -101,12 +100,10 @@ export class LagoonOpeningScene extends Phaser.Scene {
       )
       .setOrigin(0.5)
       .setDepth(UI_DEPTH);
-    if (seen) {
-      new Button(this, 604, 20, t('pupLagoon.intro.skip'), () => this.toVacantCard(), {
-        width: 56,
-        height: 20,
-      }).setDepth(UI_DEPTH);
-    }
+    new Button(this, 604, 20, t('pupLagoon.intro.skip'), () => this.toVacantCard(), {
+      width: 56,
+      height: 20,
+    }).setDepth(UI_DEPTH);
     const tap = this.add
       .zone(320, 180, 640, 360)
       .setInteractive()
@@ -175,40 +172,67 @@ export class LagoonOpeningScene extends Phaser.Scene {
     // A notebook page with four steps, each a taped-in picture, a number badge, a title and a note.
     c.add(this.add.image(0, 0, 'note_how'));
     c.add(this.add.text(0, -124, t('pupLagoon.how.title'), textStyle(16, TEXT.red)).setOrigin(0.5));
+    const reduced = services().save.data.settings.reducedMotion;
     for (let i = 0; i < 4; i++) {
       const x = -222 + (i % 2) * 226;
       const y = -100 + Math.floor(i / 2) * 108;
-      c.add(this.add.rectangle(x + 52, y + 36, 110, 78, 0xffffff).setStrokeStyle(1, 0xb8a888));
-      c.add(this.add.image(x, y, 'lagoon_how', i).setOrigin(0));
-      c.add(this.add.rectangle(x + 52, y - 3, 30, 8, 0xf2e6a8, 0.8));
-      c.add(this.add.circle(x + 2, y + 2, 8, COLORS.red).setStrokeStyle(1, COLORS.ink));
-      c.add(this.add.text(x + 2, y + 2, String(i + 1), textStyle(8, TEXT.cream)).setOrigin(0.5));
-      c.add(
+      const stepCard = this.add.container(x + 108, y + 40);
+      const sx = -(x + 108);
+      const sy = -(y + 40);
+      stepCard.add([
+        this.add.rectangle(sx + x + 52, sy + y + 36, 110, 78, 0xffffff).setStrokeStyle(1, 0xb8a888),
+        this.add.image(sx + x, sy + y, 'lagoon_how', i).setOrigin(0),
+        this.add.rectangle(sx + x + 52, sy + y - 3, 30, 8, 0xf2e6a8, 0.8),
+        this.add.circle(sx + x + 2, sy + y + 2, 8, COLORS.red).setStrokeStyle(1, COLORS.ink),
+        this.add
+          .text(sx + x + 2, sy + y + 2, String(i + 1), textStyle(8, TEXT.cream))
+          .setOrigin(0.5),
         this.add.text(
-          x + 112,
-          y,
+          sx + x + 112,
+          sy + y,
           t(`pupLagoon.how.step${i + 1}.title`),
           textStyle(8, TEXT.red, { wordWrap: { width: 104 } }),
         ),
-      );
-      c.add(
         this.add.text(
-          x + 112,
-          y + 24,
+          sx + x + 112,
+          sy + y + 24,
           t(`pupLagoon.how.step${i + 1}.text`),
           textStyle(8, TEXT.ink, { wordWrap: { width: 104 } }),
         ),
-      );
+      ]);
+      c.add(stepCard);
+      if (!reduced) {
+        stepCard.setScale(0.88).setAlpha(0);
+        this.tweens.add({
+          targets: stepCard,
+          scale: 1,
+          alpha: 1,
+          duration: 240,
+          delay: 140 + i * 110,
+          ease: 'Back.easeOut',
+        });
+      }
     }
-    c.add(
-      new Button(this, 0, 124, t('pupLagoon.how.go'), () => this.toVacantCard(), {
-        width: 120,
-        height: 24,
-        fill: COLORS.yellow,
-        textColor: TEXT.red,
-        fontSize: 16,
-      }),
-    );
+    const goBtn = new Button(this, 0, 124, t('pupLagoon.how.go'), () => this.toVacantCard(), {
+      width: 120,
+      height: 24,
+      fill: COLORS.yellow,
+      textColor: TEXT.red,
+      fontSize: 16,
+    });
+    c.add(goBtn);
+    if (!reduced) {
+      this.tweens.add({
+        targets: goBtn,
+        scaleX: 1.05,
+        scaleY: 1.05,
+        duration: 550,
+        delay: 600,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut',
+      });
+    }
     c.setScale(0.9).setAlpha(0);
     this.tweens.add({ targets: c, scale: 1, alpha: 1, duration: 220, ease: 'Back.easeOut' });
     this.cameras.main.ignore(c);

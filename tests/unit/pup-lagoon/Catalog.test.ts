@@ -11,9 +11,9 @@ import {
 import { TAGS } from '../../../src/minigames/pup-lagoon/logic/types';
 
 describe('menu and stall data', () => {
-  it('has the 46 menu items from §7 with valid stalls and tags', () => {
-    expect(MENU).toHaveLength(46);
-    expect(new Set(MENU.map((m) => m.key)).size).toBe(46);
+  it('has the 57 menu items with valid stalls and tags', () => {
+    expect(MENU).toHaveLength(57);
+    expect(new Set(MENU.map((m) => m.key)).size).toBe(57);
     const stalls = new Set(STALLS.map((s) => s.key));
     for (const m of MENU) {
       expect(stalls.has(m.stall)).toBe(true);
@@ -35,7 +35,7 @@ describe('Catalog', () => {
   });
 
   it('opens every food stall from the first vacant, and the water station with the Tumbler (L-030)', () => {
-    for (const tier of [1, 2, 3, 4] as const) expect(openStalls(tier, [])).toHaveLength(8);
+    for (const tier of [1, 2, 3, 4] as const) expect(openStalls(tier, [])).toHaveLength(10);
     expect(openStalls(1, [])).not.toContain('water');
     expect(openStalls(1, ['tumbler'])).toContain('water');
   });

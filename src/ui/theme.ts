@@ -1,12 +1,11 @@
 /**
- * Shared UI look (SPEC §6 UI style): cream panels with a dark outline, Pixelify Sans text.
- * ₱ and ★ are missing from Pixelify Sans, so the font stack falls back to monospace for those
- * glyphs until the art pass adds a pixel ₱ (DECISIONS H-005).
+ * Shared UI look (SPEC §6 UI style): cream panels with a dark outline, sleek rounded Nunito text.
+ * Supports ₱, ★, and Filipino diacritics cleanly without monospace glyph fallbacks.
  */
 import type Phaser from 'phaser';
 import { RENDER_SCALE } from './view';
 
-export const FONT = '"Pixelify Sans", monospace';
+export const FONT = '"Nunito", system-ui, -apple-system, sans-serif';
 
 export const COLORS = {
   ink: 0x2b2233,
@@ -34,7 +33,14 @@ export function textStyle(
   color: string = TEXT.ink,
   extra: Phaser.Types.GameObjects.Text.TextStyle = {},
 ): Phaser.Types.GameObjects.Text.TextStyle {
-  return { fontFamily: FONT, fontSize: `${size}px`, color, resolution: RENDER_SCALE, ...extra };
+  return {
+    fontFamily: FONT,
+    fontSize: `${size}px`,
+    fontStyle: size >= 14 ? '700' : '600',
+    color,
+    resolution: RENDER_SCALE,
+    ...extra,
+  };
 }
 
 /** Scene keys, so scenes never mistype each other's names. */

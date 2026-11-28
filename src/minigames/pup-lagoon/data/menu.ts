@@ -1,5 +1,5 @@
 /**
- * The Lagoon menu: 46 items (SPEC-pup-lagoon §7). Prices are game prices; tune them here.
+ * The Lagoon menu: 57 items (SPEC-pup-lagoon §7 + tinapay & ricebox stalls). Prices are game prices; tune them here.
  * Names are i18n keys: pupLagoon.food.<key>.
  */
 import type { MenuItem, StallKey, Tag } from '../logic/types';
@@ -37,7 +37,6 @@ export const MENU: readonly MenuItem[] = [
   item('squidball', 'tusok', 15, ['tusok'], 1, tusok),
   item('tokneneng', 'tusok', 18, ['tusok'], 2, tusok),
   item('kwekkwek', 'tusok', 20, ['tusok'], 2, tusok),
-  item('fewa', 'tusok', 30, ['tusok'], 3, tusok),
   // Palamig ni Ate Joy
   item('gulaman', 'palamig', 20, ['inumin', 'malamig', 'matamis'], 1),
   item('melon', 'palamig', 20, ['inumin', 'malamig', 'matamis'], 1),
@@ -59,6 +58,13 @@ export const MENU: readonly MenuItem[] = [
   item('puto', 'merienda', 15, ['merienda', 'matamis'], 1),
   item('bananacue', 'merienda', 20, ['merienda', 'matamis'], 2),
   item('siopao', 'merienda', 35, ['merienda'], 3),
+  // Tinapay & Sandwich ni Ate Nena
+  item('fewa', 'tinapay', 30, ['merienda'], 3),
+  item('cheese_bread', 'tinapay', 15, ['merienda'], 2),
+  item('ensaymada', 'tinapay', 20, ['merienda', 'matamis'], 2),
+  item('egg_sandwich', 'tinapay', 25, ['merienda'], 2),
+  item('ham_cheese', 'tinapay', 35, ['merienda'], 3),
+  item('tuna_sandwich', 'tinapay', 35, ['merienda'], 3),
   // Lugawan sa Lagoon
   item('lugaw', 'lugawan', 25, ['sabaw'], 3),
   item('tokwa', 'lugawan', 30, ['maanghang'], 2),
@@ -76,6 +82,13 @@ export const MENU: readonly MenuItem[] = [
   item('longsilog', 'silog', 65, ['kanin'], 6),
   item('tapsilog', 'silog', 75, ['kanin'], 6),
   item('sisig_rice', 'silog', 80, ['kanin', 'maanghang'], 6),
+  // Siomai & Rice Box ni Kuya Ben
+  item('siomai_rice', 'ricebox', 50, ['kanin'], 5),
+  item('shanghai_rice', 'ricebox', 55, ['kanin'], 5),
+  item('spicy_siomai_rice', 'ricebox', 55, ['kanin', 'maanghang'], 5),
+  item('chaofan_siomai', 'ricebox', 60, ['kanin'], 5),
+  item('burger_steak', 'ricebox', 60, ['kanin'], 5),
+  item('chicken_fillet', 'ricebox', 65, ['kanin'], 6),
   // Water station (needs the Tumbler; once per vacant)
   item('tumbler_water', 'water', 0, ['inumin'], 0, { requires: 'tumbler' }),
 ];

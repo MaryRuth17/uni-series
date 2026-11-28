@@ -18,9 +18,11 @@ const ALL: ReadonlySet<StallKey> = new Set([
   'palamig',
   'ihaw',
   'merienda',
+  'tinapay',
   'lugawan',
   'halohalo',
   'silog',
+  'ricebox',
 ]);
 
 describe('RunRules (owner rules, DECISIONS L-034)', () => {

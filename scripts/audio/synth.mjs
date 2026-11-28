@@ -143,6 +143,35 @@ export class Mix {
     }
   }
 
+  /** Warm wooden marimba / kalimba mallet tone: fundamental + brief woody 4th-harmonic bar transient. */
+  marimba(t, midi, vel, bus = 'melody') {
+    const f = midiHz(midi);
+    const start = Math.round(t * SR);
+    const n = Math.round(0.75 * SR);
+    for (let k = 0; k < n; k++) {
+      const s = k / SR;
+      const env = Math.min(1, s / 0.0025) * Math.exp(-s * (4.8 + f / 700));
+      if (s > 0.01 && env < 1e-4) break;
+      const overtone = 0.28 * Math.sin(TAU * f * 3.98 * s) * Math.exp(-s * 34);
+      const v = Math.sin(TAU * f * s) + overtone;
+      this.add(bus, start + k, v * env * vel * 0.22);
+    }
+  }
+
+  /** Crisp wooden rimshot / clave tap for light acoustic percussion. */
+  rim(t, vel, random, bus = 'drums') {
+    const start = Math.round(t * SR);
+    let ph = 0;
+    for (let k = 0; k < 0.08 * SR; k++) {
+      const s = k / SR;
+      const f = 540 + 380 * Math.exp(-s * 140);
+      ph += (TAU * f) / SR;
+      const click = (random() * 2 - 1) * Math.exp(-s * 160) * 0.35;
+      const body = Math.sin(ph) * Math.exp(-s * 55);
+      this.add(bus, start + k, (body + click) * Math.min(1, s / 0.001) * vel * 0.22);
+    }
+  }
+
   snare(t, vel, random, bus = 'drums') {
     const start = Math.round(t * SR);
     let lp = 0;

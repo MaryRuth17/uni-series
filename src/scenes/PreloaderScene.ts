@@ -1,7 +1,7 @@
 /**
  * PreloaderScene (SPEC-homepage §6 transitions)
  * Shows: the loading bar as a road with a tiny jeepney whose signboard shows the percent, and
- * "Sumasakay na…". Loads the art packs (assets/home, assets/common) and Pixelify Sans, then starts the
+ * "Sumasakay na…". Loads the art packs (assets/home, assets/common) and Nunito, then starts the
  * toast layer and the Landing screen.
  * Listens to: the loader's 'progress' event.
  */
@@ -13,7 +13,7 @@ import { services } from '../core/services';
 import { FADE_MS, PALETTE } from '../home/config';
 import { COLORS, SCENES, TEXT, textStyle } from '../ui/theme';
 
-const FONT_URL = 'assets/fonts/PixelifySans.ttf';
+const FONT_URL = 'assets/fonts/Nunito.ttf';
 const ROAD = { x: 160, y: 200, w: 320 };
 
 export class PreloaderScene extends Phaser.Scene {
@@ -63,10 +63,13 @@ export class PreloaderScene extends Phaser.Scene {
   }
 }
 
-/** Load Pixelify Sans before any scene draws text (SPEC §6). Fails quietly to the fallback font. */
+/** Load Nunito before any scene draws text. Fails quietly to the fallback font. */
 async function loadFont(): Promise<void> {
   if (typeof FontFace === 'undefined' || !document.fonts) return;
-  const face = new FontFace('Pixelify Sans', `url(${FONT_URL})`);
+  const face = new FontFace('Nunito', `url(${FONT_URL})`, { weight: '400 800' });
   document.fonts.add(await face.load());
-  await document.fonts.load('16px "Pixelify Sans"');
+  await Promise.all([
+    document.fonts.load('600 16px "Nunito"'),
+    document.fonts.load('700 16px "Nunito"'),
+  ]);
 }

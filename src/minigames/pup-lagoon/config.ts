@@ -31,9 +31,11 @@ export const STALLS_OPEN_FROM: Readonly<Record<Exclude<StallKey, 'water'>, Tier>
   palamig: 1,
   ihaw: 1,
   merienda: 1,
+  tinapay: 1,
   lugawan: 1,
   halohalo: 1,
   silog: 1,
+  ricebox: 1,
 };
 
 /** Vacant n uses SLOT_ORDER[n % 3], so the tutorial (n = 1) is tanghali, then hapon, umaga, … (OC-4). */
@@ -238,10 +240,12 @@ export const STALL_COUNTER: Readonly<Record<StallKey, number>> = {
   karinderya: 0xd22f2a,
   halohalo: 0xd22f2a,
   silog: 0xd22f2a,
+  ricebox: 0xd22f2a,
   tusok: 0x6fa65a,
   palamig: 0x6fa65a,
   ihaw: 0x6fa65a,
   merienda: 0x6fa65a,
+  tinapay: 0x6fa65a,
   lugawan: 0x6fa65a,
   water: 0x3b6fb6,
 };
@@ -268,16 +272,18 @@ export const LAGOON_MUSIC = 'music_lagoon';
 /** Crowd murmur, birds and leaves under the music (L-035). */
 export const LAGOON_AMBIENCE = 'amb_lagoon';
 
-/** Stall order for keys 1–8 (§10.3, §7 order). */
+/** Stall order for keys 1–0 (§10.3, §7 order). */
 export const STALL_KEYS_ORDER: readonly StallKey[] = [
   'karinderya',
   'tusok',
   'palamig',
   'ihaw',
   'merienda',
+  'tinapay',
   'lugawan',
   'halohalo',
   'silog',
+  'ricebox',
 ];
 
 /** The arrival intro (LagoonOpeningScene): pan across the PUP panorama, then How to play. */

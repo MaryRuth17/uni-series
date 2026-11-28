@@ -249,6 +249,39 @@ function tumbler() {
   return p;
 }
 
+function sandwich(filling, accent = null) {
+  const p = new Pix(S, S);
+  // Two stacked triangular sandwich halves.
+  p.ellipse(12, 19, 9, 2, '#00000030');
+  for (const [ox, oy] of [
+    [0, 2],
+    [2, -3],
+  ]) {
+    for (let k = 0; k < 8; k++) {
+      p.hline(6 + ox, 15 + oy - k, 12 - k, '#f7f3ea');
+      p.px(6 + ox, 15 + oy - k, '#c98a4a');
+    }
+    p.hline(6 + ox, 16 + oy, 12, '#c98a4a');
+    p.hline(7 + ox, 13 + oy, 9, filling);
+    if (accent) p.hline(7 + ox, 12 + oy, 8, accent);
+  }
+  p.outline(INK);
+  return p;
+}
+
+function siomaiGroup(p, cx, cy, chili = false) {
+  for (const [dx, dy] of [
+    [-3, -2],
+    [2, -2],
+    [0, 1],
+  ]) {
+    p.rect(cx + dx - 1, cy + dy, 4, 3, '#f2c87a');
+    p.hline(cx + dx - 1, cy + dy, 4, '#fbe27a');
+    p.px(cx + dx, cy + dy, chili ? '#d94b3d' : '#f08a3c');
+    if (chili) p.px(cx + dx + 1, cy + dy + 1, '#3a9a6a');
+  }
+}
+
 const ITEMS = {
   adobo_meal: () => meal(sauce('#6b3a22', '#8a4a2a')),
   curry_meal: () => meal(sauce('#d9a441', '#f0c16a')),
@@ -311,6 +344,42 @@ const ITEMS = {
   puto,
   bananacue: () => skewer(['#d9902a', '#d9902a'], { size: 3, gap: 7 }),
   siopao,
+  cheese_bread: () => {
+    const p = new Pix(S, S);
+    p.ellipse(12, 16, 8, 3, '#00000025');
+    p.ellipse(12, 13, 8, 5, '#c98a4a');
+    p.ellipse(11, 11, 6, 3, '#e0a868');
+    for (const [x, y] of [
+      [9, 10],
+      [12, 9],
+      [14, 11],
+      [10, 12],
+      [13, 12],
+    ])
+      p.rect(x, y, 2, 2, '#f7d046');
+    p.outline(INK);
+    return p;
+  },
+  ensaymada: () => {
+    const p = new Pix(S, S);
+    p.ellipse(12, 17, 9, 3, '#00000025');
+    p.ellipse(12, 13, 8, 6, '#e8b872');
+    p.ellipse(12, 11, 6, 4, '#fff4dc');
+    for (const [x, y] of [
+      [8, 10],
+      [11, 9],
+      [14, 10],
+      [10, 12],
+      [13, 12],
+      [12, 14],
+    ])
+      p.rect(x, y, 2, 1, '#f7d046');
+    p.outline(INK);
+    return p;
+  },
+  egg_sandwich: () => sandwich('#fbe27a', '#ffffff'),
+  ham_cheese: () => sandwich('#e98ab0', '#f2c14e'),
+  tuna_sandwich: () => sandwich('#e8a888', '#5e9c48'),
   lugaw: () =>
     bowl('#efe6cc', (p) => {
       p.px(10, 11, '#3a9a6a');
@@ -393,6 +462,41 @@ const ITEMS = {
       p.ellipse(x, y, 4, 3, '#2b2233');
       chunks('#a0522d', 3)(p, x, y);
       p.px(x + 1, y - 1, '#f2c14e');
+    }),
+  siomai_rice: () => meal((p, x, y) => siomaiGroup(p, x, y, false)),
+  shanghai_rice: () =>
+    meal((p, x, y) => {
+      for (let i = 0; i < 3; i++) {
+        p.rect(x - 3 + i * 2, y - 3 + i * 2, 6, 2, '#d98a3a');
+        p.hline(x - 3 + i * 2, y - 3 + i * 2, 6, '#f2b35a');
+      }
+      p.disc(x + 3, y - 2, 1, '#d94b3d');
+    }),
+  spicy_siomai_rice: () => meal((p, x, y) => siomaiGroup(p, x, y, true)),
+  chaofan_siomai: () => {
+    const p = new Pix(S, S);
+    plate(p);
+    p.ellipse(8, 13, 4, 3, '#f2c94e');
+    p.px(6, 12, '#f08a3c');
+    p.px(9, 12, '#5e9c48');
+    p.px(7, 14, '#c98a4a');
+    siomaiGroup(p, 15, 13, false);
+    p.outline(INK);
+    return p;
+  },
+  burger_steak: () =>
+    meal((p, x, y) => {
+      p.ellipse(x, y + 1, 5, 3, '#6b3a22');
+      p.ellipse(x - 1, y - 1, 3, 2, '#5a2a12');
+      p.ellipse(x + 2, y + 1, 3, 2, '#7a4228');
+      p.px(x - 1, y - 1, '#efe6cc');
+      p.px(x + 2, y + 1, '#efe6cc');
+    }),
+  chicken_fillet: () =>
+    meal((p, x, y) => {
+      p.ellipse(x, y, 4, 3, '#d98a3a');
+      p.hline(x - 3, y - 1, 6, '#f2b35a');
+      p.hline(x - 2, y, 5, '#efe6cc');
     }),
   tumbler_water: tumbler,
 };

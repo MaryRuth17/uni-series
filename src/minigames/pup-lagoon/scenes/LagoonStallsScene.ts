@@ -11,7 +11,7 @@
  * listahan unfinished, or money that can no longer buy anything still needed, is game over
  * (LagoonResultScene). Every tap makes one sound (L-037). The guided round (L-039) rings what to tap next
  * and explains it in a speech bubble: on for the first vacant, toggled by the Guide button.
- * Listens to: pointer; keyboard (1–8 stalls, ← / → previous / next, B = Bayad, K = Kain na!, Esc = close,
+ * Listens to: pointer; keyboard (1–0 stalls, ← / → previous / next, B = Bayad, K = Kain na!, Esc = close,
  * P = pause); LagoonVacant events (paid, ticked, grillDone, soldOut); the frame update (grill, ≤ 100 ms).
  */
 import Phaser from 'phaser';
@@ -91,6 +91,8 @@ export class LagoonStallsScene extends Phaser.Scene {
   /** The guided round (L-039): on for the first vacant, toggled by the Guide button. */
   private guide: Guide | null = null;
   private guideLayer!: Phaser.GameObjects.Container;
+  private guideTweens: Phaser.Tweens.Tween[] = [];
+  private lastGuideKind: GuideStep['kind'] | null = null;
   private placed: Money = emptyMoney();
   private note = '';
   private ended = false;
@@ -128,7 +130,13 @@ export class LagoonStallsScene extends Phaser.Scene {
     this.modalKind = null;
     this.sauceFor = null;
     this.guideLayer = this.add.container(0, 0).setDepth(95);
-    this.guide = this.gen.def.special === 'tutorial' ? new Guide(this.gen.route.complete) : null;
+    this.guideTweens = [];
+    this.lastGuideKind = null;
+    this.guide =
+      this.gen.def.special === 'tutorial' &&
+      !services().save.data.settings.tutorialSeen['pup-lagoon']
+        ? new Guide(this.gen.route.complete)
+        : null;
     this.goTo(this.order[0] ?? 'karinderya');
     this.bindKeys();
     services().audio.playMusic(LAGOON_MUSIC, this);
@@ -204,13 +212,14 @@ export class LagoonStallsScene extends Phaser.Scene {
       if (on)
         this.tabs.add(this.add.rectangle(x + w / 2, y + FRONT.tabsH - 1, w - 4, 2, COLORS.red));
       const dim = !on && this.locked;
+      const tabFont = this.order.length >= 10 ? 7 : 8;
       this.tabs.add(
         this.add
           .text(
             x + w / 2,
             y + FRONT.tabsH / 2,
             t(`pupLagoon.tab.${stall}`),
-            textStyle(8, on ? TEXT.red : dim ? TEXT.grey : TEXT.ink),
+            textStyle(tabFont, on ? TEXT.red : dim ? TEXT.grey : TEXT.ink),
           )
           .setOrigin(0.5),
       );
@@ -993,13 +1002,22 @@ export class LagoonStallsScene extends Phaser.Scene {
     this.updateGuide();
   }
 
-  /** Redraw the guide: a pulsing gold ring on what to tap next and a speech bubble saying why. */
+  private clearGuideTweens(): void {
+    for (const tw of this.guideTweens) tw.remove();
+    this.guideTweens = [];
+  }
+
+  /** Redraw the guide: 4-panel spotlight dim, pulsing double ring, bouncing arrow, and speech bubble. */
   private updateGuide(): void {
     if (!this.guideLayer) return;
-    this.tweens.killTweensOf(this.guideLayer.list);
+    this.clearGuideTweens();
     this.guideLayer.removeAll(true);
     const g = this.guide;
-    if (!g || this.ended) return;
+    if (!g || this.ended) {
+      this.lastGuideKind = null;
+      return;
+    }
+    const reduced = services().save.data.settings.reducedMotion;
     const s = g.step({
       stall: this.stall,
       order: this.vacant.currentOrder.map((o) => ({ item: o.item, sauce: o.sauce })),
@@ -1009,48 +1027,237 @@ export class LagoonStallsScene extends Phaser.Scene {
       total: this.vacant.orderTotal(),
       grilling: this.vacant.isGrilling,
     });
+    const isNewStep = this.lastGuideKind !== s.kind;
+    this.lastGuideKind = s.kind;
     const target = this.guideTarget(s);
-    if (target) {
-      const ring = this.add
-        .rectangle(target.x - 2, target.y - 2, target.w + 4, target.h + 4)
-        .setOrigin(0)
-        .setStrokeStyle(2, COLORS.gold);
-      this.guideLayer.add(ring);
-      if (!services().save.data.settings.reducedMotion)
-        this.tweens.add({ targets: ring, alpha: 0.3, duration: 500, yoyo: true, repeat: -1 });
-    }
-    // The bubble sits over the banner, or over the tray bar while paying, so it never hides a target.
+
+    // The bubble sits over the banner (shifted slightly for tab arrows), or over the tray bar while paying.
     const paying = this.modalKind === 'pay';
-    const B = paying ? { y: 317, h: 42 } : { y: 44, h: 56 };
-    this.guideLayer.add(panel(this, VIEW.mapRight / 2, B.y + B.h / 2, VIEW.mapRight - 16, B.h));
     const ack = s.kind === 'intro' || s.kind === 'sukli' || s.kind === 'offPlan';
-    this.guideLayer.add(
+    const B = paying
+      ? { y: 317, h: 42 }
+      : s.kind === 'tab'
+        ? { y: 66, h: 52 }
+        : { y: 42, h: ack ? 54 : 46 };
+
+    // 1. 4-rectangle spotlight dim backdrop (leaves target bright and directly clickable).
+    if (target) {
+      const pad = 3;
+      const tx = Math.max(0, target.x - pad);
+      const ty = Math.max(0, target.y - pad);
+      const tr = Math.min(640, target.x + target.w + pad);
+      const tb = Math.min(360, target.y + target.h + pad);
+      const dimAlpha = 0.54;
+      if (ty > 0)
+        this.guideLayer.add(this.add.rectangle(0, 0, 640, ty, COLORS.ink, dimAlpha).setOrigin(0));
+      if (tb < 360)
+        this.guideLayer.add(
+          this.add.rectangle(0, tb, 640, 360 - tb, COLORS.ink, dimAlpha).setOrigin(0),
+        );
+      if (tx > 0 && tb > ty)
+        this.guideLayer.add(
+          this.add.rectangle(0, ty, tx, tb - ty, COLORS.ink, dimAlpha).setOrigin(0),
+        );
+      if (tr < 640 && tb > ty)
+        this.guideLayer.add(
+          this.add.rectangle(tr, ty, 640 - tr, tb - ty, COLORS.ink, dimAlpha).setOrigin(0),
+        );
+
+      // 2. Dual-layer pulsing highlight ring centered on the target.
+      const cx = target.x + target.w / 2;
+      const cy = target.y + target.h / 2;
+      const outer = this.add
+        .rectangle(cx, cy, target.w + 10, target.h + 10)
+        .setStrokeStyle(3, COLORS.cream, 0.9);
+      const inner = this.add
+        .rectangle(cx, cy, target.w + 4, target.h + 4)
+        .setStrokeStyle(2.5, COLORS.gold, 1);
+      this.guideLayer.add([outer, inner]);
+      if (!reduced) {
+        if (isNewStep) {
+          outer.setScale(1.14);
+          inner.setScale(1.1);
+          this.guideTweens.push(
+            this.tweens.add({
+              targets: [outer, inner],
+              scale: 1,
+              duration: 200,
+              ease: 'Back.easeOut',
+            }),
+          );
+        }
+        this.guideTweens.push(
+          this.tweens.add({
+            targets: outer,
+            scaleX: 1.06,
+            scaleY: 1.06,
+            alpha: 0.25,
+            duration: 550,
+            yoyo: true,
+            repeat: -1,
+            ease: 'Sine.easeInOut',
+          }),
+          this.tweens.add({
+            targets: inner,
+            scaleX: 1.03,
+            scaleY: 1.03,
+            duration: 550,
+            yoyo: true,
+            repeat: -1,
+            ease: 'Sine.easeInOut',
+          }),
+        );
+      }
+
+      // 3. Bouncing directional pointer arrow pointing straight at the target.
+      const arrow = this.makeGuideArrow(s.kind, target);
+      this.guideLayer.add(arrow.obj);
+      if (!reduced) {
+        this.guideTweens.push(
+          this.tweens.add({
+            targets: arrow.obj,
+            x: arrow.obj.x + arrow.dx,
+            y: arrow.obj.y + arrow.dy,
+            duration: 400,
+            yoyo: true,
+            repeat: -1,
+            ease: 'Sine.easeInOut',
+          }),
+        );
+      }
+    } else {
+      this.guideLayer.add(this.add.rectangle(0, 0, 640, 360, COLORS.ink, 0.35).setOrigin(0));
+    }
+
+    // 4. Speech bubble (+ animated entrance on new step).
+    const bubble = this.add.container(VIEW.mapRight / 2, B.y + B.h / 2);
+    bubble.add(panel(this, 0, 0, VIEW.mapRight - 16, B.h));
+    const leftEdge = -(VIEW.mapRight - 16) / 2 + 10;
+    const canSkip = s.kind !== 'offPlan';
+    const wrapWidth = ack ? (canSkip ? 316 : 400) : 388;
+    bubble.add(
       this.add
         .text(
-          18,
-          B.y + B.h / 2,
+          leftEdge,
+          0,
           this.guideText(s),
-          textStyle(8, TEXT.ink, { wordWrap: { width: ack ? 400 : 470 } }),
+          textStyle(8, TEXT.ink, { wordWrap: { width: wrapWidth } }),
         )
         .setOrigin(0, 0.5),
     );
-    if (ack) {
-      this.guideLayer.add(
+    if (canSkip) {
+      const skipX = ack ? 128 : 200;
+      bubble.add(
         new Button(
           this,
-          VIEW.mapRight - 48,
-          B.y + B.h / 2,
-          t(s.kind === 'offPlan' ? 'pupLagoon.guide.ok' : 'pupLagoon.guide.next'),
+          skipX,
+          0,
+          t('pupLagoon.guide.skip'),
           () => {
-            if (s.kind === 'intro') g.ackIntro();
-            else if (s.kind === 'sukli') g.ackSukli();
-            else this.guide = null;
+            services().settings.setTutorialSeen('pup-lagoon', true);
+            this.guide = null;
             this.updateGuide();
           },
-          { width: 64, height: 22, fill: COLORS.yellow, textColor: TEXT.red },
+          { width: 80, height: 20 },
         ),
       );
     }
+    if (ack) {
+      const nextBtn = new Button(
+        this,
+        (VIEW.mapRight - 16) / 2 - 40,
+        0,
+        t(s.kind === 'offPlan' ? 'pupLagoon.guide.ok' : 'pupLagoon.guide.next'),
+        () => {
+          if (s.kind === 'intro') g.ackIntro();
+          else if (s.kind === 'sukli') g.ackSukli();
+          else this.guide = null;
+          this.updateGuide();
+        },
+        { width: 64, height: 22, fill: COLORS.yellow, textColor: TEXT.red },
+      );
+      bubble.add(nextBtn);
+      if (!reduced) {
+        this.guideTweens.push(
+          this.tweens.add({
+            targets: nextBtn,
+            scaleX: 1.06,
+            scaleY: 1.06,
+            duration: 500,
+            yoyo: true,
+            repeat: -1,
+            ease: 'Sine.easeInOut',
+          }),
+        );
+      }
+    }
+    this.guideLayer.add(bubble);
+    if (!reduced && isNewStep) {
+      bubble.setScale(0.95).setAlpha(0);
+      this.guideTweens.push(
+        this.tweens.add({
+          targets: bubble,
+          scale: 1,
+          alpha: 1,
+          duration: 180,
+          ease: 'Back.easeOut',
+        }),
+      );
+    }
+  }
+
+  /** Build an outlined gold pointer arrow oriented cleanly toward the active guide target. */
+  private makeGuideArrow(
+    kind: GuideStep['kind'],
+    target: { x: number; y: number; w: number; h: number },
+  ): { obj: Phaser.GameObjects.Graphics; dx: number; dy: number } {
+    const cx = target.x + target.w / 2;
+    const cy = target.y + target.h / 2;
+    type Dir = 'down' | 'up' | 'left' | 'right';
+    let dir: Dir = 'down';
+    let x = cx;
+    let y = target.y - 13;
+
+    if (kind === 'intro' || kind === 'offPlan' || kind === 'sukli') {
+      dir = 'right';
+      x = target.x - 15;
+      y = cy;
+    } else if (kind === 'tab' || kind === 'place') {
+      dir = 'up';
+      x = cx;
+      y = target.y + target.h + 14;
+    } else if (kind === 'closeSauce') {
+      dir = 'left';
+      x = target.x + target.w + 14;
+      y = cy;
+    }
+
+    const g = this.add.graphics({ x, y });
+    g.lineStyle(2, COLORS.ink, 1);
+    g.fillStyle(COLORS.gold, 1);
+    // Arrow points downward (+Y) by default; rotate for other directions.
+    g.beginPath();
+    g.moveTo(-4, -9);
+    g.lineTo(4, -9);
+    g.lineTo(4, -1);
+    g.lineTo(9, -1);
+    g.lineTo(0, 9);
+    g.lineTo(-9, -1);
+    g.lineTo(-4, -1);
+    g.closePath();
+    g.fillPath();
+    g.strokePath();
+
+    const angle: Record<Dir, number> = { down: 0, up: 180, right: -90, left: 90 };
+    const bounce: Record<Dir, [number, number]> = {
+      down: [0, 5],
+      up: [0, -5],
+      right: [5, 0],
+      left: [-5, 0],
+    };
+    g.setAngle(angle[dir]);
+    const [dx, dy] = bounce[dir];
+    return { obj: g, dx, dy };
   }
 
   private guideText(s: GuideStep): string {
@@ -1143,7 +1350,7 @@ export class LagoonStallsScene extends Phaser.Scene {
     if (!kb) return;
     STALL_KEYS_ORDER.forEach((stall, i) =>
       kb.on(
-        `keydown-${['ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN', 'EIGHT'][i]}`,
+        `keydown-${['ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN', 'EIGHT', 'NINE', 'ZERO'][i]}`,
         () => {
           if (this.order.includes(stall)) this.goTo(stall);
         },
@@ -1175,7 +1382,10 @@ export class LagoonStallsScene extends Phaser.Scene {
       if (this.modal) this.closeModal();
     });
     kb.on('keydown-P', () => this.pause());
-    this.events.once('shutdown', () => kb.removeAllListeners());
+    this.events.once('shutdown', () => {
+      kb.removeAllListeners();
+      this.clearGuideTweens();
+    });
   }
 
   private pause(): void {

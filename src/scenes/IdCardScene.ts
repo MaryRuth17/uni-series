@@ -166,6 +166,7 @@ export class IdCardScene extends Phaser.Scene {
       width: '110px',
       height: '16px',
       fontFamily: FONT,
+      fontWeight: '600',
       fontSize: '10px',
       padding: '0 4px',
       border: '1px solid #2B2233',
